@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Open input image with leptonica library
-	Pix* image = pixRead("resources/gradiente.png");
+	Pix* image = pixRead("resources/sizes/2160p-47x94_47x94_47x94_47x94_47x94.png");
 	api->SetImage(image);
 	api->Recognize(0);
 	// Get OCR result
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 	printf("OCR output:\n%s", outText);*/
 
 	tesseract::ResultIterator* ri = api->GetIterator();
-	tesseract::PageIteratorLevel level = tesseract::RIL_WORD; //Mirar con symbol?
+	tesseract::PageIteratorLevel level = tesseract::RIL_SYMBOL; //Mirar con symbol?
 	if (ri != 0) {
 		do {
 			const char* word = ri->GetUTF8Text(level);
@@ -36,7 +36,8 @@ int main(int argc, char* argv[]) {
 				std::cout << "confidence: " << conf << " ";
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
 				std::cout << "height: " << y2 - y1 << " ";
-				std::cout << "word: " << word << std::endl;
+				std::cout << "width: " << x2 - x1 << " ";
+				std::cout << "char: " << word << std::endl;
 			}
 
 			delete[] word;
