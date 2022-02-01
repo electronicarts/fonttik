@@ -76,7 +76,7 @@ void GenerateLuminanceMap()
 
 int main(int argc, char* argv[]) {
 	GenerateLuminanceMap();
-	return 0;
+	
 	char* outText;
 	Configuration config("config.json");
 
