@@ -7,12 +7,20 @@
 #include <leptonica/allheaders.h>
 #include <iostream>
 
+#include "Configuration.h"
+#include "nlohmann/json.hpp"
+
 int main(int argc, char* argv[]) {
 	char* outText;
+	Configuration config("config.json");
+
+	config.setActiveResolution((argc > 1) ? atoi(argv[1]) : 1080);
+
+	std::cout << config.getHeightRequirement() << "\t" << config.getContrastRequirement() << std::endl;
 
 	tesseract::TessBaseAPI* api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with English, without specifying tessdata path
-	if (api->Init("tessdata/", "eng")) {
+	if (api->Init("tessdata/",config.getLanguage().c_str())) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
@@ -50,5 +58,5 @@ int main(int argc, char* argv[]) {
 	//delete[] outText;
 	pixDestroy(&image);
 	std::cin.get();
-	return 3;
+	return 0;
 }

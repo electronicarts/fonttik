@@ -1,0 +1,21 @@
+{
+  "language": "eng",
+  "contrast": 4.5,
+
+  "resolutions": {
+    "720": {
+      "width": 4,
+      "height": 19
+    },
+
+    "1080": {
+      "width": 4,
+      "height": 28
+    },
+
+    "2160": {
+      "width": 14,
+      "height": 92
+    }
+  }
+}
