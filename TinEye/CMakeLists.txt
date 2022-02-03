@@ -7,6 +7,7 @@ project ("TinEye")
 
 #Source files for compilation
 file(GLOB_RECURSE sources src/*.cpp src/*.h)
+file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -21,14 +22,26 @@ include_directories(${Tesseract_INCLUDE_DIRS})
 # Add source to this project's executable.
 add_executable (TinEye ${sources})
 
-target_link_libraries(TinEye ${OpenCV_LIBS})
-target_link_libraries(TinEye ${Tesseract_LIBRARIES})
-target_link_libraries(TinEye nlohmann_json nlohmann_json::nlohmann_json)
-# TODO: Add tests and install targets if needed.
+set(Tineye_Libs ${OpenCV_LIBS} ${Tesseract_LIBRARIES} nlohmann_json nlohmann_json::nlohmann_json)
+
+target_link_libraries(TinEye ${Tineye_Libs})
+
+
+#Unit tests
+enable_testing()
+find_package(GTest CONFIG REQUIRED)
+
+add_executable(Tineye_tests ${test_sources})
+
+target_link_libraries(Tineye_tests GTest::gtest GTest::gtest_main)
+
+target_include_directories(Tineye_tests PRIVATE src/)
+
+add_test(Tineye_tests Tineye_tests)
 
 #Copy data to destination folder
-file(COPY data/config.json DESTINATION /)
-file(COPY data/tessdata DESTINATION /)
-file(COPY data/resources DESTINATION /)
+file(COPY data/config.json DESTINATION ./)
+file(COPY data/tessdata DESTINATION ./)
+file(COPY data/resources DESTINATION ./)
 #file(COPY ${tessdata} DESTINATION tessdata)
 #file(COPY ${resources} DESTINATION resources)

@@ -4,6 +4,7 @@
   "dependencies": [
     "tesseract",
     "opencv",
-    "nlohmann-json"
+    "nlohmann-json",
+    "gtest"
   ]
 }
