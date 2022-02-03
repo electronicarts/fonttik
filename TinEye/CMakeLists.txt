@@ -27,8 +27,8 @@ target_link_libraries(TinEye nlohmann_json nlohmann_json::nlohmann_json)
 # TODO: Add tests and install targets if needed.
 
 #Copy data to destination folder
-file(COPY data/config.json DESTINATION /)
-file(COPY data/tessdata DESTINATION /)
-file(COPY data/resources DESTINATION /)
+file(COPY data/config.json DESTINATION ./)
+file(COPY data/tessdata DESTINATION ./)
+file(COPY data/resources DESTINATION ./)
 #file(COPY ${tessdata} DESTINATION tessdata)
 #file(COPY ${resources} DESTINATION resources)
