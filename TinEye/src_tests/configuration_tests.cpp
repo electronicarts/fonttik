@@ -24,3 +24,16 @@ TEST(ConfigurationTests, 2160_legal_guidelines) {
 	ASSERT_EQ(cfg.getWidthRequirement(), 14);
 	ASSERT_EQ(cfg.getHeightRequirement(), 92);
 }
+
+TEST(ConfigurationTests, missing_resolution) {
+	Configuration cfg("config.json");
+	cfg.setActiveResolution(1);
+	ASSERT_EQ(cfg.getWidthRequirement(), 4);
+	ASSERT_EQ(cfg.getHeightRequirement(), 28);
+}
+
+TEST(ConfigurationTests, missing_configuration_file) {
+	Configuration cfg("non-existent_file");
+	ASSERT_EQ(cfg.getContrastRequirement(), 4.5);
+	ASSERT_EQ(cfg.getLanguage(), "eng");
+}

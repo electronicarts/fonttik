@@ -17,24 +17,47 @@ class Configuration {
 private:
 	float contrastRatio;
 	std::string language;
-	std::unordered_map<int,ResolutionGuidelines> resolutionGuidelines;
+	std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
 	ResolutionGuidelines* activeResolution = nullptr;
 public:
 	Configuration(std::string configPath) {
 		json config;
 		std::ifstream configFile(configPath);
-		configFile >> config;
-		contrastRatio = config["contrast"];
-		language = config["language"];
+		if (configFile) {
+			configFile >> config;
+			contrastRatio = config["contrast"];
+			language = config["language"];
 
-		for (auto it = config["resolutions"].begin(); it != config["resolutions"].end(); ++it)
-		{
-			ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
-			resolutionGuidelines[atoi(it.key().c_str())] = a;
+			for (auto it = config["resolutions"].begin(); it != config["resolutions"].end(); ++it)
+			{
+				ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
+				resolutionGuidelines[atoi(it.key().c_str())] = a;
+			}
 		}
+		else {
+			//If file is not found, error and set default values
+			std::cerr << "Configuration file not found, falling back to default configuration\n";
+			std::cerr << "Contrast ratio: 4.5, language: eng" << std::endl;
+
+			contrastRatio = 4.5f;
+			language = "eng";
+		}
+
 	}
 
-	void setActiveResolution(int resolution) { activeResolution = &resolutionGuidelines.find(resolution)->second; };
+	void setActiveResolution(int resolution) {
+		auto foundRes = resolutionGuidelines.find(resolution);
+		//Check if specified resolution was added during file load
+		if (foundRes == resolutionGuidelines.end()) {
+			//If not found, error and create default for 1080
+			std::cerr << "Specified resolution not found, using 1080p, 28x4px as baseline" << std::endl;
+			resolutionGuidelines[1080] = ResolutionGuidelines(4, 28);
+			activeResolution = &resolutionGuidelines.find(1080)->second;
+		}
+		else {
+			activeResolution = &foundRes->second;
+		}
+	};
 
 	size_t getHeightRequirement() const { return activeResolution->height; }
 	size_t getWidthRequirement() const { return activeResolution->width; }
