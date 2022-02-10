@@ -8,6 +8,7 @@ project ("TinEye")
 #Source files for compilation
 file(GLOB_RECURSE sources src/*.cpp src/*.h)
 file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
+file(GLOB_RECURSE east_src east_prototype/*.cpp east_prototype/*.h)
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -22,9 +23,13 @@ include_directories(${Tesseract_INCLUDE_DIRS})
 # Add source to this project's executable.
 add_executable (TinEye ${sources})
 
+add_executable (EAST ${east_src})
+
 set(Tineye_Libs ${OpenCV_LIBS} ${Tesseract_LIBRARIES} nlohmann_json nlohmann_json::nlohmann_json)
 
 target_link_libraries(TinEye ${Tineye_Libs})
+
+target_link_libraries(EAST ${Tineye_Libs})
 
 
 #Unit tests
@@ -43,5 +48,3 @@ add_test(Tineye_tests Tineye_tests)
 file(COPY data/config.json DESTINATION ./)
 file(COPY data/tessdata DESTINATION ./)
 file(COPY data/resources DESTINATION ./)
-#file(COPY ${tessdata} DESTINATION tessdata)
-#file(COPY ${resources} DESTINATION resources)
