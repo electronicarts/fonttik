@@ -30,6 +30,10 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 
 	//Open input image with openCV
 	cv::Mat openCVMat = img.getLuminanceMap();
+
+	if (openCVMat.empty())
+		return false;
+
 	api->SetImage(openCVMat.data, openCVMat.cols, openCVMat.rows, 1, openCVMat.step);
 
 	api->Recognize(0);
@@ -58,7 +62,8 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 				//std::cout << "line: " << word << std::endl;
 				if (x2 - x1 < minimumWidth) {
 					passes = false;
-					std::cout << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 << std::endl;
+					std::cout << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 << 
+						" at (" <<x1 << ", " << y1 <<")" << std::endl;
 				}
 			}
 
@@ -69,7 +74,7 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 	delete ri;
 	//Test for height for entire lines (so it includes characters that are longer and shorter (trying to approximate hp distance)
 	ri = api->GetIterator();
-	level = tesseract::RIL_TEXTLINE;
+	level = tesseract::RIL_WORD;
 	if (ri != 0) {
 		do {
 			const char* word = ri->GetUTF8Text(level);
@@ -79,8 +84,13 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
 				if (y2 - y1 < minimumHeight) {
 					passes = false;
-					std::cout << "Line: '" << word << "' doesn't comply with minimum height, detected height: " << x2 - x1 << std::endl;
+					std::cout << "Line: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 << 
+						" at (" << x1 << ", " << y1 << ")" << std::endl;
 				}
+
+				//Check for luminance with background using retrieved bounding box
+				int averageBgLuminance = img.getAverageSurroundingLuminance(x1, x2, y1, y2);
+				std::cout << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
 			}
 
 			delete[] word;
