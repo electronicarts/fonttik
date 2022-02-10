@@ -10,7 +10,7 @@
 #include <string>
 #include "Image.h"
 
-void GenerateLuminanceMap()
+Image GenerateLuminanceMap()
 {
 	std::cout << "Enter image path:";
 	std::string fileName;
@@ -20,58 +20,103 @@ void GenerateLuminanceMap()
 	img.loadImage(fileName);
 	img.getLuminanceMap();
 	img.saveLuminanceMap(fileName + "_luminance.png");
+	return img;
 }
 
-
-
-int main(int argc, char* argv[]) {
-	GenerateLuminanceMap();
-	
-	Configuration config("config.json");
-
-	config.setActiveResolution((argc > 1) ? atoi(argv[1]) : 1080);
-
-	std::cout << config.getHeightRequirement() << "\t" << config.getContrastRequirement() << std::endl;
-
-	tesseract::TessBaseAPI* api = new tesseract::TessBaseAPI();
-	// Initialize tesseract-ocr with English, without specifying tessdata path
-	if (api->Init("tessdata/",config.getLanguage().c_str())) {
-		fprintf(stderr, "Could not initialize tesseract.\n");
-		exit(1);
-	}
-
+bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* api) {
 	// Open input image with leptonica library
-	Pix* image = pixRead("resources/sizes/2160p-47x94_47x94_47x94_47x94_47x94.png");
-	api->SetImage(image);
-	api->Recognize(0);
-	// Get OCR result
-	/*outText = api->GetUTF8Text();
-	printf("OCR output:\n%s", outText);*/
+	//Pix* image = pixRead("resources/sizes/1080p-31x40.png");
+	//api->SetImage(image);
 
+	//Open input image with openCV
+	cv::Mat openCVMat = img.getLuminanceMap();
+	api->SetImage(openCVMat.data, openCVMat.cols, openCVMat.rows, 1, openCVMat.step);
+
+	api->Recognize(0);
+
+	config.setActiveResolution(openCVMat.rows);
+
+	//Start font size test
+	bool passes = true;
+	int minimumHeight = config.getHeightRequirement(), minimumWidth = config.getWidthRequirement();
+
+
+	//Test for width of each individual character
+	//Can recognize words, letters, lines or complete blocks
 	tesseract::ResultIterator* ri = api->GetIterator();
-	tesseract::PageIteratorLevel level = tesseract::RIL_SYMBOL; //Mirar con symbol?
+	tesseract::PageIteratorLevel level = tesseract::RIL_SYMBOL;
 	if (ri != 0) {
 		do {
 			const char* word = ri->GetUTF8Text(level);
 			int x1, y1, x2, y2;
 			float conf = ri->Confidence(level);
 			if (conf >= 80) {
-				std::cout << "confidence: " << conf << " ";
+				//std::cout << "confidence: " << conf << " ";
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-				std::cout << "height: " << y2 - y1 << " ";
-				std::cout << "width: " << x2 - x1 << " ";
-				std::cout << "char: " << word << std::endl;
+				//std::cout << "height: " << y2 - y1 << " ";
+				//std::cout << "width: " << x2 - x1 << " ";
+				//std::cout << "line: " << word << std::endl;
+				if (x2 - x1 < minimumWidth) {
+					passes = false;
+					std::cout << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 << std::endl;
+				}
 			}
 
 			delete[] word;
-		} while (ri->Next(level));
+		} while (ri->Next(level) && passes);
 	}
+
+	delete ri;
+	//Test for height for entire lines (so it includes characters that are longer and shorter (trying to approximate hp distance)
+	ri = api->GetIterator();
+	level = tesseract::RIL_TEXTLINE;
+	if (ri != 0) {
+		do {
+			const char* word = ri->GetUTF8Text(level);
+			int x1, y1, x2, y2;
+			float conf = ri->Confidence(level);
+			if (conf >= 80) {
+				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
+				if (y2 - y1 < minimumHeight) {
+					passes = false;
+					std::cout << "Line: '" << word << "' doesn't comply with minimum height, detected height: " << x2 - x1 << std::endl;
+				}
+			}
+
+			delete[] word;
+		} while (ri->Next(level) && passes);
+	}
+	delete ri;
+
+	std::cout << ((passes) ? "PASS" : "FAIL") << std::endl;
+
+	//pixDestroy(&image);
+
+	return passes;
+}
+
+int main(int argc, char* argv[]) {
+	Configuration config("config.json");
+
+	//config.setActiveResolution((argc > 1) ? atoi(argv[1]) : 1080);
+
+	tesseract::TessBaseAPI* api = new tesseract::TessBaseAPI();
+	// Initialize tesseract-ocr with language specified by config
+	if (api->Init("tessdata/", config.getLanguage().c_str())) {
+		fprintf(stderr, "Could not initialize tesseract.\n");
+		exit(1);
+	}
+
+	Image img = GenerateLuminanceMap();
+
+	// Get OCR result
+
+	fontSizeCheck(img, config, api);
 
 	// Destroy used object and release memory
 	api->End();
 	delete api;
 	//delete[] outText;
-	pixDestroy(&image);
 	std::cin.get();
 	return 0;
 }
