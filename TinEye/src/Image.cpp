@@ -18,7 +18,8 @@ bool Image::loadImage(std::string filepath) {
 }
 
 cv::Mat Image::getLuminanceMap() {
-	if (!imageMatrix.empty()) {
+	//Make sure that image has been loaded and we haven't previously calculated the luminance already
+	if (!imageMatrix.empty() && luminanceMap.empty()) {
 		//Load pixel information to float matrix (so bgr values go from 0.0 to 1.0)
 		cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_32FC3); //1 channel (luminance)
 
@@ -56,6 +57,34 @@ void Image::saveLuminanceMap(std::string filepath) {
 		//Save image to same filepath
 		cv::imwrite(filepath, luminanceMap);
 	}
+}
+
+uchar Image::getAverageSurroundingLuminance(const int& x1, const int& x2, const int& y1, const int& y2, const int& marginX, const int& marginY)
+{
+	uchar lum = 0;
+
+	if (!luminanceMap.empty()) {
+		
+
+		int yMin = std::max(y1 - marginY, 0), yMax = std::min(y2 + marginY, luminanceMap.rows);
+		int xMin = std::max(x1 - marginX, 0), xMax = std::min(x2 + marginX, luminanceMap.cols);
+
+		int cumulativeLuminance=0, valuesChecked = 0;
+
+		for (int y = yMin; y < yMax; y++) {
+			for (int x = xMin; x < xMax; x++) {
+				//Only use values outside of text bounding box
+				if (!(x > x1 && x<x2 && y>y1 && y < y2)) {
+					cumulativeLuminance += luminanceMap.at<uchar>(y, x);
+					valuesChecked++;
+				}
+			}
+		}
+
+		lum = cumulativeLuminance / valuesChecked;
+	}
+	
+	return lum;
 }
 
 float Image::linearize8bitRGB(const uchar& colorBits) {
