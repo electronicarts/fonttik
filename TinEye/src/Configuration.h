@@ -22,6 +22,7 @@ private:
 	ResolutionGuidelines* activeResolution = nullptr;
 	fs::path tessdataPath = "./tessdata";
 	fs::path trainingDataPath = "./tessdata/eng.traineddata";
+	bool validLanguage = false;
 
 	void setDefaultConfig() {
 		//If file is not found, error and set default values
@@ -29,7 +30,7 @@ private:
 		std::cerr << "Contrast ratio: 4.5, language: eng" << std::endl;
 
 		contrastRatio = 4.5f;
-		language = "eng";
+		setActiveLanguage("eng");
 	}
 public:
 	Configuration(std::string configPath) {
@@ -39,6 +40,7 @@ public:
 			try {
 				configFile >> config;
 				contrastRatio = config["contrast"];
+				tessdataPath = fs::path(std::string(config["tessdataPath"]));
 				setActiveLanguage(config["language"]);
 
 				for (auto it = config["resolutions"].begin(); it != config["resolutions"].end(); ++it)
@@ -75,8 +77,10 @@ public:
 	void setActiveLanguage(std::string lang) {
 		fs::path path = tessdataPath / (lang + ".traineddata");
 		if (fs::exists(path)) {
+			std::cout << path.native().c_str() << std::endl;
 			language = lang;
 			trainingDataPath = path;
+			validLanguage = true;
 		}
 		else if (lang != "eng") {
 			std::cout << "No training data found for: " << lang << " ,defatulting to english" << std::endl;
@@ -92,4 +96,5 @@ public:
 	float getContrastRequirement() const { return contrastRatio; }
 	std::string getLanguage() const { return language; }
 	std::filesystem::path getTessdataPath() const { return tessdataPath; }
+	bool isValidLanguage() const { return validLanguage; }
 };
