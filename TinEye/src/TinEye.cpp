@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include "Image.h"
+#include <filesystem>
 
 Image GenerateLuminanceMap()
 {
@@ -108,11 +109,11 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 int main(int argc, char* argv[]) {
 	Configuration config("config.json");
 
-	//config.setActiveResolution((argc > 1) ? atoi(argv[1]) : 1080);
 
 	tesseract::TessBaseAPI* api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with language specified by config
-	if (api->Init("tessdata/", config.getLanguage().c_str())) {
+	
+	if (api->Init(config.getTessdataPath().string().c_str(), config.getLanguage().c_str())) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
