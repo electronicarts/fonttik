@@ -1,9 +1,10 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <map>
-
+#include <filesystem>
 
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 struct ResolutionGuidelines {
 	size_t width;
@@ -19,28 +20,43 @@ private:
 	std::string language;
 	std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
 	ResolutionGuidelines* activeResolution = nullptr;
+	fs::path tessdataPath = "./tessdata";
+	fs::path trainingDataPath = "./tessdata/eng.traineddata";
+	bool validLanguage = false;
+
+	void setDefaultConfig() {
+		//If file is not found, error and set default values
+		std::cerr << "Configuration file not found, falling back to default configuration\n";
+		std::cerr << "Contrast ratio: 4.5, language: eng" << std::endl;
+
+		contrastRatio = 4.5f;
+		setActiveLanguage("eng");
+	}
 public:
 	Configuration(std::string configPath) {
 		json config;
 		std::ifstream configFile(configPath);
 		if (configFile) {
-			configFile >> config;
-			contrastRatio = config["contrast"];
-			language = config["language"];
+			try {
+				configFile >> config;
+				contrastRatio = config["contrast"];
+				tessdataPath = fs::path(std::string(config["tessdataPath"]));
+				setActiveLanguage(config["language"]);
 
-			for (auto it = config["resolutions"].begin(); it != config["resolutions"].end(); ++it)
-			{
-				ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
-				resolutionGuidelines[atoi(it.key().c_str())] = a;
+				for (auto it = config["resolutions"].begin(); it != config["resolutions"].end(); ++it)
+				{
+					ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
+					resolutionGuidelines[atoi(it.key().c_str())] = a;
+				}
+			}
+			catch (...) {
+				std::cout << "Malformed configuration file" << std::endl;
+				setDefaultConfig();
 			}
 		}
 		else {
-			//If file is not found, error and set default values
-			std::cerr << "Configuration file not found, falling back to default configuration\n";
-			std::cerr << "Contrast ratio: 4.5, language: eng" << std::endl;
-
-			contrastRatio = 4.5f;
-			language = "eng";
+			std::cout << "Configuration file not found" << std::endl;
+			setDefaultConfig();
 		}
 
 	}
@@ -58,9 +74,27 @@ public:
 			activeResolution = &foundRes->second;
 		}
 	};
+	void setActiveLanguage(std::string lang) {
+		fs::path path = tessdataPath / (lang + ".traineddata");
+		if (fs::exists(path)) {
+			std::cout << path.native().c_str() << std::endl;
+			language = lang;
+			trainingDataPath = path;
+			validLanguage = true;
+		}
+		else if (lang != "eng") {
+			std::cout << "No training data found for: " << lang << " ,defatulting to english" << std::endl;
+			setActiveLanguage("eng");
+		}
+		else {
+			std::cout << "Active language is english, but no training data was found" << std::endl;
+		}
+	}
 
 	size_t getHeightRequirement() const { return activeResolution->height; }
 	size_t getWidthRequirement() const { return activeResolution->width; }
 	float getContrastRequirement() const { return contrastRatio; }
 	std::string getLanguage() const { return language; }
+	std::filesystem::path getTessdataPath() const { return tessdataPath; }
+	bool isValidLanguage() const { return validLanguage; }
 };
