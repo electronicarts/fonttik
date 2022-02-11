@@ -19,7 +19,13 @@ public:
 	//Saves calculated luminance map to specified filepath
 	void saveLuminanceMap(std::string filepath);
 
+	//Flips the luminance of a given region
+	void flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2);
+
+	//Flips the luminance of the whole image
+	void flipLuminance();
+
 
 	//Returns average surrounding luminance of a given bounding box in luminance map
-	uchar getAverageSurroundingLuminance(const int& x1, const int& x2, const int& y1, const int& y2, const int& marginX = 3, const int& marginY=3);
+	uchar getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX = 3, const int& marginY=3);
 };

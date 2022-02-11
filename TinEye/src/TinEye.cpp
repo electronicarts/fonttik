@@ -19,6 +19,7 @@ Image GenerateLuminanceMap()
 	Image img;
 	img.loadImage(fileName);
 	img.getLuminanceMap();
+	//img.flipLuminance(0, 0, 1260, 230);
 	img.saveLuminanceMap(fileName + "_luminance.png");
 	return img;
 }
@@ -89,7 +90,7 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 				}
 
 				//Check for luminance with background using retrieved bounding box
-				int averageBgLuminance = img.getAverageSurroundingLuminance(x1, x2, y1, y2);
+				int averageBgLuminance = img.getAverageSurroundingLuminance(x1, y1, x2, y2);
 				std::cout << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
 			}
 
