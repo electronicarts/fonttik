@@ -59,7 +59,22 @@ void Image::saveLuminanceMap(std::string filepath) {
 	}
 }
 
-uchar Image::getAverageSurroundingLuminance(const int& x1, const int& x2, const int& y1, const int& y2, const int& marginX, const int& marginY)
+void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2)
+{
+	if (!luminanceMap.empty()) {
+		cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1, y2 - y1));
+		cv::bitwise_not(subMatrix, subMatrix);
+	}
+}
+
+void Image::flipLuminance()
+{
+	if (!luminanceMap.empty()) {
+		flipLuminance(0, luminanceMap.cols, 0, luminanceMap.rows);
+	}
+}
+
+uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX, const int& marginY)
 {
 	uchar lum = 0;
 
