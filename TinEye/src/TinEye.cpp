@@ -34,7 +34,10 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 	cv::Mat openCVMat = img.getLuminanceMap();
 
 	if (openCVMat.empty())
+	{
 		return false;
+	}
+
 
 	api->SetImage(openCVMat.data, openCVMat.cols, openCVMat.rows, 1, openCVMat.step);
 
@@ -64,8 +67,8 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 				//std::cout << "line: " << word << std::endl;
 				if (x2 - x1 < minimumWidth) {
 					passes = false;
-					std::cout << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 << 
-						" at (" <<x1 << ", " << y1 <<")" << std::endl;
+					std::cout << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 <<
+						" at (" << x1 << ", " << y1 << ")" << std::endl;
 				}
 			}
 
@@ -86,7 +89,7 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
 				if (y2 - y1 < minimumHeight) {
 					passes = false;
-					std::cout << "Line: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 << 
+					std::cout << "Line: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
 						" at (" << x1 << ", " << y1 << ")" << std::endl;
 				}
 
@@ -113,7 +116,7 @@ int main(int argc, char* argv[]) {
 
 	tesseract::TessBaseAPI* api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with language specified by config
-	
+
 	if (api->Init(config.getTessdataPath().string().c_str(), config.getLanguage().c_str())) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
