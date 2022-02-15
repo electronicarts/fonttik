@@ -17,6 +17,11 @@ bool Image::loadImage(std::string filepath) {
 	}
 }
 
+cv::Mat Image::getImageMatrix()
+{
+	return imageMatrix;
+}
+
 cv::Mat Image::getLuminanceMap() {
 	//Make sure that image has been loaded and we haven't previously calculated the luminance already
 	if (!imageMatrix.empty() && luminanceMap.empty()) {

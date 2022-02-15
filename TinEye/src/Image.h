@@ -13,6 +13,9 @@ public:
 
 	bool loadImage(std::string filepath);
 
+	//Returns loaded image matrix
+	cv::Mat getImageMatrix();
+
 	//Returns loaded image's luminance map, if map hasn't been calculated calculates it as well
 	cv::Mat getLuminanceMap();
 
