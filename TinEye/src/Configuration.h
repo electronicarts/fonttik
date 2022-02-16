@@ -1,7 +1,9 @@
+#pragma once
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <map>
 #include <filesystem>
+#include <iostream>
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -33,7 +35,8 @@ private:
 		setActiveLanguage("eng");
 	}
 public:
-	Configuration(std::string configPath) {
+	Configuration() {};
+	Configuration(fs::path configPath) {
 		json config;
 		std::ifstream configFile(configPath);
 		if (configFile) {
