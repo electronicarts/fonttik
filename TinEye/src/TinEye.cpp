@@ -1,32 +1,26 @@
-﻿// TinEye.cpp : Defines the entry point for the application.
-//
-
 #include "TinEye.h"
-#include "Configuration.h"
-#include "TextboxDetection.h"
-
-#include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 #include <iostream>
 #include <string>
-#include "Image.h"
-#include <filesystem>
+#include "Configuration.h"
+#include "TextboxDetection.h"
 
-Image GenerateLuminanceMap()
+void TinEye::init(fs::path configFile)
 {
-	std::cout << "Enter image path:";
-	std::string fileName;
-	std::getline(std::cin, fileName);
+	config = Configuration(configFile.c_str());
 
-	Image img;
-	img.loadImage(fileName);
-	img.getLuminanceMap();
-	//img.flipLuminance(0, 0, 1260, 230);
-	img.saveLuminanceMap(fileName + "_luminance.png");
-	return img;
+	if (api != nullptr)
+		delete api;
+	api = new tesseract::TessBaseAPI();
+	// Initialize tesseract-ocr with language specified by config
+
+	if (api->Init(config.getTessdataPath().string().c_str(), config.getLanguage().c_str())) {
+		fprintf(stderr, "Could not initialize tesseract.\n");
+		exit(1);
+	}
 }
 
-bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* api, std::vector<std::vector<cv::Point>>& boxes) {
+bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes) {
 	// Set API page segmentation mode to single word, since we know the boxes of the words we'll be searching for
 	api->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
@@ -118,14 +112,10 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 	return passes;
 }
 
-bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* api) {
+bool TinEye::fontSizeCheck(Image& img) {
 	// Set API page segmentation mode to sparse text (finds as much text as possible in no particular order)
 	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
-	// Open input image with leptonica library
-	//Pix* image = pixRead("resources/sizes/1080p-31x40.png");
-	//api->SetImage(image);
 
-	//Open input image with openCV
 	cv::Mat openCVMat = img.getLuminanceMap();
 
 	if (openCVMat.empty())
@@ -180,7 +170,7 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 			const char* word = ri->GetUTF8Text(level);
 			int x1, y1, x2, y2;
 			float conf = ri->Confidence(level);
-			if (conf >= 80) {
+			if (conf >= 50) {
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
 				if (y2 - y1 < minimumHeight) {
 					//passes = false;
@@ -199,70 +189,46 @@ bool fontSizeCheck(Image& img, Configuration& config, tesseract::TessBaseAPI* ap
 
 	delete ri;
 
-	ri = api->GetIterator();
-	level = tesseract::RIL_WORD;
-	if (ri != 0) {
-		do {
-			const char* word = ri->GetUTF8Text(level);
-			int x1, y1, x2, y2;
-			float conf = ri->Confidence(level);
-			if (conf >= 80) {
-				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-				std::cout << "Line: '" << word << "' at (" << x1 << ", " << y1 << ")" << std::endl;
-
-				//Check for luminance with background using retrieved bounding box
-				int averageBgLuminance = img.getAverageSurroundingLuminance(x1, y1, x2, y2);
-				std::cout << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
-			}
-
-			delete[] word;
-		} while (ri->Next(level));
-	}
-	delete ri;
-
-	std::cout << ((passes) ? "PASS" : "FAIL") << std::endl;
-
-	//pixDestroy(&image);
-
 	return passes;
 }
 
-int main(int argc, char* argv[]) {
-	Configuration config("config.json");
+bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
+{
+	//Open input image with openCV
+	Image img;
+	img.loadImage(imagePath.string());
 
+	bool testResult = false;
 
-	tesseract::TessBaseAPI* api = new tesseract::TessBaseAPI();
-	// Initialize tesseract-ocr with language specified by config
+	if (EASTBoxing) {
+		std::cout << "Using EAST preprocessing" << std::endl;
+		//Check if image has text recognized by OCR
+		std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
 
-	if (api->Init(config.getTessdataPath().string().c_str(), config.getLanguage().c_str())) {
-		fprintf(stderr, "Could not initialize tesseract.\n");
-		exit(1);
+		if (textBoxes.empty()) {
+			std::cout << "No words recognized in image" << std::endl;
+		}
+		else {
+			// Get OCR result
+			testResult = fontSizeCheck(img, textBoxes);
+		}
+
+	}
+	else {
+		testResult = fontSizeCheck(img);
 	}
 
-	std::cout << "Enter image path:";
-	std::string fileName;
-	std::getline(std::cin, fileName);
+	return testResult;
+	
+}
 
-	Image img;
-	img.loadImage(fileName);
+TinEye::~TinEye()
+{
+	if (api != nullptr) 
+	{
+		api->End();
+		delete api;
+	}
 
-	////Check if image has text recognized by OCR
-	//std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
-
-	//if (textBoxes.empty()) {
-	//	std::cout << "No words recognized in image" << std::endl;
-	//}
-	//else {
-	//	// Get OCR result
-	//	fontSizeCheck(img, config, api, textBoxes);
-	//}
-
-	fontSizeCheck(img, config, api);
-
-
-	// Destroy used object and release memory
-	api->End();
-	delete api;
-	std::cin.get();
-	return 0;
+	api = nullptr;
 }

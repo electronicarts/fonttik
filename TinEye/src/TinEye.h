@@ -1,8 +1,23 @@
-﻿// TinEye.h : Include file for standard system include files,
-// or project specific include files.
+﻿#pragma once
+#include "Configuration.h"
+#include <tesseract/baseapi.h>
+#include "Image.h"
+#include <filesystem>
 
-#pragma once
+using json = nlohmann::json;
+namespace fs = std::filesystem;
 
-#include <iostream>
 
-// TODO: Reference additional headers your program requires here.
+#define DLLExport   __declspec( dllexport )
+
+class DLLExport TinEye {
+	Configuration config;
+	tesseract::TessBaseAPI* api = nullptr;
+	bool fontSizeCheck(Image& img);
+	bool fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes);
+public:
+	TinEye() {};
+	~TinEye();
+	void init(fs::path configFile);
+	bool fontSizeCheck(fs::path imagePath, bool EAST_Textboxes=false);
+};
