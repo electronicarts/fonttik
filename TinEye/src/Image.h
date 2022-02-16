@@ -8,6 +8,8 @@ protected:
 	cv::Mat luminanceMap;
 
 	float linearize8bitRGB(const uchar& colorBits);
+
+	
 public:
 	Image();
 
@@ -28,7 +30,9 @@ public:
 	//Flips the luminance of the whole image
 	void flipLuminance();
 
-
 	//Returns average surrounding luminance of a given bounding box in luminance map
-	uchar getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX = 3, const int& marginY=3);
+	uchar getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX = 3, const int& marginY = 3);
+
+	//Hightlights box in specified matrix
+	static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix);
 };

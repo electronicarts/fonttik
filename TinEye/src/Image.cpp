@@ -1,5 +1,15 @@
 #include "Image.h"
 
+void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2,cv::Scalar& color, cv::Mat& matrix)
+{
+	if (!matrix.empty()) {
+		cv::line(matrix, cv::Point(x1, y1), cv::Point(x2, y1), color);
+		cv::line(matrix, cv::Point(x2, y1), cv::Point(x2, y2), color);
+		cv::line(matrix, cv::Point(x2, y2), cv::Point(x1, y2), color);
+		cv::line(matrix, cv::Point(x1, y2), cv::Point(x1, y1), color);
+	}
+}
+
 Image::Image() {
 
 }
@@ -84,12 +94,12 @@ uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const 
 	uchar lum = 0;
 
 	if (!luminanceMap.empty()) {
-		
+
 
 		int yMin = std::max(y1 - marginY, 0), yMax = std::min(y2 + marginY, luminanceMap.rows);
 		int xMin = std::max(x1 - marginX, 0), xMax = std::min(x2 + marginX, luminanceMap.cols);
 
-		int cumulativeLuminance=0, valuesChecked = 0;
+		int cumulativeLuminance = 0, valuesChecked = 0;
 
 		for (int y = yMin; y < yMax; y++) {
 			for (int x = xMin; x < xMax; x++) {
@@ -103,7 +113,7 @@ uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const 
 
 		lum = cumulativeLuminance / valuesChecked;
 	}
-	
+
 	return lum;
 }
 
