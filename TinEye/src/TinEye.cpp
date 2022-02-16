@@ -263,7 +263,6 @@ int main(int argc, char* argv[]) {
 	// Destroy used object and release memory
 	api->End();
 	delete api;
-	//delete[] outText;
 	std::cin.get();
 	return 0;
 }
