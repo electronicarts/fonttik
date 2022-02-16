@@ -5,6 +5,7 @@
     "tesseract",
     "opencv",
     "nlohmann-json",
-    "gtest"
+    "gtest",
+    "boost-log"
   ]
 }
