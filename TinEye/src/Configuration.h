@@ -4,6 +4,7 @@
 #include <map>
 #include <filesystem>
 #include <iostream>
+#include <boost/log/trivial.hpp>
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -53,12 +54,12 @@ public:
 				}
 			}
 			catch (...) {
-				std::cout << "Malformed configuration file" << std::endl;
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration file" << std::endl;
 				setDefaultConfig();
 			}
 		}
 		else {
-			std::cout << "Configuration file not found" << std::endl;
+			BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
 			setDefaultConfig();
 		}
 
@@ -80,17 +81,17 @@ public:
 	void setActiveLanguage(std::string lang) {
 		fs::path path = tessdataPath / (lang + ".traineddata");
 		if (fs::exists(path)) {
-			std::cout << path.native().c_str() << std::endl;
+			BOOST_LOG_TRIVIAL(info) << path.native().c_str() << std::endl;
 			language = lang;
 			trainingDataPath = path;
 			validLanguage = true;
 		}
 		else if (lang != "eng") {
-			std::cout << "No training data found for: " << lang << " ,defatulting to english" << std::endl;
+			BOOST_LOG_TRIVIAL(error) << "No training data found for: " << lang << " ,defatulting to english" << std::endl;
 			setActiveLanguage("eng");
 		}
 		else {
-			std::cout << "Active language is english, but no training data was found" << std::endl;
+			BOOST_LOG_TRIVIAL(error) << "Active language is english, but no training data was found" << std::endl;
 		}
 	}
 

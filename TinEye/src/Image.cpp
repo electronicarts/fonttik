@@ -1,4 +1,5 @@
 #include "Image.h"
+#include <boost/log/trivial.hpp>
 
 void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2,cv::Scalar& color, cv::Mat& matrix)
 {
@@ -19,7 +20,7 @@ bool Image::loadImage(std::string filepath) {
 	imageMatrix = cv::imread(filepath, cv::IMREAD_COLOR);
 
 	if (imageMatrix.empty()) {
-		std::cout << "Could not read image: " << filepath << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
 		return false;
 	}
 	else {
