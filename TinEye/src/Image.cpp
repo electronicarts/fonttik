@@ -1,7 +1,7 @@
 #include "Image.h"
 #include <boost/log/trivial.hpp>
 
-void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2,cv::Scalar& color, cv::Mat& matrix)
+void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix)
 {
 	if (!matrix.empty()) {
 		cv::line(matrix, cv::Point(x1, y1), cv::Point(x2, y1), color);
@@ -11,21 +11,45 @@ void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int&
 	}
 }
 
+bool Image::nextFrame()
+{
+	imageMatrix.release();
+	luminanceMap.release();
+
+	video >> imageMatrix;
+
+	if (imageMatrix.empty()) {
+		std::cout << "No more images\n";
+		video.release();
+		return false;
+	}
+
+	return true;
+}
+
 Image::Image() {
 
 }
 
 bool Image::loadImage(std::string filepath) {
-	//IMREAD_COLOR transforms image to BGR format
-	imageMatrix = cv::imread(filepath, cv::IMREAD_COLOR);
+	video = cv::VideoCapture(filepath);
 
-	if (imageMatrix.empty()) {
-		BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
-		return false;
+	if (video.isOpened()) {
+
+		//cv::Mat matrix;
+		video >> imageMatrix;
+		//imageMatrix = matrix.clone();
+		//use cvCloneImage if permissions don't allow to do something, currently not needed
+
+		if (imageMatrix.empty()) {
+			BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
+		}
+		else {
+			return true;
+		}
 	}
-	else {
-		return true;
-	}
+
+	return false;
 }
 
 cv::Mat Image::getImageMatrix()
@@ -37,7 +61,13 @@ cv::Mat Image::getLuminanceMap() {
 	//Make sure that image has been loaded and we haven't previously calculated the luminance already
 	if (!imageMatrix.empty() && luminanceMap.empty()) {
 		//Load pixel information to float matrix (so bgr values go from 0.0 to 1.0)
-		cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_32FC3); //1 channel (luminance)
+
+		//Matrix to store linearized rgb
+		cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_32FC3);
+
+		if (imageMatrix.channels() == 1) {
+			cv::cvtColor(imageMatrix, imageMatrix, cv::COLOR_GRAY2BGR);
+		}
 
 		for (int y = 0; y < imageMatrix.rows; y++) {
 			for (int x = 0; x < imageMatrix.cols; x++) {
