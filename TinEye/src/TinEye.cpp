@@ -197,30 +197,33 @@ bool TinEye::fontSizeCheck(Image& img) {
 }
 
 bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
-{
+{	
 	//Open input image with openCV
 	Image img;
 	img.loadImage(imagePath.string());
 
 	bool testResult = false;
 
-	if (EASTBoxing) {
-		BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
-		//Check if image has text recognized by OCR
-		std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
+	do {
+		if (EASTBoxing) {
+			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
+			//Check if image has text recognized by OCR
+			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
 
-		if (textBoxes.empty()) {
-			BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+			if (textBoxes.empty()) {
+				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+			}
+			else {
+				// Get OCR result
+				testResult = fontSizeCheck(img, textBoxes);
+			}
+
 		}
 		else {
-			// Get OCR result
-			testResult = fontSizeCheck(img, textBoxes);
+			testResult = fontSizeCheck(img);
 		}
-
-	}
-	else {
-		testResult = fontSizeCheck(img);
-	}
+	} while (img.nextFrame());
+	
 
 	return testResult;
 	

@@ -8,9 +8,11 @@ protected:
 	cv::Mat imageMatrix;
 	cv::Mat luminanceMap;
 
-	float linearize8bitRGB(const uchar& colorBits);
+	cv::VideoCapture video;
 
-	
+	bool isVideo = false;
+
+	float linearize8bitRGB(const uchar& colorBits);
 public:
 	Image();
 
@@ -36,4 +38,7 @@ public:
 
 	//Hightlights box in specified matrix
 	static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix);
+
+	//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
+	bool nextFrame();
 };

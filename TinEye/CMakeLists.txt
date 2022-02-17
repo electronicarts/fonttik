@@ -5,6 +5,14 @@ cmake_minimum_required (VERSION 3.8)
 #project name
 project ("TinEye")
 
+if (UNIX)
+   add_compile_definitions(_UNIX)
+endif (UNIX)
+
+if (MSVC)
+   add_compile_definitions(_WIN)
+endif (MSVC)
+
 #Source files for compilation
 file(GLOB_RECURSE sources src/*.cpp src/*.h)
 file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
