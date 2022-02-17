@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
+
 bool cmdOptionExists(char** begin, char** end, const std::string& option)
 {
 	return std::find(begin, end, option) != end;
@@ -9,9 +10,10 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
-		std::cout << "Usage: \"./tineye_cli media_path \n"
-			"options:\n"
-			"--east: running OCR on regions where EAST finds text";
+		std::cout << "Usage: \"./tineye_cli media_path/ [options] \n"
+			<< "options:\n"
+			<< "--east: running OCR on regions where EAST finds text";
+		std::cin.get();
 		return 1;
 	}
 	TinEye* tineye = new TinEye();
@@ -21,4 +23,5 @@ int main(int argc, char* argv[]) {
 	delete tineye;
 
 	std::cout << ((pass) ? "PASS" : "FAIL") << std::endl;;
+	std::cin.get();
 }
