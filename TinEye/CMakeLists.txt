@@ -23,6 +23,7 @@ include_directories(${Tesseract_INCLUDE_DIRS})
 
 # Add source to this project's executable.
 add_library (TinEye SHARED ${sources} )
+add_library (TinEyeStatic STATIC ${sources} )
 
 add_executable(TinEye_CLI ${cli_sources} )
 
@@ -44,7 +45,7 @@ find_package(GTest CONFIG REQUIRED)
 
 add_executable(Tineye_tests ${test_sources} )
 
-target_link_libraries(Tineye_tests GTest::gtest GTest::gtest_main)
+target_link_libraries(Tineye_tests TinEyeStatic ${OpenCV_LIBS} GTest::gtest GTest::gtest_main)
 
 target_include_directories(Tineye_tests PRIVATE src/)
 
@@ -55,3 +56,4 @@ file(COPY data/config.json DESTINATION ./)
 file(COPY data/tessdata DESTINATION ./)
 file(COPY data/resources DESTINATION ./)
 file(COPY data/unit_test DESTINATION ./)
+file(COPY data/frozen_east_text_detection.pb DESTINATION ./)
