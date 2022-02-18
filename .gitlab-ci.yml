@@ -23,7 +23,7 @@ build-corecpp:
     script:
         #Write deployment token to nuget.config
         - apt-get install -y sed
-        - REP_ENVIRONMENT_EXP1='s/[token]/$ASPNETCORE_ENVIRONMENT/g'
+        - REP_ENVIRONMENT_EXP1='s/[token]/$DEPLOYMENT_TOKEN/g'
         - sed -e $REP_ENVIRONMENT_EXP1 $TINEYE_CPP_APP_PATH/nuget.config.template > $TINEYE_CPP_APP_PATH/nuget.config
         #donwload needed depencencies
         - echo "Start installing dependencies for CoreCpp"
