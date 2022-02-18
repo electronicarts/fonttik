@@ -200,7 +200,7 @@ bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
 {	
 	//Open input image with openCV
 	Image img;
-	img.loadImage(imagePath.string());
+	img.loadImage(imagePath);
 
 	bool testResult = false;
 
