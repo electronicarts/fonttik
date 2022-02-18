@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
  <config>
-     <add key="defaultPushSource" value="https://gitlab.ea.com/api/v4/groups/7406/packages/nuget/index.json" />
+     <add key="defaultPushSource" value="https://gitlab.ea.com/api/v4/groups/7406/-/packages/nuget/index.json" />
  </config>
  <packageSources>
-     <add key="defaultPushSource" value="https://gitlab.ea.com/api/v4/groups/7406/packages/nuget/index.json" />
+     <add key="defaultPushSource" value="https://gitlab.ea.com/api/v4/groups/7406/-/packages/nuget/index.json" />
  </packageSources>
  <packageSourceCredentials>
      <defaultPushSource>
