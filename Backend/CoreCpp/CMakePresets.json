@@ -68,5 +68,69 @@
       },
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
     }
+  ],
+  "buildPresets": [
+    {
+      "name": "core-build",
+      "description": "Inherits environment from base configurePreset",
+      "configurePreset": "base",
+      "hidden": true,
+      "inheritConfigureEnvironment": true
+    },
+    {
+      "name": "windows-debug",
+      "description": "Windows debug build",
+      "inherits": "core-build",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "description": "Windows release build",
+      "inherits": "core-build",
+      "configurePreset": "windows-release"
+    },
+    {
+      "name": "clean-build-debug",
+      "description": "Clean before build (--clean-first)",
+      "inherits": "windows-debug",
+      "cleanFirst": true
+    },
+    {
+      "name": "clean-build-release",
+      "description": "Clean before build (--clean-first)",
+      "inherits": "windows-release",
+      "cleanFirst": true
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug",
+      "inherits": "core-build"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release",
+      "inherits": "core-build"
+    },
+    {
+      "name": "linux-clean-build-debug",
+      "inherits": "linux-debug",
+      "cleanFirst": true
+    },
+    {
+      "name": "linux-clean-build-release",
+      "inherits": "linux-release",
+      "cleanFirst": true
+    },
+    {
+      "name": "macos-debug",
+      "description": "MacOS debug build",
+      "inherits": "core-build",
+      "configurePreset": "macos-default"
+    },
+    {
+      "name": "macos-clean-build-debug",
+      "inherits": "macos-debug",
+      "cleanFirst": true
+    }
   ]
 }
