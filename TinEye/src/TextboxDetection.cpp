@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
+#include <boost/log/trivial.hpp>
 
 
 void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result)
@@ -46,7 +47,7 @@ std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, b
 	std::vector< std::vector<cv::Point> > detResults;
 	east.detect(resizedImg, detResults);
 
-	//std::cout << "EAST found " << detResults.size() << "boxes\n";
+	BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << "boxes\n";
 
 	//Return smart pointer?
 

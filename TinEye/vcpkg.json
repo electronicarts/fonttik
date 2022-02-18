@@ -3,8 +3,13 @@
   "version-string": "0.0.1",
   "dependencies": [
     "tesseract",
-    "opencv",
+    {
+      "name": "opencv",
+      "features": [ "ffmpeg" ]
+    },
+
     "nlohmann-json",
-    "gtest"
+    "gtest",
+    "boost-log"
   ]
 }

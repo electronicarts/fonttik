@@ -7,8 +7,12 @@
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-
+#ifdef _WIN
 #define DLLExport   __declspec( dllexport )
+#endif
+#ifdef _UNIX
+#define DLLExport  __attribute__((visibility("default")))
+#endif
 
 class DLLExport TinEye {
 	Configuration config;
