@@ -77,7 +77,7 @@ void Image::saveLuminanceMap(std::string filepath) {
 void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2)
 {
 	if (!luminanceMap.empty()) {
-		cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1, y2 - y1));
+		cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
 		cv::bitwise_not(subMatrix, subMatrix);
 	}
 }
@@ -85,7 +85,7 @@ void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int
 void Image::flipLuminance()
 {
 	if (!luminanceMap.empty()) {
-		flipLuminance(0, luminanceMap.cols, 0, luminanceMap.rows);
+		flipLuminance(0, 0, luminanceMap.cols-1, luminanceMap.rows-1);
 	}
 }
 
