@@ -2,9 +2,6 @@
 # and include sub-projects here.
 cmake_minimum_required (VERSION 3.8)
 
-#project name
-project ("TinEye")
-
 if (UNIX)
    add_compile_definitions(_UNIX)
 endif (UNIX)
@@ -18,10 +15,6 @@ file(GLOB_RECURSE sources src/*.cpp src/*.h)
 file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
 file(GLOB_RECURSE east_src east_prototype/*.cpp east_prototype/*.h)
 file(GLOB_RECURSE cli_sources src_cli/*.cpp src_cli/*.h)
-
-# Specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Tesseract CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
