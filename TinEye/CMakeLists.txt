@@ -65,7 +65,5 @@ target_include_directories(Tineye_tests PRIVATE src/)
 add_test(Tineye_tests Tineye_tests)
 
 #Copy data to destination folder
-file(COPY data/config.json DESTINATION ./)
-file(COPY data/tessdata DESTINATION ./)
-file(COPY data/resources DESTINATION ./)
-file(COPY data/unit_test DESTINATION ./)
+
+add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:TinEye>)
