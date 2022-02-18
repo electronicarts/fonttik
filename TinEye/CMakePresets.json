@@ -1,4 +1,4 @@
-﻿{
+{
   "version": 3,
   "configurePresets": [
     {
@@ -23,11 +23,14 @@
       "description": "Target a remote macOS system with Ninja",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/bin/build/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/bin/install/${presetName}",
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
       },
-      "vendor": {
+    "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "macOS" ] },
         "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
       }
