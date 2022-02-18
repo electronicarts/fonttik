@@ -1,5 +1,6 @@
 variables:
-    TINEYE_CPP_APP_PATH: "./Backend/CoreCpp/bin/build"
+    TINEYE_CPP_APP_PATH: "./Backend/CoreCpp"
+    TINEYE_CPP_BUILD_PATH: "./Backend/CoreCpp/bin/build"
 
 stages:
     - build-corecpp
@@ -58,4 +59,4 @@ build-corecpp:
         - cmake --build --preset linux-release
     artifacts:
         paths:
-            - $TINEYE_CPP_APP_PATH/linux-release
+            - $TINEYE_CPP_BUILD_PATH/linux-release
