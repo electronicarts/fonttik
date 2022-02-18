@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc.hpp>
 #include <string>
+#include <filesystem>
 
 class Image {
 protected:
@@ -11,12 +12,15 @@ protected:
 	cv::VideoCapture video;
 
 	bool isVideo = false;
+	std::vector<std::string > imageFormats;
+
+	void convertImageMatrixToBGR();
 
 	float linearize8bitRGB(const uchar& colorBits);
 public:
 	Image();
 
-	bool loadImage(std::string filepath);
+	bool loadImage(std::filesystem::path filepath);
 
 	//Returns loaded image matrix
 	cv::Mat getImageMatrix();
