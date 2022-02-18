@@ -59,7 +59,7 @@ find_package(GTest CONFIG REQUIRED)
 
 add_executable(Tineye_tests ${test_sources} )
 
-target_link_libraries(Tineye_tests TinEyeStatic ${OpenCV_LIBS} GTest::gtest GTest::gtest_main)
+target_link_libraries(Tineye_tests TinEyeStatic ${OpenCV_LIBS} ${Boost_LIBRARIES} GTest::gtest GTest::gtest_main)
 
 target_include_directories(Tineye_tests PRIVATE src/)
 
