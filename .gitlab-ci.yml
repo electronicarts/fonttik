@@ -57,7 +57,7 @@ build-corecpp:
         #build project
         - echo "Start building CoreCpp"
         - cd $TINEYE_CPP_APP_PATH
-        - cmake --preset linux-release
+        - cmake --preset linux-release --debug
         - cmake --build --preset linux-release
     artifacts:
         paths:
