@@ -1,6 +1,7 @@
 #include "Image.h"
 #include <boost/log/trivial.hpp>
 
+
 void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix)
 {
 	if (!matrix.empty()) {
@@ -16,37 +17,51 @@ bool Image::nextFrame()
 	imageMatrix.release();
 	luminanceMap.release();
 
-	video >> imageMatrix;
-
-	if (imageMatrix.empty()) {
-		std::cout << "No more images\n";
-		video.release();
-		return false;
-	}
-
-	return true;
-}
-
-Image::Image() {
-
-}
-
-bool Image::loadImage(std::string filepath) {
-	video = cv::VideoCapture(filepath);
-
-	if (video.isOpened()) {
-
-		//cv::Mat matrix;
+	if (isVideo) {
 		video >> imageMatrix;
-		//imageMatrix = matrix.clone();
-		//use cvCloneImage if permissions don't allow to do something, currently not needed
-
 		if (imageMatrix.empty()) {
-			BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "No more images" << std::endl;
+			video.release();
 		}
 		else {
 			return true;
 		}
+	}
+
+	return false;
+}
+
+Image::Image() {
+	imageFormats = { ".bmp",".jpeg",".jpg",".jpe",".jp2",".png",".webp",".pbm",".pgm",".ppm",".pnm",".sr",".ras",".tiff",".tif",".exr",".hdr",".pic" };
+}
+
+bool Image::loadImage(std::filesystem::path filepath) {
+	path = filepath;
+	
+	std::string fileFormat = filepath.extension().string();
+
+	//Check if given file is an admitted image type, if not, attempt to load as video
+	if (std::find(imageFormats.begin(), imageFormats.end(), fileFormat) != imageFormats.end()) {
+		isVideo = false;
+
+		imageMatrix = cv::imread(filepath.string(), cv::IMREAD_COLOR);
+	}
+	else {
+		isVideo = true;
+		video = cv::VideoCapture(filepath.string());
+
+		if (video.isOpened()) {
+			video >> imageMatrix;
+		}
+	}
+
+	//If imagematrix is empty something has gone wrong when loading
+	if (imageMatrix.empty()) {
+		BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
+	}
+	else {
+		convertImageMatrixToBGR();
+		return true;
 	}
 
 	return false;
@@ -64,10 +79,6 @@ cv::Mat Image::getLuminanceMap() {
 
 		//Matrix to store linearized rgb
 		cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_32FC3);
-
-		if (imageMatrix.channels() == 1) {
-			cv::cvtColor(imageMatrix, imageMatrix, cv::COLOR_GRAY2BGR);
-		}
 
 		for (int y = 0; y < imageMatrix.rows; y++) {
 			for (int x = 0; x < imageMatrix.cols; x++) {
@@ -108,7 +119,7 @@ void Image::saveLuminanceMap(std::string filepath) {
 void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2)
 {
 	if (!luminanceMap.empty()) {
-		cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1, y2 - y1));
+		cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
 		cv::bitwise_not(subMatrix, subMatrix);
 	}
 }
@@ -116,7 +127,7 @@ void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int
 void Image::flipLuminance()
 {
 	if (!luminanceMap.empty()) {
-		flipLuminance(0, luminanceMap.cols, 0, luminanceMap.rows);
+		flipLuminance(0, 0, luminanceMap.cols-1, luminanceMap.rows-1);
 	}
 }
 
@@ -146,6 +157,16 @@ uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const 
 	}
 
 	return lum;
+}
+
+void Image::convertImageMatrixToBGR()
+{
+	if (imageMatrix.channels() == 1) {
+		cv::cvtColor(imageMatrix, imageMatrix, cv::COLOR_GRAY2BGR);
+	}
+	else if (imageMatrix.channels() == 4) {
+		cv::cvtColor(imageMatrix, imageMatrix, cv::COLOR_BGRA2BGR);
+	}
 }
 
 float Image::linearize8bitRGB(const uchar& colorBits) {

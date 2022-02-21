@@ -21,6 +21,9 @@ void TinEye::init(fs::path configFile)
 		exit(1);
 	}
 
+	//Manually set dpi 
+	api->SetVariable("user_defined_dpi", "70");
+
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
 }
 
@@ -29,6 +32,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 	api->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
 	cv::Mat openCVMat = img.getLuminanceMap();
+	img.flipLuminance();
 
 	if (openCVMat.empty())
 	{
@@ -39,14 +43,27 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 
 	bool passes = true;
 	int minimumHeight = config.getHeightRequirement(), minimumWidth = config.getWidthRequirement();
-	int padding = 10;
+	int padding = 5;
+
+#ifdef _DEBUG
+	//Regions of interest
+	cv::Mat ROIs = img.getImageMatrix().clone();
+	//int counter = 0;
+#endif
 
 	for (std::vector<cv::Point> box : boxes) {
 		//Set word detection to word bounding box, automatically recognizes
-		cv::Mat subMatrix = openCVMat(cv::Rect(box[1].x - padding, box[1].y - padding, box[2].x - box[1].x + padding, box[0].y - box[1].y + padding));
+		cv::Rect boxRect(box[1].x - padding, box[1].y - padding, box[2].x - box[1].x + (padding * 2), box[0].y - box[1].y + (padding * 2));
+		cv::Mat subMatrix = openCVMat(boxRect);
 		api->SetImage(subMatrix.data, subMatrix.cols, subMatrix.rows, 1, subMatrix.step);
 		api->Recognize(0);
+#ifdef _DEBUG
+		//highlight on debug
+		Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, cv::Scalar(255, 255, 0), ROIs);
+		//cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), subMatrix);
+		//counter++;
 
+#endif
 		//int conf = api->MeanTextConf();
 		//BOOST_LOG_TRIVIAL(trace) << conf << "\n";
 		//if (conf < 80) {
@@ -108,6 +125,9 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 
 		delete ri;
 	}
+#ifdef _DEBUG
+	cv::imwrite(img.getPath().replace_filename(img.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
+#endif
 
 	BOOST_LOG_TRIVIAL(info) << ((passes) ? "PASS" : "FAIL") << std::endl;
 
@@ -197,10 +217,10 @@ bool TinEye::fontSizeCheck(Image& img) {
 }
 
 bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
-{	
+{
 	//Open input image with openCV
 	Image img;
-	img.loadImage(imagePath.string());
+	img.loadImage(imagePath);
 
 	bool testResult = false;
 
@@ -208,7 +228,7 @@ bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
 		if (EASTBoxing) {
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
-			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
+			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), false);
 
 			if (textBoxes.empty()) {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
@@ -223,15 +243,15 @@ bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
 			testResult = fontSizeCheck(img);
 		}
 	} while (img.nextFrame());
-	
+
 
 	return testResult;
-	
+
 }
 
 TinEye::~TinEye()
 {
-	if (api != nullptr) 
+	if (api != nullptr)
 	{
 		api->End();
 		delete api;

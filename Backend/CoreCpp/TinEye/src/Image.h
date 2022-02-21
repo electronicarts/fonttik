@@ -2,21 +2,26 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc.hpp>
 #include <string>
+#include <filesystem>
 
 class Image {
 protected:
 	cv::Mat imageMatrix;
 	cv::Mat luminanceMap;
+	std::filesystem::path path;
 
 	cv::VideoCapture video;
 
 	bool isVideo = false;
+	std::vector<std::string > imageFormats;
+
+	void convertImageMatrixToBGR();
 
 	float linearize8bitRGB(const uchar& colorBits);
 public:
 	Image();
 
-	bool loadImage(std::string filepath);
+	bool loadImage(std::filesystem::path filepath);
 
 	//Returns loaded image matrix
 	cv::Mat getImageMatrix();
@@ -41,4 +46,7 @@ public:
 
 	//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 	bool nextFrame();
+
+	//Path of the original image or the video its coming from
+	std::filesystem::path getPath() { return path; };
 };

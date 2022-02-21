@@ -24,7 +24,8 @@ find_package(Boost REQUIRED COMPONENTS log)
 
 include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 # Add source to this project's executable.
-add_library (TinEye STATIC ${sources} )
+add_library (TinEye SHARED ${sources} )
+add_library (TinEyeStatic STATIC ${sources} )
 
 
 
@@ -51,14 +52,12 @@ find_package(GTest CONFIG REQUIRED)
 
 add_executable(Tineye_tests ${test_sources} )
 
-target_link_libraries(Tineye_tests GTest::gtest GTest::gtest_main ${Tineye_Libs})
+target_link_libraries(Tineye_tests TinEyeStatic ${OpenCV_LIBS} ${Boost_LIBRARIES} GTest::gtest GTest::gtest_main)
 
 target_include_directories(Tineye_tests PRIVATE src/)
 
 add_test(Tineye_tests Tineye_tests)
 
 #Copy data to destination folder
-file(COPY data/config.json DESTINATION ./)
-file(COPY data/tessdata DESTINATION ./)
-file(COPY data/resources DESTINATION ./)
-file(COPY data/unit_test DESTINATION ./)
+
+add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:TinEye>)
