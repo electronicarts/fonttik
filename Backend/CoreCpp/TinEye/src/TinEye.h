@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 #define DLLExport  __attribute__((visibility("default")))
 #endif
 
-class DLLExport TinEye {
+class TinEye {
 	Configuration config;
 	tesseract::TessBaseAPI* api = nullptr;
 	bool fontSizeCheck(Image& img);
