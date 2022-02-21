@@ -8,6 +8,7 @@ class Image {
 protected:
 	cv::Mat imageMatrix;
 	cv::Mat luminanceMap;
+	std::filesystem::path path;
 
 	cv::VideoCapture video;
 
@@ -45,4 +46,7 @@ public:
 
 	//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 	bool nextFrame();
+
+	//Path of the original image or the video its coming from
+	std::filesystem::path getPath() { return path; };
 };

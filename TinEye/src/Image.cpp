@@ -36,6 +36,8 @@ Image::Image() {
 }
 
 bool Image::loadImage(std::filesystem::path filepath) {
+	path = filepath;
+	
 	std::string fileFormat = filepath.extension().string();
 
 	//Check if given file is an admitted image type, if not, attempt to load as video
