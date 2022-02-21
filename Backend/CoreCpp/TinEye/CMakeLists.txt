@@ -2,14 +2,6 @@
 # and include sub-projects here.
 cmake_minimum_required (VERSION 3.8)
 
-if (UNIX)
-   add_compile_definitions(_UNIX)
-endif (UNIX)
-
-if (MSVC)
-   add_compile_definitions(_WIN)
-endif (MSVC)
-
 #Source files for compilation
 file(GLOB_RECURSE sources src/*.cpp src/*.h)
 file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
@@ -60,4 +52,4 @@ add_test(Tineye_tests Tineye_tests)
 
 #Copy data to destination folder
 
-add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:TinEye>)
+add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/TinEye/data $<TARGET_FILE_DIR:TinEye>)
