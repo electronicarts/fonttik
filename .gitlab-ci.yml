@@ -1,0 +1,64 @@
+variables:
+    TINEYE_CPP_APP_PATH: "./Backend/CoreCpp"
+    TINEYE_CPP_BUILD_PATH: "./Backend/CoreCpp/bin/build"
+
+stages:
+    - build-corecpp
+#    - test-corecpp
+
+#build CoreCpp project
+build-corecpp:
+    stage: build-corecpp
+    image: docker.artifactory.ea.com/gcc:latest
+    tags:
+        - docker
+    variables:
+        VCPKG_BUILD_TYPE: "Release" #vcpkg will only build release for dependencies
+        VCPKG_BINARY_SOURCES: "nugetconfig,/builds/eacc-tech/tineye/Backend/CoreCpp/nuget.config,readwrite"
+    #only:
+        #changes:
+         #   - "Backend/CoreCpp/*" 
+     #   refs:
+      #      - development-migration@eacc-tech/iris # only trigger from the migration repo
+    script:
+        #Write deployment token to nuget.config
+        - apt-get install -y sed
+        - REP_ENVIRONMENT_EXP1='s/"token"/"'$DEPLOYMENT_TOKEN'"/g'
+        - sed -e $REP_ENVIRONMENT_EXP1 $TINEYE_CPP_APP_PATH/nuget.config.template > $TINEYE_CPP_APP_PATH/nuget.config
+        - more $TINEYE_CPP_APP_PATH/nuget.config
+        - pwd
+        #donwload needed depencencies
+        - echo "Start installing dependencies for CoreCpp"
+        - apt-get update 
+        - apt-get install --yes ninja-build rsync zip 
+        - apt-get install --yes pkg-config
+        - apt-get install --yes python3
+        - apt-get install --yes python3-distutils
+        #install latest CMake version
+        - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
+        - sh cmake-3.22.2-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
+        #install needed packages to build OpenCV
+        - apt-get install --yes libx11-dev libxft-dev 
+        - apt-get install --yes bison 
+        - apt-get install --yes gperf 
+        - apt-get install --yes libgles2-mesa-dev 
+        - apt-get install --yes libxrandr-dev 
+        - apt-get install --yes libxi-dev 
+        - apt-get install --yes libxcursor-dev 
+        - apt-get install --yes libxdamage-dev 
+        - apt-get install --yes libxinerama-dev
+        - apt-get install --yes nasm
+        #nuget 
+        - apt-get install --yes mono-complete
+        #download vcpkg
+        - git clone https://github.com/Microsoft/vcpkg.git
+        - ./vcpkg/bootstrap-vcpkg.sh
+        - export VCPKG_ROOT=`pwd`/vcpkg
+        #build project
+        - echo "Start building CoreCpp"
+        - cd $TINEYE_CPP_APP_PATH
+        - cmake --preset linux-release
+        - cmake --build --preset linux-release
+    artifacts:
+        paths:
+            - $TINEYE_CPP_BUILD_PATH/linux-release
