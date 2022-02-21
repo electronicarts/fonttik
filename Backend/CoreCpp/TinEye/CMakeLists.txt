@@ -24,7 +24,7 @@ find_package(Boost REQUIRED COMPONENTS log)
 
 include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 # Add source to this project's executable.
-add_library (TinEye SHARED ${sources} )
+add_library (TinEye STATIC ${sources} )
 
 
 

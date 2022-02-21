@@ -3,6 +3,14 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+# if (UNIX)
+#    add_compile_definitions(_UNIX)
+# endif (UNIX)
+
+# if (MSVC)
+#    add_compile_definitions(_WIN)
+# endif (MSVC)
+
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
