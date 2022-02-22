@@ -2,14 +2,6 @@
 # and include sub-projects here.
 cmake_minimum_required (VERSION 3.8)
 
-if (UNIX)
-   add_compile_definitions(_UNIX)
-endif (UNIX)
-
-if (MSVC)
-   add_compile_definitions(_WIN)
-endif (MSVC)
-
 #Source files for compilation
 file(GLOB_RECURSE sources src/*.cpp src/*.h)
 file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
@@ -24,8 +16,7 @@ find_package(Boost REQUIRED COMPONENTS log)
 
 include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 # Add source to this project's executable.
-add_library (TinEye SHARED ${sources} )
-add_library (TinEyeStatic STATIC ${sources} )
+add_library (TinEye STATIC ${sources} )
 
 
 
@@ -52,7 +43,7 @@ find_package(GTest CONFIG REQUIRED)
 
 add_executable(Tineye_tests ${test_sources} )
 
-target_link_libraries(Tineye_tests TinEyeStatic ${OpenCV_LIBS} ${Boost_LIBRARIES} GTest::gtest GTest::gtest_main)
+target_link_libraries(Tineye_tests TinEye ${OpenCV_LIBS} ${Boost_LIBRARIES} GTest::gtest GTest::gtest_main)
 
 target_include_directories(Tineye_tests PRIVATE src/)
 
@@ -60,4 +51,4 @@ add_test(Tineye_tests Tineye_tests)
 
 #Copy data to destination folder
 
-add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:TinEye>)
+add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/TinEye/data $<TARGET_FILE_DIR:TinEye>)
