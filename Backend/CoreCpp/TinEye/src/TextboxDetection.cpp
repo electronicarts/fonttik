@@ -47,7 +47,7 @@ std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, b
 	std::vector< std::vector<cv::Point> > detResults;
 	east.detect(resizedImg, detResults);
 
-	BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << "boxes\n";
+	//BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << "boxes\n";
 
 	//Return smart pointer?
 

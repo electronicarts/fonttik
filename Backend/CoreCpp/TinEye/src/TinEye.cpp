@@ -24,7 +24,7 @@ void TinEye::init(fs::path configFile)
 	//Manually set dpi 
 	api->SetVariable("user_defined_dpi", "70");
 
-	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
+	//boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
 }
 
 bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes) {
@@ -87,7 +87,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 					//Count number of characters in word
 					const char* word = ri->GetUTF8Text(level);
 					int numberOfChars = strlen(word);
-					BOOST_LOG_TRIVIAL(trace) << word << "\n";
+					//BOOST_LOG_TRIVIAL(trace) << word << "\n";
 
 					int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 					ri->BoundingBox(level, &x1, &y1, &x2, &y2);
@@ -95,30 +95,30 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 					//Check average width
 					if ((x2 - x1) / numberOfChars < minimumWidth) {
 						passes = false;
-						BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << word << " doesn't comply with minimum width, detected width: " << (x2 - x1) / numberOfChars <<
-							" at (" << x1 << ", " << y1 << ")" << std::endl;
+						//BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << word << " doesn't comply with minimum width, detected width: " << (x2 - x1) / numberOfChars <<
+						//	" at (" << x1 << ", " << y1 << ")" << std::endl;
 					}
 
 					//Check height
 					if (y2 - y1 < minimumHeight) {
 						passes = false;
-						BOOST_LOG_TRIVIAL(info) << "Word: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
-							" at (" << x1 << ", " << y1 << ")" << std::endl;
+						//BOOST_LOG_TRIVIAL(info) << "Word: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
+						//	" at (" << x1 << ", " << y1 << ")" << std::endl;
 					}
 
 					//Check for luminance with background using retrieved bounding box
 					int averageBgLuminance = img.getAverageSurroundingLuminance(x1, y1, x2, y2);
-					BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
+					//BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
 
 					delete[] word;
 				}
 				else {
-					BOOST_LOG_TRIVIAL(warning) << "Not enough confidence at: " << box[1] << " " << box[3] << std::endl;
+					//BOOST_LOG_TRIVIAL(warning) << "Not enough confidence at: " << box[1] << " " << box[3] << std::endl;
 				}
 			} while (ri->Next(level));
 		}
 		else {
-			BOOST_LOG_TRIVIAL(warning) << "Tesseract can't detect text in region" << box[1] << " " << box[3] << std::endl;
+			//BOOST_LOG_TRIVIAL(warning) << "Tesseract can't detect text in region" << box[1] << " " << box[3] << std::endl;
 		}
 
 
@@ -129,7 +129,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 	cv::imwrite(img.getPath().replace_filename(img.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
 #endif
 
-	BOOST_LOG_TRIVIAL(info) << ((passes) ? "PASS" : "FAIL") << std::endl;
+	//BOOST_LOG_TRIVIAL(info) << ((passes) ? "PASS" : "FAIL") << std::endl;
 
 	//pixDestroy(&image);
 
@@ -169,15 +169,15 @@ bool TinEye::fontSizeCheck(Image& img) {
 			int x1, y1, x2, y2;
 			float conf = ri->Confidence(level);
 			if (conf >= 80) {
-				BOOST_LOG_TRIVIAL(trace) << "confidence: " << conf << " ";
+				//BOOST_LOG_TRIVIAL(trace) << "confidence: " << conf << " ";
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-				BOOST_LOG_TRIVIAL(trace) << "height: " << y2 - y1 << " ";
-				BOOST_LOG_TRIVIAL(trace) << "width: " << x2 - x1 << " ";
-				BOOST_LOG_TRIVIAL(trace) << "line: " << word << std::endl;
+				//BOOST_LOG_TRIVIAL(trace) << "height: " << y2 - y1 << " ";
+				//BOOST_LOG_TRIVIAL(trace) << "width: " << x2 - x1 << " ";
+				//BOOST_LOG_TRIVIAL(trace) << "line: " << word << std::endl;
 				if (x2 - x1 < minimumWidth) {
 					passes = false;
-					BOOST_LOG_TRIVIAL(info) << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 <<
-						" at (" << x1 << ", " << y1 << ")" << std::endl;
+					//BOOST_LOG_TRIVIAL(info) << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 <<
+					//	" at (" << x1 << ", " << y1 << ")" << std::endl;
 				}
 			}
 
@@ -198,13 +198,13 @@ bool TinEye::fontSizeCheck(Image& img) {
 				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
 				if (y2 - y1 < minimumHeight) {
 					//passes = false;
-					BOOST_LOG_TRIVIAL(info) << "Line: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
-						" at (" << x1 << ", " << y1 << ")" << std::endl;
+					//BOOST_LOG_TRIVIAL(info) << "Line: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
+					//	" at (" << x1 << ", " << y1 << ")" << std::endl;
 				}
 
 				//Check for luminance with background using retrieved bounding box
 				int averageBgLuminance = img.getAverageSurroundingLuminance(x1, y1, x2, y2);
-				BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
+				//BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
 			}
 
 			delete[] word;
@@ -226,12 +226,12 @@ bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
 
 	do {
 		if (EASTBoxing) {
-			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
+			//BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
 			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), false);
 
 			if (textBoxes.empty()) {
-				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+				//BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
 			}
 			else {
 				// Get OCR result
