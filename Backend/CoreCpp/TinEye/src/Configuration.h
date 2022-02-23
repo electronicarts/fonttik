@@ -54,12 +54,12 @@ public:
 				}
 			}
 			catch (...) {
-				BOOST_LOG_TRIVIAL(error) << "Malformed configuration file" << std::endl;
+				//BOOST_LOG_TRIVIAL(error) << "Malformed configuration file" << std::endl;
 				setDefaultConfig();
 			}
 		}
 		else {
-			BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
+			//BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
 			setDefaultConfig();
 		}
 
@@ -81,17 +81,17 @@ public:
 	void setActiveLanguage(std::string lang) {
 		fs::path path = tessdataPath / (lang + ".traineddata");
 		if (fs::exists(path)) {
-			BOOST_LOG_TRIVIAL(info) << path.native().c_str() << std::endl;
+			//BOOST_LOG_TRIVIAL(info) << path.native().c_str() << std::endl;
 			language = lang;
 			trainingDataPath = path;
 			validLanguage = true;
 		}
 		else if (lang != "eng") {
-			BOOST_LOG_TRIVIAL(error) << "No training data found for: " << lang << " ,defatulting to english" << std::endl;
+			//BOOST_LOG_TRIVIAL(error) << "No training data found for: " << lang << " ,defatulting to english" << std::endl;
 			setActiveLanguage("eng");
 		}
 		else {
-			BOOST_LOG_TRIVIAL(error) << "Active language is english, but no training data was found" << std::endl;
+			//BOOST_LOG_TRIVIAL(error) << "Active language is english, but no training data was found" << std::endl;
 		}
 	}
 
