@@ -6,6 +6,8 @@
 #include "TextboxDetection.h"
 #include "boost/log/trivial.hpp"
 #include <boost/log/utility/setup/console.hpp>
+#include <tesseract/baseapi.h>
+
 
 void TinEye::init(fs::path configFile)
 {
