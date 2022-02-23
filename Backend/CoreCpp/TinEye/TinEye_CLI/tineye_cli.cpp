@@ -1,6 +1,7 @@
 #include "TinEye.h"
 #include <iostream>
 #include <algorithm>
+#include "TextboxDetection.h"
 
 
 bool cmdOptionExists(char** begin, char** end, const std::string& option)
@@ -18,7 +19,37 @@ int main(int argc, char* argv[]) {
 	}
 	TinEye* tineye = new TinEye();
 	tineye->init("./config.json");
-	bool pass = tineye->fontSizeCheck(argv[1], cmdOptionExists(argv, argv + argc, "--east"));
+
+	//Open input image with openCV
+	Image img;
+	img.loadImage(argv[1]);
+
+	bool pass  = false;
+	bool EASTBoxes = cmdOptionExists(argv, argv + argc, "--east");
+
+	do {
+		if (EASTBoxes) {
+
+
+			//BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
+			//Check if image has text recognized by OCR
+			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), false);
+
+			if (textBoxes.empty()) {
+				//BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+			}
+			else {
+				// Get OCR result
+				pass = tineye->fontSizeCheck(img, textBoxes);
+			}
+
+		}
+		else {
+			pass = tineye->fontSizeCheck(img);
+		}
+	} while (img.nextFrame());
+
+
 
 	delete tineye;
 
