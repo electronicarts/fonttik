@@ -32,7 +32,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 	api->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
 
 	cv::Mat openCVMat = img.getLuminanceMap();
-	img.flipLuminance();
+	//img.flipLuminance();
 
 	if (openCVMat.empty())
 	{
@@ -43,12 +43,12 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 
 	bool passes = true;
 	int minimumHeight = config.getHeightRequirement(), minimumWidth = config.getWidthRequirement();
-	int padding = 5;
+	int padding = 0;
 
 #ifdef _DEBUG
 	//Regions of interest
 	cv::Mat ROIs = img.getImageMatrix().clone();
-	//int counter = 0;
+	int counter = 0;
 #endif
 
 	for (std::vector<cv::Point> box : boxes) {
@@ -60,8 +60,13 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 #ifdef _DEBUG
 		//highlight on debug
 		Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, cv::Scalar(255, 255, 0), ROIs);
-		//cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), subMatrix);
-		//counter++;
+		//To check textboxes and histograms uncomment following lines
+		/*
+		cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), subMatrix);
+		Image::saveLuminanceHistogram(img.calculateLuminanceHistogram(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height),
+			img.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string());
+			*/
+		counter++;
 
 #endif
 		//int conf = api->MeanTextConf();

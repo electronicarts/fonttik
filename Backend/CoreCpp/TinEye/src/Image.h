@@ -17,7 +17,9 @@ protected:
 
 	void convertImageMatrixToBGR();
 
-	float linearize8bitRGB(const uchar& colorBits);
+	static float linearize8bitRGB(const uchar& colorBits);
+
+	static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
 public:
 	Image();
 
@@ -43,6 +45,18 @@ public:
 
 	//Hightlights box in specified matrix
 	static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix);
+
+	//Calculates the luminance histogram of a region
+	//Can return an empty mat if luminance hadn't been calculated before
+	cv::Mat calculateLuminanceHistogram(const int& x1, const int& y1, const int& x2, const int& y2);
+	
+	//Calculates the luminance histogram of an image
+	//Can return an empty mat if luminance hadn't been calculated before
+	cv::Mat calculateLuminanceHistogram();
+
+	static void displayLuminanceHistogram(cv::Mat histogram);
+
+	static void saveLuminanceHistogram(cv::Mat histogram, std::string filepath);
 
 	//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 	bool nextFrame();
