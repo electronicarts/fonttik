@@ -12,6 +12,40 @@ void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int&
 	}
 }
 
+cv::Mat Image::calculateLuminanceHistogram(const int& x1, const int& y1, const int& x2, const int& y2)
+{
+	cv::Mat region = luminanceMap(cv::Rect(x1, y1, x2 - x1, y2 - y1));
+	cv::Mat histogram;
+
+	if (!luminanceMap.empty()) {
+		int histSize = 256;
+		float range[] = { 0,256 };
+		const float* histRange[] = { range };
+
+		cv::calcHist(&region, 1, 0, cv::Mat(), histogram, 1, &histSize, histRange, true, false);
+	}
+
+	return histogram;
+}
+
+cv::Mat Image::calculateLuminanceHistogram()
+{
+	return calculateLuminanceHistogram(0, 0, luminanceMap.cols - 1, luminanceMap.rows - 1);
+}
+
+void Image::displayLuminanceHistogram(cv::Mat histogram)
+{
+	cv::Mat histImage = generateLuminanceHistogramImage(histogram);
+	cv::imshow("histogram", histImage);
+	cv::waitKey();
+}
+
+void Image::saveLuminanceHistogram(cv::Mat histogram, std::string filepath)
+{
+	cv::Mat histImage = generateLuminanceHistogramImage(histogram);
+	cv::imwrite(filepath, histImage);
+}
+
 bool Image::nextFrame()
 {
 	imageMatrix.release();
@@ -37,7 +71,7 @@ Image::Image() {
 
 bool Image::loadImage(std::filesystem::path filepath) {
 	path = filepath;
-	
+
 	std::string fileFormat = filepath.extension().string();
 
 	//Check if given file is an admitted image type, if not, attempt to load as video
@@ -127,7 +161,7 @@ void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int
 void Image::flipLuminance()
 {
 	if (!luminanceMap.empty()) {
-		flipLuminance(0, 0, luminanceMap.cols-1, luminanceMap.rows-1);
+		flipLuminance(0, 0, luminanceMap.cols - 1, luminanceMap.rows - 1);
 	}
 }
 
@@ -179,4 +213,21 @@ float Image::linearize8bitRGB(const uchar& colorBits) {
 	else {
 		return pow((color + 0.055f) / 1.1055f, 2.4f);
 	}
+}
+
+cv::Mat Image::generateLuminanceHistogramImage(cv::Mat histogram)
+{
+	//Display the histogram
+	int hist_w = 512, hist_h = 400;
+	int bin_w = cvRound((double)hist_w / 256);
+	cv::Mat histImage(hist_h, hist_w, CV_8UC1, cv::Scalar(0, 0, 0));
+
+	cv::normalize(histogram, histogram, 0, histImage.rows, cv::NORM_MINMAX);
+
+	for (int i = 1; i < 256; i++) {
+		line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(histogram.at<float>(i - 1))), cv::Point(bin_w * (i), hist_h - cvRound(histogram.at<float>(i))), cv::Scalar(255), 1, 8, 0);
+	}
+
+
+	return histImage;
 }
