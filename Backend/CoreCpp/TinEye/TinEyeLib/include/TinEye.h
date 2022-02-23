@@ -1,30 +1,23 @@
 ﻿#pragma once
-#include "Configuration.h"
-#include "Image.h"
 #include <filesystem>
+#include "Image.h"
 
-using json = nlohmann::json;
 namespace fs = std::filesystem;
-
-#ifdef _WIN
-#define DLLExport   __declspec( dllexport )
-#endif
-#ifdef _UNIX
-#define DLLExport  __attribute__((visibility("default")))
-#endif
 
 namespace tesseract {
 	class TessBaseAPI;
 }
 
+class Configuration;
+
 class TinEye {
-	Configuration config;
+	Configuration* config = nullptr;
 	tesseract::TessBaseAPI* api = nullptr;
-	bool fontSizeCheck(Image& img);
-	bool fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes);
 public:
 	TinEye() {};
 	~TinEye();
 	void init(fs::path configFile);
-	bool fontSizeCheck(fs::path imagePath, bool EAST_Textboxes=false);
+
+	bool fontSizeCheck(Image& img);
+	bool fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes);
 };

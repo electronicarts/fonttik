@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include "Configuration.h"
+#include "Image.h"
 #include "TextboxDetection.h"
 #include "boost/log/trivial.hpp"
 #include <boost/log/utility/setup/console.hpp>
@@ -11,14 +12,14 @@
 
 void TinEye::init(fs::path configFile)
 {
-	config = Configuration(configFile.c_str());
+	config = new Configuration(configFile.c_str());
 
 	if (api != nullptr)
 		delete api;
 	api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with language specified by config
 
-	if (api->Init(config.getTessdataPath().string().c_str(), config.getLanguage().c_str())) {
+	if (api->Init(config->getTessdataPath().string().c_str(), config->getLanguage().c_str())) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
@@ -41,10 +42,10 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 		return false;
 	}
 
-	config.setActiveResolution(openCVMat.rows);
+	config->setActiveResolution(openCVMat.rows);
 
 	bool passes = true;
-	int minimumHeight = config.getHeightRequirement(), minimumWidth = config.getWidthRequirement();
+	int minimumHeight = config->getHeightRequirement(), minimumWidth = config->getWidthRequirement();
 	int padding = 0;
 
 #ifdef _DEBUG
@@ -159,11 +160,11 @@ bool TinEye::fontSizeCheck(Image& img) {
 
 	api->Recognize(0);
 
-	config.setActiveResolution(openCVMat.rows);
+	config->setActiveResolution(openCVMat.rows);
 
 	//Start font size test
 	bool passes = true;
-	int minimumHeight = config.getHeightRequirement(), minimumWidth = config.getWidthRequirement();
+	int minimumHeight = config->getHeightRequirement(), minimumWidth = config->getWidthRequirement();
 
 
 	//Test for width of each individual character
@@ -223,39 +224,6 @@ bool TinEye::fontSizeCheck(Image& img) {
 	return passes;
 }
 
-bool TinEye::fontSizeCheck(fs::path imagePath, bool EASTBoxing)
-{
-	//Open input image with openCV
-	Image img;
-	img.loadImage(imagePath);
-
-	bool testResult = false;
-
-	do {
-		if (EASTBoxing) {
-			//BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
-			//Check if image has text recognized by OCR
-			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), false);
-
-			if (textBoxes.empty()) {
-				//BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
-			}
-			else {
-				// Get OCR result
-				testResult = fontSizeCheck(img, textBoxes);
-			}
-
-		}
-		else {
-			testResult = fontSizeCheck(img);
-		}
-	} while (img.nextFrame());
-
-
-	return testResult;
-
-}
-
 TinEye::~TinEye()
 {
 	if (api != nullptr)
@@ -264,5 +232,10 @@ TinEye::~TinEye()
 		delete api;
 	}
 
+	if (config != nullptr) {
+		delete config;
+	}
+
+	config = nullptr;
 	api = nullptr;
 }
