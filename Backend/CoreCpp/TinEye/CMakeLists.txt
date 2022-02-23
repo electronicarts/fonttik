@@ -3,52 +3,24 @@
 cmake_minimum_required (VERSION 3.8)
 
 #Source files for compilation
-file(GLOB_RECURSE sources src/*.cpp src/*.h)
 file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
-file(GLOB_RECURSE east_src east_prototype/*.cpp east_prototype/*.h)
 file(GLOB_RECURSE cli_sources src_cli/*.cpp src_cli/*.h)
 
 find_package(Tesseract CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS log)
+find_package(GTest CONFIG REQUIRED)
 
-
-include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-# Add source to this project's executable.
-add_library (TinEye STATIC ${sources} )
-
-
-
-add_executable(TinEye_CLI ${cli_sources} )
-
-add_executable (EAST ${east_src} )
-
-set(Tineye_Libs ${OpenCV_LIBS} 
+set(TinEye_DEPS ${OpenCV_LIBS}
 ${Tesseract_LIBRARIES} 
 nlohmann_json nlohmann_json::nlohmann_json
 ${Boost_LIBRARIES})
 
-target_link_libraries(TinEye PRIVATE ${Tineye_Libs})
+add_subdirectory("east_prototype")
+add_subdirectory("TinEyeLib")
+add_subdirectory("TinEye_CLI")
 
-target_link_libraries(TinEye_CLI TinEye)
-target_include_directories(TinEye_CLI PRIVATE src/)
-
-target_link_libraries(EAST ${Tineye_Libs})
-
-
-#Unit tests
 enable_testing()
-find_package(GTest CONFIG REQUIRED)
 
-add_executable(Tineye_tests ${test_sources} )
-
-target_link_libraries(Tineye_tests TinEye ${OpenCV_LIBS} ${Boost_LIBRARIES} GTest::gtest GTest::gtest_main)
-
-target_include_directories(Tineye_tests PRIVATE src/)
-
-add_test(Tineye_tests Tineye_tests)
-
-#Copy data to destination folder
-
-add_custom_command(TARGET TinEye_CLI Tineye_tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/TinEye/data $<TARGET_FILE_DIR:TinEye>)
+add_subdirectory("TinEyeLib_Tests")

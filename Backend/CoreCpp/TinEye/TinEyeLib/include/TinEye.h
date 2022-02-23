@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Configuration.h"
-#include <tesseract/baseapi.h>
 #include "Image.h"
 #include <filesystem>
 
@@ -13,6 +12,10 @@ namespace fs = std::filesystem;
 #ifdef _UNIX
 #define DLLExport  __attribute__((visibility("default")))
 #endif
+
+namespace tesseract {
+	class TessBaseAPI;
+}
 
 class TinEye {
 	Configuration config;
