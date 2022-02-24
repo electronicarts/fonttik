@@ -44,7 +44,7 @@ public:
 	uchar getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX = 3, const int& marginY = 3);
 
 	//Hightlights box in specified matrix
-	static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix);
+	static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness = 1);
 
 	//Calculates the luminance histogram of a region
 	//Can return an empty mat if luminance hadn't been calculated before

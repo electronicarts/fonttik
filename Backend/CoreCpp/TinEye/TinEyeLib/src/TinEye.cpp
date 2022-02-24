@@ -28,11 +28,8 @@ void TinEye::init(fs::path configFile)
 }
 
 bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes) {
-	// Set API page segmentation mode to single word, since we know the boxes of the words we'll be searching for
-	api->SetPageSegMode(tesseract::PSM_SINGLE_WORD);
-
-	cv::Mat openCVMat = img.getLuminanceMap();
-	//img.flipLuminance();
+	cv::Mat openCVMat = img.getImageMatrix();
+	img.getLuminanceMap();
 
 	if (openCVMat.empty())
 	{
@@ -51,15 +48,63 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 	int counter = 0;
 #endif
 
+	//from https://docs.opencv.org/4.x/d4/d43/tutorial_dnn_text_spotting.html
+
+	// Load models weights
+	cv::dnn::TextRecognitionModel model("crnn_cs.onnx");
+	model.setDecodeType("CTC-greedy");
+	std::ifstream vocFile;
+	vocFile.open("alphabet_94.txt");
+	CV_Assert(vocFile.is_open());
+	std::string vocLine;
+	std::vector<std::string> vocabulary;
+	while (std::getline(vocFile, vocLine)) {
+		vocabulary.push_back(vocLine);
+	}
+	model.setVocabulary(vocabulary);
+
+	// Normalization parameters
+	double scale = 1.0 / 127.5;
+	cv::Scalar mean = cv::Scalar(127.5, 127.5, 127.5);
+	// The input shape
+	cv::Size inputSize = cv::Size(100, 32);
+	model.setInputParams(scale, inputSize, mean);
+
+
 	for (std::vector<cv::Point> box : boxes) {
-		//Set word detection to word bounding box, automatically recognizes
-		cv::Rect boxRect(box[1].x - padding, box[1].y - padding, box[2].x - box[1].x + (padding * 2), box[0].y - box[1].y + (padding * 2));
+		bool individualPass = true;
+		//Set word detection to word bounding box
+		int originalBoxWidth = box[3].x - box[1].x, originalBoxHeight = std::max(box[0].y,box[3].y) - box[1].y;
+		cv::Rect boxRect(box[1].x - padding, box[1].y - padding, originalBoxWidth + (padding * 2), originalBoxHeight + (padding * 2));
 		cv::Mat subMatrix = openCVMat(boxRect);
-		api->SetImage(subMatrix.data, subMatrix.cols, subMatrix.rows, 1, subMatrix.step);
-		api->Recognize(0);
+
+		//Recognize word in region
+		std::string recognitionResult = model.recognize(subMatrix);
+
+		//Check average width
+		if (originalBoxWidth / recognitionResult.size() < minimumWidth) {
+			passes = false;
+			individualPass = false;
+			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << originalBoxWidth / recognitionResult.size() <<
+				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+		}
+
+
+		//Check height
+		if (originalBoxHeight < minimumHeight) {
+			passes = false;
+			individualPass = false;
+			BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << originalBoxHeight <<
+				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+		}
+
+		//Check for luminance with background using retrieved bounding box
+		int averageBgLuminance = img.getAverageSurroundingLuminance(box[1].x, box[1].y, box[3].x, box[3].y);
+		BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << recognitionResult << "' is " << averageBgLuminance << std::endl;
+
 #ifdef _DEBUG
 		//highlight on debug
-		Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, cv::Scalar(255, 255, 0), ROIs);
+		Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0,255,0) : cv::Scalar(0,0,255), ROIs,2);
 		//To check textboxes and histograms uncomment following lines
 		/*
 		cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), subMatrix);
@@ -69,66 +114,6 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 		counter++;
 
 #endif
-		//int conf = api->MeanTextConf();
-		//BOOST_LOG_TRIVIAL(trace) << conf << "\n";
-		//if (conf < 80) {
-		//	BOOST_LOG_TRIVIAL(info) << "Flipping luminance\n";
-		//	//East detected text but tesseract didn't. flip luminance to improve detection and recalculate
-		//	img.flipLuminance(box[1].x - padding, box[1].y - padding, box[3].x + padding, box[3].y + padding);
-		//	//api->SetImage(openCVMat.data, openCVMat.cols, openCVMat.rows, 1, openCVMat.step);
-		//	api->SetImage(subMatrix.data, subMatrix.cols, subMatrix.rows, 1, subMatrix.step);
-		//	api->Recognize(0);
-		//}
-
-		//conf = api->MeanTextConf();
-		//BOOST_LOG_TRIVIAL(trace) << conf << "\n";
-
-		tesseract::ResultIterator* ri = api->GetIterator();
-		tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
-
-		if (ri != 0) {
-			do {
-				if (ri->Confidence(level) >= 80) {
-					//Count number of characters in word
-					const char* word = ri->GetUTF8Text(level);
-					int numberOfChars = strlen(word);
-					BOOST_LOG_TRIVIAL(trace) << word << "\n";
-
-					int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-					ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-
-					//Check average width
-					if ((x2 - x1) / numberOfChars < minimumWidth) {
-						passes = false;
-						BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << word << " doesn't comply with minimum width, detected width: " << (x2 - x1) / numberOfChars <<
-							" at (" << x1 << ", " << y1 << ")" << std::endl;
-					}
-
-					//Check height
-					if (y2 - y1 < minimumHeight) {
-						passes = false;
-						BOOST_LOG_TRIVIAL(info) << "Word: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
-							" at (" << x1 << ", " << y1 << ")" << std::endl;
-					}
-
-					//Check for luminance with background using retrieved bounding box
-					int averageBgLuminance = img.getAverageSurroundingLuminance(x1, y1, x2, y2);
-					BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
-
-					delete[] word;
-				}
-				else {
-					BOOST_LOG_TRIVIAL(warning) << "Not enough confidence at: " << box[1] << " " << box[3] << std::endl;
-				}
-			} while (ri->Next(level));
-		}
-		else {
-			BOOST_LOG_TRIVIAL(warning) << "Tesseract can't detect text in region" << box[1] << " " << box[3] << std::endl;
-		}
-
-
-
-		delete ri;
 	}
 #ifdef _DEBUG
 	cv::imwrite(img.getPath().replace_filename(img.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);

@@ -20,7 +20,7 @@ void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point
 	warpPerspective(frame, result, rotationMatrix, outputSize);
 }
 
-std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, bool debug)
+std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, bool saveBoxesImage)
 {
 	//Calculate needed conversion for new width and height to be multiples of 32
 	////This needs to be multiple of 32
@@ -67,11 +67,10 @@ std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, b
 	[0]---------[3]
 	*/
 
-	if (debug) {
+	if (saveBoxesImage) {
+		// Text Recognition
+		cv::Mat recInput = img.clone();
 		if (detResults.size() > 0) {
-			// Text Recognition
-			cv::Mat recInput = img;
-
 			std::vector< std::vector<cv::Point> > contours;
 			for (uint i = 0; i < detResults.size(); i++)
 			{
@@ -88,9 +87,9 @@ std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, b
 				cv::Mat cropped;
 				fourPointsTransform(recInput, &quadrangle_2f[0], cropped);
 			}
-			polylines(img, contours, true, cv::Scalar(0, 255, 0), 2);
+			polylines(recInput, contours, true, cv::Scalar(0, 255, 0), 2);
 		}
-		cv::imwrite("resources/textbox_results.png", img);
+		cv::imwrite("resources/textbox_results.png", recInput);
 	}
 
 	return detResults;
