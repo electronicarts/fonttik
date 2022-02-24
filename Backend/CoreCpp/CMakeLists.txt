@@ -19,3 +19,6 @@ project ("TinEye")
 
 # Include sub-projects.
 add_subdirectory ("TinEye")
+
+enable_testing()
+add_subdirectory("TinEye/TinEyeLib.Tests")

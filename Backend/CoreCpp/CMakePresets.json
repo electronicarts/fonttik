@@ -161,5 +161,14 @@
       "inherits": "macos-debug",
       "cleanFirst": true
     }
+  ],
+  "testPresets": [
+    {
+      "name": "tineyelib-linux",
+      "configurePreset": "linux-release",
+      "environment": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
   ]
 }

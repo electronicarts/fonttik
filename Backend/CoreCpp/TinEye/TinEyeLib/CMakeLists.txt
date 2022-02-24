@@ -12,4 +12,4 @@ include_directories("include/" "include_private/")
 
 add_library(TinEyeLib STATIC ${SOURCES})
 
-target_link_libraries(TinEyeLib PRIVATE ${TinEye_DEPS})
+target_link_libraries(TinEyeLib PRIVATE ${TinEye_DEPS} Boost::log)
