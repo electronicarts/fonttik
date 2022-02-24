@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
-			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), false);
+			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
 
 			if (textBoxes.empty()) {
 				//BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;

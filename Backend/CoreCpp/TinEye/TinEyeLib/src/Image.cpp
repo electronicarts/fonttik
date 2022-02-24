@@ -2,13 +2,13 @@
 #include <boost/log/trivial.hpp>
 
 
-void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix)
+void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
 {
 	if (!matrix.empty()) {
-		cv::line(matrix, cv::Point(x1, y1), cv::Point(x2, y1), color);
-		cv::line(matrix, cv::Point(x2, y1), cv::Point(x2, y2), color);
-		cv::line(matrix, cv::Point(x2, y2), cv::Point(x1, y2), color);
-		cv::line(matrix, cv::Point(x1, y2), cv::Point(x1, y1), color);
+		cv::line(matrix, cv::Point(x1, y1), cv::Point(x2, y1), color, thickness);
+		cv::line(matrix, cv::Point(x2, y1), cv::Point(x2, y2), color, thickness);
+		cv::line(matrix, cv::Point(x2, y2), cv::Point(x1, y2), color, thickness);
+		cv::line(matrix, cv::Point(x1, y2), cv::Point(x1, y1), color, thickness);
 	}
 }
 
