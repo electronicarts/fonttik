@@ -54,7 +54,7 @@ bool Image::nextFrame()
 	if (isVideo) {
 		video >> imageMatrix;
 		if (imageMatrix.empty()) {
-			//BOOST_LOG_TRIVIAL(info) << "No more images" << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "No more images" << std::endl;
 			video.release();
 		}
 		else {
@@ -91,7 +91,7 @@ bool Image::loadImage(std::filesystem::path filepath) {
 
 	//If imagematrix is empty something has gone wrong when loading
 	if (imageMatrix.empty()) {
-		//BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "Could not read image: " << filepath << std::endl;
 	}
 	else {
 		convertImageMatrixToBGR();

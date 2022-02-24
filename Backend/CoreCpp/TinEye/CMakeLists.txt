@@ -10,7 +10,6 @@ find_package(Tesseract CONFIG REQUIRED)
 find_package(OpenCV CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS log)
-find_package(GTest CONFIG REQUIRED)
 
 set(TinEye_DEPS ${OpenCV_LIBS}
 ${Tesseract_LIBRARIES} 
@@ -19,8 +18,4 @@ ${Boost_LIBRARIES})
 
 add_subdirectory("east_prototype")
 add_subdirectory("TinEyeLib")
-add_subdirectory("TinEye_CLI")
-
-enable_testing()
-
-add_subdirectory("TinEyeLib_Tests")
+add_subdirectory("TinEyeApp")

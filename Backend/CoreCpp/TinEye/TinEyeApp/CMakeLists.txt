@@ -11,11 +11,11 @@ file(GLOB_RECURSE SOURCES ./*.h ./*.cpp)
 include_directories("../TinEyeLib/include/")  #TODO make this absolute from a TINEYE_CORE_PATH variable
 include_directories("include/" "include_private/")
 
-add_executable(TineEye_CLI ${SOURCES})
+add_executable(TineEyeApp ${SOURCES})
 
-target_link_libraries(TineEye_CLI PRIVATE
+target_link_libraries(TineEyeApp PRIVATE
 TinEyeLib
 ${TinEye_DEPS})
 
 #Copy data to destination folder
-add_custom_command(TARGET TineEye_CLI POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/TinEye/data $<TARGET_FILE_DIR:TineEye_CLI>)
+add_custom_command(TARGET TineEyeApp POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/TinEye/data $<TARGET_FILE_DIR:TineEyeApp>)

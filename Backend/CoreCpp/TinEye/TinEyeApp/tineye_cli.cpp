@@ -2,7 +2,8 @@
 #include <iostream>
 #include <algorithm>
 #include "TextboxDetection.h"
-
+#include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/console.hpp>
 
 bool cmdOptionExists(char** begin, char** end, const std::string& option)
 {
@@ -17,6 +18,8 @@ int main(int argc, char* argv[]) {
 		std::cin.get();
 		return 1;
 	}
+	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
+
 	TinEye* tineye = new TinEye();
 	tineye->init("./config.json");
 
@@ -31,7 +34,7 @@ int main(int argc, char* argv[]) {
 		if (EASTBoxes) {
 
 
-			//BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
+			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
 			std::vector<std::vector<cv::Point>> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), false);
 
