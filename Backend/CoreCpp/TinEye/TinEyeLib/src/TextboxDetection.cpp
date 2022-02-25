@@ -20,7 +20,7 @@ void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point
 	warpPerspective(frame, result, rotationMatrix, outputSize);
 }
 
-std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, bool saveBoxesImage)
+std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, bool saveBoxesImage)
 {
 	//Calculate needed conversion for new width and height to be multiples of 32
 	////This needs to be multiple of 32
@@ -59,6 +59,11 @@ std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, b
 		}
 	}
 
+	std::vector<Textbox> boxes;
+	for (std::vector<cv::Point > points : detResults) {
+		boxes.emplace_back(points);
+	}
+
 	//Points are
 	/*
 	[1]---------[2]
@@ -92,5 +97,5 @@ std::vector<std::vector<cv::Point>> TextboxDetection::detectBoxes(cv::Mat img, b
 		cv::imwrite("resources/textbox_results.png", recInput);
 	}
 
-	return detResults;
+	return boxes;
 }

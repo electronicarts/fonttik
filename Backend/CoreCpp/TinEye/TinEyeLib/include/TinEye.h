@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <filesystem>
 #include "Image.h"
+#include "Textbox.h"
 
 namespace fs = std::filesystem;
 
@@ -19,5 +20,5 @@ public:
 	void init(fs::path configFile);
 
 	bool fontSizeCheck(Image& img);
-	bool fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes);
+	bool fontSizeCheck(Image& img, std::vector<Textbox>& boxes);
 };
