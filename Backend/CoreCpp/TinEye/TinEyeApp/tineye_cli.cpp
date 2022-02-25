@@ -20,8 +20,10 @@ int main(int argc, char* argv[]) {
 	}
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
 
+	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
+
 	TinEye* tineye = new TinEye();
-	tineye->init("./config.json");
+	tineye->init("config.json");
 
 	//Open input image with openCV
 	Image img;

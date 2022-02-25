@@ -7,7 +7,8 @@
 #include "TextboxDetection.h"
 #include "boost/log/trivial.hpp"
 #include <tesseract/baseapi.h>
-
+#include "Guideline.h"
+#include "AppSettings.h"
 
 void TinEye::init(fs::path configFile)
 {
@@ -18,7 +19,7 @@ void TinEye::init(fs::path configFile)
 	api = new tesseract::TessBaseAPI();
 	// Initialize tesseract-ocr with language specified by config
 
-	if (api->Init(config->getTessdataPath().string().c_str(), config->getLanguage().c_str())) {
+	if (api->Init("tessdata/", "eng")) {
 		fprintf(stderr, "Could not initialize tesseract.\n");
 		exit(1);
 	}
@@ -31,15 +32,18 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	cv::Mat openCVMat = img.getImageMatrix();
 	img.getLuminanceMap();
 
+	AppSettings* appSettings = config->getAppSettings();
+	Guideline* guideline = config->getGuideline();
+
 	if (openCVMat.empty())
 	{
 		return false;
 	}
 
-	config->setActiveResolution(openCVMat.rows);
+	guideline->setActiveResolution(openCVMat.rows);
 
 	bool passes = true;
-	int minimumHeight = config->getHeightRequirement(), minimumWidth = config->getWidthRequirement();
+	int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
 	int padding = 0;
 
 #ifdef _DEBUG
@@ -102,20 +106,25 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 		BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << recognitionResult << "' is " << averageBgLuminance << std::endl;
 
 #ifdef _DEBUG
-		//highlight on debug
-		Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0,255,0) : cv::Scalar(0,0,255), ROIs,2);
-		//To check textboxes and histograms uncomment following lines
-		/*
-		cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), subMatrix);
-		Image::saveLuminanceHistogram(img.calculateLuminanceHistogram(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height),
-			img.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string());
-			*/
+		if (appSettings->saveTexboxOutline()) {
+			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0,255,0) : cv::Scalar(0,0,255), ROIs,2);
+		}
+		if (appSettings->saveSeparateTextboxes()) {
+			cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), box.getSubmatrix());
+		}
+		if (appSettings->saveHistograms()) {
+			fs::path savePath = img.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
+			Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
+				savePath.string());
+		}
 		counter++;
 
 #endif
 	}
 #ifdef _DEBUG
-	cv::imwrite(img.getPath().replace_filename(img.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
+	if (appSettings->saveTexboxOutline()) {
+		cv::imwrite(img.getPath().replace_filename(img.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
+	}
 #endif
 
 	BOOST_LOG_TRIVIAL(info) << ((passes) ? "PASS" : "FAIL") << std::endl;
@@ -130,6 +139,9 @@ bool TinEye::fontSizeCheck(Image& img) {
 	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
 
 	cv::Mat openCVMat = img.getLuminanceMap();
+	AppSettings* appSettings = config->getAppSettings();
+	Guideline* guideline = config->getGuideline();
+
 
 	if (openCVMat.empty())
 	{
@@ -141,11 +153,11 @@ bool TinEye::fontSizeCheck(Image& img) {
 
 	api->Recognize(0);
 
-	config->setActiveResolution(openCVMat.rows);
+	guideline->setActiveResolution(openCVMat.rows);
 
 	//Start font size test
 	bool passes = true;
-	int minimumHeight = config->getHeightRequirement(), minimumWidth = config->getWidthRequirement();
+	int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
 
 
 	//Test for width of each individual character

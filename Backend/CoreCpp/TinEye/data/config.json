@@ -1,5 +1,13 @@
 {
-  "language": "eng",
+  "appSettings":{
+    "resultsPath":"./results/",
+    "debugInfoPath":"./debug_info/",
+    "saveLuminanceMap": true,
+    "saveTextboxOutline": true,
+    "saveSeparateTexboxes":false,
+    "saveHistograms":false
+  },
+ "guideline":{
   "contrast": 4.5,
   "tessdataPath": "tessdata",
 
@@ -19,4 +27,4 @@
       "height": 92
     }
   }
-}
+}}
