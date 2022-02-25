@@ -27,7 +27,7 @@ void TinEye::init(fs::path configFile)
 	api->SetVariable("user_defined_dpi", "70");
 }
 
-bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxes) {
+bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	cv::Mat openCVMat = img.getImageMatrix();
 	img.getLuminanceMap();
 
@@ -71,35 +71,34 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<std::vector<cv::Point>>& boxe
 	model.setInputParams(scale, inputSize, mean);
 
 
-	for (std::vector<cv::Point> box : boxes) {
+	for (Textbox box : boxes) {
 		bool individualPass = true;
 		//Set word detection to word bounding box
-		int originalBoxWidth = box[3].x - box[1].x, originalBoxHeight = std::max(box[0].y,box[3].y) - box[1].y;
-		cv::Rect boxRect(box[1].x - padding, box[1].y - padding, originalBoxWidth + (padding * 2), originalBoxHeight + (padding * 2));
-		cv::Mat subMatrix = openCVMat(boxRect);
+		box.setParentImage(&img);
+		cv::Rect boxRect = box.getRect();
 
 		//Recognize word in region
-		std::string recognitionResult = model.recognize(subMatrix);
+		std::string recognitionResult = model.recognize(box.getSubmatrix());
 
 		//Check average width
-		if (originalBoxWidth / recognitionResult.size() < minimumWidth) {
+		if (boxRect.width / recognitionResult.size() < minimumWidth) {
 			passes = false;
 			individualPass = false;
-			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << originalBoxWidth / recognitionResult.size() <<
+			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << boxRect.width / recognitionResult.size() <<
 				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
 		}
 
 
 		//Check height
-		if (originalBoxHeight < minimumHeight) {
+		if (boxRect.height < minimumHeight) {
 			passes = false;
 			individualPass = false;
-			BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << originalBoxHeight <<
+			BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << boxRect.height <<
 				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
 		}
 
 		//Check for luminance with background using retrieved bounding box
-		int averageBgLuminance = img.getAverageSurroundingLuminance(box[1].x, box[1].y, box[3].x, box[3].y);
+		int averageBgLuminance = img.getAverageSurroundingLuminance(boxRect);
 		BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << recognitionResult << "' is " << averageBgLuminance << std::endl;
 
 #ifdef _DEBUG

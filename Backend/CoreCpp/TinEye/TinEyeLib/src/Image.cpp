@@ -12,25 +12,31 @@ void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int&
 	}
 }
 
-cv::Mat Image::calculateLuminanceHistogram(const int& x1, const int& y1, const int& x2, const int& y2)
+cv::Mat Image::calculateLuminanceHistogram(cv::Rect rect, cv::Rect ignoreRegion)
 {
-	cv::Mat region = luminanceMap(cv::Rect(x1, y1, x2 - x1, y2 - y1));
+	if (luminanceMap.empty()) {
+		getLuminanceMap();
+	}
+
+	cv::Mat region = luminanceMap(rect);
+	cv::Mat mask = cv::Mat::ones(region.rows,region.cols, CV_8UC1)*255;
+	cv::rectangle(mask, ignoreRegion, cv::Scalar(0,0,0,0), cv::FILLED);
+	//cv::imshow("mask show", mask);
+	//cv::waitKey();
 	cv::Mat histogram;
 
-	if (!luminanceMap.empty()) {
-		int histSize = 256;
-		float range[] = { 0,256 };
-		const float* histRange[] = { range };
+	int histSize = 256;
+	float range[] = { 0,256 };
+	const float* histRange[] = { range };
 
-		cv::calcHist(&region, 1, 0, cv::Mat(), histogram, 1, &histSize, histRange, true, false);
-	}
+	cv::calcHist(&region, 1, 0, mask, histogram, 1, &histSize, histRange, true, false);
 
 	return histogram;
 }
 
 cv::Mat Image::calculateLuminanceHistogram()
 {
-	return calculateLuminanceHistogram(0, 0, luminanceMap.cols - 1, luminanceMap.rows - 1);
+	return calculateLuminanceHistogram();
 }
 
 void Image::displayLuminanceHistogram(cv::Mat histogram)
@@ -168,7 +174,7 @@ void Image::flipLuminance()
 uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX, const int& marginY)
 {
 	uchar lum = 0;
-
+	//TODO use more efficient ROI operations
 	if (!luminanceMap.empty()) {
 
 
@@ -191,6 +197,11 @@ uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const 
 	}
 
 	return lum;
+}
+
+uchar Image::getAverageSurroundingLuminance(cv::Rect region, const int& marginX, const int& marginY)
+{
+	return getAverageSurroundingLuminance(region.x, region.y, region.x + region.width, region.y + region.height, marginX, marginY);
 }
 
 void Image::convertImageMatrixToBGR()
