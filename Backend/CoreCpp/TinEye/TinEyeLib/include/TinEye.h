@@ -19,6 +19,6 @@ public:
 	~TinEye();
 	void init(fs::path configFile);
 
-	bool fontSizeCheck(Image& img);
 	bool fontSizeCheck(Image& img, std::vector<Textbox>& boxes);
+	bool textContrastCheck(Image& image, std::vector<Textbox>& boxes);
 };
