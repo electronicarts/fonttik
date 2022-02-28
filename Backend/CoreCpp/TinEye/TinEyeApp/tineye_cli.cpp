@@ -29,11 +29,10 @@ int main(int argc, char* argv[]) {
 	Image img;
 	img.loadImage(argv[1]);
 
-	bool pass  = false;
-	bool EASTBoxes = cmdOptionExists(argv, argv + argc, "--east");
+	bool passesSize  = false;
+	bool passesContrast = false;
 
 	do {
-		if (EASTBoxes) {
 
 
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
@@ -45,19 +44,16 @@ int main(int argc, char* argv[]) {
 			}
 			else {
 				// Get OCR result
-				pass = tineye->fontSizeCheck(img, textBoxes);
+				passesSize = tineye->fontSizeCheck(img, textBoxes);
+				passesContrast = tineye->textContrastCheck(img, textBoxes);
 			}
-
-		}
-		else {
-			pass = tineye->fontSizeCheck(img);
-		}
 	} while (img.nextFrame());
 
 
 
 	delete tineye;
 
-	std::cout << ((pass) ? "PASS" : "FAIL") << std::endl;;
+	std::cout << "SIZE: " << ((passesSize) ? "PASS" : "FAIL") <<
+		"\tCONTRAST (not implemented): " << ((passesContrast) ? "PASS" : "FAIL")  << std::endl;;
 	std::cin.get();
 }

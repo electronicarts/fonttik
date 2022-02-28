@@ -101,10 +101,6 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
 		}
 
-		//Check for luminance with background using retrieved bounding box
-		int averageBgLuminance = img.getAverageSurroundingLuminance(boxRect);
-		BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << recognitionResult << "' is " << averageBgLuminance << std::endl;
-
 #ifdef _DEBUG
 		if (appSettings->saveTexboxOutline()) {
 			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0,255,0) : cv::Scalar(0,0,255), ROIs,2);
@@ -136,87 +132,21 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	return passes;
 }
 
-bool TinEye::fontSizeCheck(Image& img) {
-	// Set API page segmentation mode to sparse text (finds as much text as possible in no particular order)
-	api->SetPageSegMode(tesseract::PSM_SPARSE_TEXT);
-
-	cv::Mat openCVMat = img.getLuminanceMap();
-	AppSettings* appSettings = config->getAppSettings();
-	Guideline* guideline = config->getGuideline();
-
-
-	if (openCVMat.empty())
-	{
-		return false;
+bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
+	bool imagePasses = true;
+	
+	for (Textbox box : boxes) {
+		cv::Rect boxRect = box.getRect();
+		//Check for luminance with background using retrieved bounding box
+		int averageBgLuminance = image.getAverageSurroundingLuminance(boxRect);
+		//TODO get luminance of text
+		//TODO output test result
+		bool boxPasses = true;
+		//TODO highlight box in function of boxpasses
+		imagePasses = imagePasses && boxPasses;
 	}
 
-
-	api->SetImage(openCVMat.data, openCVMat.cols, openCVMat.rows, 1, openCVMat.step);
-
-	api->Recognize(0);
-
-	guideline->setActiveResolution(openCVMat.rows);
-
-	//Start font size test
-	bool passes = true;
-	int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
-
-
-	//Test for width of each individual character
-	//Can recognize words, letters, lines or complete blocks
-	tesseract::ResultIterator* ri = api->GetIterator();
-	tesseract::PageIteratorLevel level = tesseract::RIL_SYMBOL;
-	if (ri != 0) {
-		do {
-			const char* word = ri->GetUTF8Text(level);
-			int x1, y1, x2, y2;
-			float conf = ri->Confidence(level);
-			if (conf >= 80) {
-				BOOST_LOG_TRIVIAL(trace) << "confidence: " << conf << " ";
-				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-				BOOST_LOG_TRIVIAL(trace) << "height: " << y2 - y1 << " ";
-				BOOST_LOG_TRIVIAL(trace) << "width: " << x2 - x1 << " ";
-				BOOST_LOG_TRIVIAL(trace) << "line: " << word << std::endl;
-				if (x2 - x1 < minimumWidth) {
-					passes = false;
-					BOOST_LOG_TRIVIAL(info) << "Character " << word << " doesn't comply with minimum width, detected width: " << x2 - x1 <<
-						" at (" << x1 << ", " << y1 << ")" << std::endl;
-				}
-			}
-
-			delete[] word;
-		} while (ri->Next(level) && passes);
-	}
-
-	delete ri;
-	//Test for height for entire lines (so it includes characters that are longer and shorter (trying to approximate hp distance)
-	ri = api->GetIterator();
-	level = tesseract::RIL_WORD;
-	if (ri != 0) {
-		do {
-			const char* word = ri->GetUTF8Text(level);
-			int x1, y1, x2, y2;
-			float conf = ri->Confidence(level);
-			if (conf >= 50) {
-				ri->BoundingBox(level, &x1, &y1, &x2, &y2);
-				if (y2 - y1 < minimumHeight) {
-					//passes = false;
-					BOOST_LOG_TRIVIAL(info) << "Line: '" << word << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << y2 - y1 <<
-						" at (" << x1 << ", " << y1 << ")" << std::endl;
-				}
-
-				//Check for luminance with background using retrieved bounding box
-				int averageBgLuminance = img.getAverageSurroundingLuminance(x1, y1, x2, y2);
-				BOOST_LOG_TRIVIAL(info) << "Average background luminance for line: '" << word << "' is " << averageBgLuminance << std::endl;
-			}
-
-			delete[] word;
-		} while (ri->Next(level) && passes);
-	}
-
-	delete ri;
-
-	return passes;
+	return imagePasses;
 }
 
 TinEye::~TinEye()
