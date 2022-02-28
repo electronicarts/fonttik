@@ -116,6 +116,8 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 			fs::path savePath = img.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
 			Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
 				savePath.string());
+
+			Image::saveHistogramCSV(img.calculateLuminanceHistogram(boxRect), img.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
 		}
 		counter++;
 

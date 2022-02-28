@@ -1,6 +1,6 @@
 #include "Image.h"
 #include <boost/log/trivial.hpp>
-
+#include <fstream>
 
 void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
 {
@@ -50,6 +50,14 @@ void Image::saveLuminanceHistogram(cv::Mat histogram, std::string filepath)
 {
 	cv::Mat histImage = generateLuminanceHistogramImage(histogram);
 	cv::imwrite(filepath, histImage);
+}
+
+void Image::saveHistogramCSV(cv::Mat histogram, std::string filename)
+{
+	std::ofstream filestream;
+	filestream.open(filename.c_str());
+	filestream << cv::format(histogram, cv::Formatter::FMT_CSV) << std::endl;
+	filestream.close();
 }
 
 bool Image::nextFrame()

@@ -59,6 +59,9 @@ public:
 
 	static void saveLuminanceHistogram(cv::Mat histogram, std::string filepath);
 
+	//Saves specified luminance histogram to a csv file
+	static void saveHistogramCSV(cv::Mat histogram, std::string filename);
+
 	//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 	bool nextFrame();
 
