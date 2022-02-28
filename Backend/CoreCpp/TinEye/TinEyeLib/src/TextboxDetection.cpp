@@ -5,6 +5,7 @@
 #include <iostream>
 #include <boost/log/trivial.hpp>
 
+#include "AppSettings.h"
 
 void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result)
 {
@@ -20,7 +21,7 @@ void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point
 	warpPerspective(frame, result, rotationMatrix, outputSize);
 }
 
-std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, bool saveBoxesImage)
+std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSettings* appSettings)
 {
 	//Calculate needed conversion for new width and height to be multiples of 32
 	////This needs to be multiple of 32
@@ -72,7 +73,7 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, bool saveBoxesIm
 	[0]---------[3]
 	*/
 
-	if (saveBoxesImage) {
+	if (appSettings->saveRawTexboxOutline()) {
 		// Text Recognition
 		cv::Mat recInput = img.clone();
 		if (detResults.size() > 0) {
@@ -94,7 +95,7 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, bool saveBoxesIm
 			}
 			polylines(recInput, contours, true, cv::Scalar(0, 255, 0), 2);
 		}
-		cv::imwrite("resources/textbox_results.png", recInput);
+		cv::imwrite("resources/raw_EAST_textboxes.png", recInput);
 	}
 
 	return boxes;

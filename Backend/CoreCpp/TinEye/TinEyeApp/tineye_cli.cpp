@@ -1,7 +1,6 @@
 #include "TinEye.h"
 #include <iostream>
 #include <algorithm>
-#include "TextboxDetection.h"
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 
@@ -37,7 +36,7 @@ int main(int argc, char* argv[]) {
 
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
-			std::vector<Textbox> textBoxes = TextboxDetection::detectBoxes(img.getImageMatrix(), true);
+			std::vector<Textbox> textBoxes = tineye->getTextBoxes(img);
 
 			if (textBoxes.empty()) {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
