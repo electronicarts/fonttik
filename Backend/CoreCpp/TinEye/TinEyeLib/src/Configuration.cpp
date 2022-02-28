@@ -30,7 +30,7 @@ Configuration::Configuration(fs::path configPath) {
 		try {
 			json settings = config["appSettings"];
 			appSettings = new AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
-				settings["saveSeparateTexboxes"], settings["saveHistograms"],
+				settings["saveSeparateTexboxes"], settings["saveHistograms"],settings["saveRawTextboxOutline"],
 				settings["resultsPath"], settings["debugInfoPath"]);
 		}
 		catch (...) {
@@ -60,6 +60,6 @@ void Configuration::setDefaultAppSettings() {
 	if (appSettings != nullptr) {
 		delete appSettings;
 	}
-	appSettings = new AppSettings(true, true, false, false, "./", "./debugInfo");
+	appSettings = new AppSettings(true, true, false, false,false, "./", "./debugInfo");
 }
 

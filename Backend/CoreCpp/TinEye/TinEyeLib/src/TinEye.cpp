@@ -149,6 +149,10 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 	return imagePasses;
 }
 
+std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
+	return TextboxDetection::detectBoxes(image.getImageMatrix(), config->getAppSettings());
+}
+
 TinEye::~TinEye()
 {
 	if (api != nullptr)

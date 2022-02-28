@@ -5,7 +5,8 @@
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
     "saveSeparateTexboxes":false,
-    "saveHistograms":false
+    "saveHistograms":false,
+    "saveRawTextboxOutline":false
   },
  "guideline":{
   "contrast": 4.5,
