@@ -8,6 +8,13 @@
     "saveHistograms":false,
     "saveRawTextboxOutline":false
   },
+  "textDetection":{
+    "confidence":0.5,
+    "nmsThreshold":0.4,
+    "detectionScale":1.0,
+    "detectionMean":[123.68, 116.78, 103.94]
+  },
+
  "guideline":{
   "contrast": 4.5,
   "tessdataPath": "tessdata",

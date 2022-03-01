@@ -6,6 +6,7 @@
 #include <boost/log/trivial.hpp>
 
 #include "AppSettings.h"
+#include "TextDetectionParams.h"
 
 void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result)
 {
@@ -21,7 +22,7 @@ void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point
 	warpPerspective(frame, result, rotationMatrix, outputSize);
 }
 
-std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSettings* appSettings)
+std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSettings* appSettings, const TextDetectionParams* params)
 {
 	//Calculate needed conversion for new width and height to be multiples of 32
 	////This needs to be multiple of 32
@@ -31,13 +32,21 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSetting
 	float heightRatio = float(inpHeight) / img.rows;
 
 	cv::dnn::TextDetectionModel_EAST east("frozen_east_text_detection.pb");
-	east.setConfidenceThreshold(0.5);
-	east.setNMSThreshold(0.4);
+	
+	BOOST_LOG_TRIVIAL(trace) << "Confidence set to " 
+		<< params->getConfidenceThreshold() << std::endl;
+	//Confidence on textbox threshold
+	east.setConfidenceThreshold(params->getConfidenceThreshold());
+	//Non Maximum supression
+	east.setNMSThreshold(params->getNMSThreshold());
 
 	// Parameters for Detection
-	double detScale = 1.0;
+	double detScale = params->getDetectionScale();
 	cv::Size detInputSize = cv::Size(inpWidth, inpHeight);
-	cv::Scalar detMean = cv::Scalar(123.68, 116.78, 103.94);
+	
+	//Default values from documentation are (123.68, 116.78, 103.94);
+	auto mean = params->getDetectionMean();
+	cv::Scalar detMean(mean[0], mean[1], mean[2]);
 	bool swapRB = true;
 	east.setInputParams(detScale, detInputSize, detMean, swapRB);
 

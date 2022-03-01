@@ -1,6 +1,7 @@
 #include "Configuration.h"
 #include "AppSettings.h"
 #include "Guideline.h"
+#include "TextDetectionParams.h"
 
 Configuration::Configuration() {
 	setDefaultAppSettings();
@@ -12,6 +13,7 @@ Configuration::Configuration(fs::path configPath) {
 	if (configFile) {
 		json config;
 		configFile >> config;
+		//Guidelines
 		try {
 			json guidelineJson = config["guideline"];
 			std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
@@ -27,6 +29,7 @@ Configuration::Configuration(fs::path configPath) {
 			BOOST_LOG_TRIVIAL(error) << "Malformed configuration guidelines" << std::endl;
 			setDefaultGuideline();
 		}
+		//AppSettigns
 		try {
 			json settings = config["appSettings"];
 			appSettings = new AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
@@ -37,10 +40,23 @@ Configuration::Configuration(fs::path configPath) {
 			BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
 			setDefaultAppSettings();
 		}
+		//Text Detection
+		try {
+			json textDetection = config["textDetection"];
+			json  mean = textDetection["detectionMean"];
+			textDetectionParams = new TextDetectionParams(textDetection["confidence"],
+				textDetection["nmsThreshold"],textDetection["detectionScale"],
+				{mean[0],mean[1] ,mean[2] });
+		}
+		catch(...) {
+			BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
+			setDefaultTextDetectionParams();
+		}
 	}
 	else {
 		BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
 		setDefaultGuideline();
+		setDefaultTextDetectionParams();
 		setDefaultAppSettings();
 	}
 }
@@ -61,5 +77,12 @@ void Configuration::setDefaultAppSettings() {
 		delete appSettings;
 	}
 	appSettings = new AppSettings(true, true, false, false,false, "./", "./debugInfo");
+}
+
+void Configuration::setDefaultTextDetectionParams() {
+	if (textDetectionParams != nullptr) {
+		delete textDetectionParams;
+	}
+	textDetectionParams = new TextDetectionParams(0.5, 0.4,1.0,{ 123.68, 116.78, 103.94 });
 }
 
