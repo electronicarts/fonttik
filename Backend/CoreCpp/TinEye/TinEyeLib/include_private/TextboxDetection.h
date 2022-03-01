@@ -4,10 +4,11 @@
 #include "Textbox.h"
 
 class AppSettings;
+class TextDetectionParams;
 
 class TextboxDetection {
 protected:
 	static void fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result);
 public:
-	static std::vector< Textbox > detectBoxes(cv::Mat img, const AppSettings* saveBoxesImage);
+	static std::vector< Textbox > detectBoxes(cv::Mat img, const AppSettings* appSettigs, const TextDetectionParams* params);
 };
