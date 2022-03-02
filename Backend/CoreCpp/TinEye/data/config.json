@@ -6,7 +6,11 @@
     "saveTextboxOutline": true,
     "saveSeparateTexboxes":false,
     "saveHistograms":false,
-    "saveRawTextboxOutline":false
+    "saveRawTextboxOutline":false,
+
+    "focusMask":[{"x":0,"y":0,"w":1,"h":1}],
+    
+    "ignoreMask":[]
   },
   "textDetection":{
     "confidence":0.5,

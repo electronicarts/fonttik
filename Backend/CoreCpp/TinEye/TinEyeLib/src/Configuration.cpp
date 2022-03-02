@@ -22,6 +22,7 @@ Configuration::Configuration(fs::path configPath) {
 				ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
 				resolutionGuidelines[atoi(it.key().c_str())] = a;
 			}
+
 			guideline = new Guideline(guidelineJson["contrast"], resolutionGuidelines);
 
 		}
@@ -32,9 +33,25 @@ Configuration::Configuration(fs::path configPath) {
 		//AppSettigns
 		try {
 			json settings = config["appSettings"];
+
+			std::vector<cv::Rect2f> focus;
+			for (auto it = settings["focusMask"].begin(); it != settings["focusMask"].end(); ++it)
+			{
+				focus.push_back(RectFromJson<float>(*it));
+			}
+
+			std::vector<cv::Rect2f> ignore;
+			for (auto it = settings["ignoreMask"].begin(); it != settings["ignoreMask"].end(); ++it)
+			{
+				ignore.push_back(RectFromJson<float>(*it));
+			}
+
 			appSettings = new AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
 				settings["saveSeparateTexboxes"], settings["saveHistograms"],settings["saveRawTextboxOutline"],
 				settings["resultsPath"], settings["debugInfoPath"]);
+			if (!focus.empty() ) {
+				appSettings->setFocusMask(focus,ignore);
+			}
 		}
 		catch (...) {
 			BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
@@ -76,7 +93,9 @@ void Configuration::setDefaultAppSettings() {
 	if (appSettings != nullptr) {
 		delete appSettings;
 	}
-	appSettings = new AppSettings(true, true, false, false,false, "./", "./debugInfo");
+
+	appSettings = new AppSettings(true, true, false, false,false,
+		"./", "./debugInfo");
 }
 
 void Configuration::setDefaultTextDetectionParams() {
@@ -86,3 +105,7 @@ void Configuration::setDefaultTextDetectionParams() {
 	textDetectionParams = new TextDetectionParams(0.5, 0.4,1.0,{ 123.68, 116.78, 103.94 });
 }
 
+template<typename T>
+cv::Rect_<T> Configuration::RectFromJson(json data) {
+	return { data["x"], data["y"], data["w"], data["h"] };
+}

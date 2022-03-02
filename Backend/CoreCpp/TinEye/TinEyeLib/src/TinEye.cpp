@@ -28,6 +28,12 @@ void TinEye::init(fs::path configFile)
 	api->SetVariable("user_defined_dpi", "70");
 }
 
+void TinEye::applyFocusMask(Image& image) {
+	cv::Mat img = image.getImageMatrix();
+	cv::Mat mask = config->getAppSettings()->calculateMask(img.cols,img.rows);
+	img = img & mask;
+}
+
 bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	cv::Mat openCVMat = img.getImageMatrix();
 	img.getLuminanceMap();
