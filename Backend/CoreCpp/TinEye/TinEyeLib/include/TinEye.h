@@ -21,6 +21,8 @@ public:
 
 	std::vector<Textbox> getTextBoxes(Image& image);
 
+	void applyFocusMask(Image& image);
+
 	bool fontSizeCheck(Image& img, std::vector<Textbox>& boxes);
 	bool textContrastCheck(Image& image, std::vector<Textbox>& boxes);
 };

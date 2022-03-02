@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
 
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
+			tineye->applyFocusMask(img);
 			std::vector<Textbox> textBoxes = tineye->getTextBoxes(img);
-
 			if (textBoxes.empty()) {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
 			}
