@@ -36,7 +36,7 @@ void TinEye::applyFocusMask(Image& image) {
 
 bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	cv::Mat openCVMat = img.getImageMatrix();
-	img.getLuminanceMap();
+	cv::Mat luminanceMap = img.getLuminanceMap();
 
 	AppSettings* appSettings = config->getAppSettings();
 	Guideline* guideline = config->getGuideline();
@@ -109,7 +109,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 
 #ifdef _DEBUG
 		if (appSettings->saveTexboxOutline()) {
-			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0,255,0) : cv::Scalar(0,0,255), ROIs,2);
+			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
 		}
 		if (appSettings->saveSeparateTextboxes()) {
 			cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), box.getSubmatrix());
@@ -124,6 +124,35 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 		counter++;
 
 #endif
+
+		//Contrast checking with thresholds
+		cv::Mat luminanceRegion = luminanceMap(boxRect);
+		cv::Mat mask;
+		//OTSU threshold automatically calculates best fitting threshold values
+		cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+		//Calculate the mean of the luminance for the light regions of the luminance
+		double meanLight = cv::mean(luminanceRegion, mask)[0]/255.0;
+
+		//Invert mask to calculate mean of the darker colors
+		cv::bitwise_not(mask, mask);
+		double meanDark = cv::mean(luminanceRegion, mask)[0]/255.0;
+
+		double ratio;
+		if (meanLight >= meanDark) {
+			ratio = (meanLight + .05) / (meanDark + .05);
+		}
+		else {
+			ratio = (meanDark + .05) / (meanLight + .05);
+		}
+
+		if (ratio < guideline->getContrastRequirement()) {
+			BOOST_LOG_TRIVIAL(info) << "Word: " << recognitionResult << " doesn't comply with minimum luminance contrast " << guideline->getContrastRequirement()
+				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
+		}
+
+		//cv::imshow("test", mask);
+		//cv::waitKey();
 	}
 #ifdef _DEBUG
 	if (appSettings->saveTexboxOutline()) {
@@ -140,7 +169,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 
 bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 	bool imagePasses = true;
-	
+
 	for (Textbox box : boxes) {
 		cv::Rect boxRect = box.getRect();
 		//Check for luminance with background using retrieved bounding box
