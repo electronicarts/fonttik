@@ -53,6 +53,6 @@ int main(int argc, char* argv[]) {
 	delete tineye;
 
 	std::cout << "SIZE: " << ((passesSize) ? "PASS" : "FAIL") <<
-		"\tCONTRAST (not implemented): " << ((passesContrast) ? "PASS" : "FAIL")  << std::endl;;
+		"\tCONTRAST: " << ((passesContrast) ? "PASS" : "FAIL")  << std::endl;;
 	std::cin.get();
 }
