@@ -90,11 +90,17 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 		//Recognize word in region
 		std::string recognitionResult = model.recognize(box.getSubmatrix());
 
+		//Avoids division by zero
+		int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
+
 		//Check average width
-		if (boxRect.width / recognitionResult.size() < minimumWidth) {
+		if (averageWidth == -1) {
+			BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
+		}
+		else if (averageWidth < minimumWidth) {
 			passes = false;
 			individualPass = false;
-			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << boxRect.width / recognitionResult.size() <<
+			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
 				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
 		}
 
