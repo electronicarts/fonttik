@@ -66,6 +66,10 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSetting
 		for (int j = 0; j < detResults[i].size(); j++) {
 			detResults[i][j].x /= widthRatio;
 			detResults[i][j].y /= heightRatio;
+
+			//Make sure points are within bounds
+			detResults[i][j].x = std::min(std::max(0, detResults[i][j].x),img.cols);
+			detResults[i][j].y = std::min(std::max(0, detResults[i][j].y), img.rows);
 		}
 	}
 
