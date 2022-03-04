@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
 			//Check if image has text recognized by OCR
 			tineye->applyFocusMask(img);
 			std::vector<Textbox> textBoxes = tineye->getTextBoxes(img);
+			tineye->mergeTextBoxes(textBoxes);
 			if (textBoxes.empty()) {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
 			}

@@ -12,7 +12,13 @@ protected:
 
 	Image* parentImage;
 public:
+	/* Returns the percentage of overlap in each axis between two rectangles in relation to the smallest one
+	* @return (x axis overlap, y axis overlap)
+	* */
+	static std::pair<float,float> OverlapAxisPercentage(const Textbox& a, const Textbox& b);
+
 	Textbox(const std::vector<cv::Point >& points, int padding = 0);
+	Textbox(cv::Rect rect);
 
 	//Sets textbox's parent image and calculates its submatrix
 	void setParentImage(Image* img);

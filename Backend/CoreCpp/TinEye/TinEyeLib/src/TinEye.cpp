@@ -9,6 +9,7 @@
 #include <tesseract/baseapi.h>
 #include "Guideline.h"
 #include "AppSettings.h"
+#include "TextDetectionParams.h"
 
 void TinEye::init(fs::path configFile)
 {
@@ -137,109 +138,116 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 
 }
 
-	bool TinEye::textContrastCheck(Image & image, std::vector<Textbox>&boxes) {
-		cv::Mat openCVMat = image.getImageMatrix();
-		cv::Mat luminanceMap = image.getLuminanceMap();
+bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
+	cv::Mat openCVMat = image.getImageMatrix();
+	cv::Mat luminanceMap = image.getLuminanceMap();
 
-		AppSettings* appSettings = config->getAppSettings();
-		Guideline* guideline = config->getGuideline();
+	AppSettings* appSettings = config->getAppSettings();
+	Guideline* guideline = config->getGuideline();
 
 #ifdef _DEBUG
-		//Regions of interest
-		cv::Mat ROIs = image.getImageMatrix().clone();
-		int counter = 0;
+	//Regions of interest
+	cv::Mat ROIs = image.getImageMatrix().clone();
+	int counter = 0;
 #endif // _DEBUG
 
 
-		if (openCVMat.empty())
-		{
-			return false;
-		}
-
-		guideline->setActiveResolution(openCVMat.rows);
-
-		bool imagePasses = true;
-		int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
-		int padding = 0;
-
-		for (Textbox box : boxes) {
-
-			box.setParentImage(&image);
-			cv::Rect boxRect = box.getRect();
-
-			//Contrast checking with thresholds
-			cv::Mat luminanceRegion = luminanceMap(boxRect);
-			cv::Mat mask;
-			//OTSU threshold automatically calculates best fitting threshold values
-			cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-
-			//Calculate the mean of the luminance for the light regions of the luminance
-			double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;
-
-			//Invert mask to calculate mean of the darker colors
-			cv::bitwise_not(mask, mask);
-			double meanDark = cv::mean(luminanceRegion, mask)[0] / 255.0;
-
-			double ratio;
-			if (meanLight >= meanDark) {
-				ratio = (meanLight + .05) / (meanDark + .05);
-			}
-			else {
-				ratio = (meanDark + .05) / (meanLight + .05);
-			}
-
-			bool boxPasses = ratio >= guideline->getContrastRequirement();
-
-			if (!boxPasses) {
-				BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << guideline->getContrastRequirement()
-					<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
-			}
-#ifdef _DEBUG
-			if (appSettings->saveSeparateTextboxes()) {
-				cv::imwrite("contrast_"+image.getPath().replace_filename(image.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
-			}
-			if (appSettings->saveTexboxOutline()) {
-				Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (boxPasses) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
-			}
-			if (appSettings->saveHistograms()) {
-				fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
-				Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
-					savePath.string());
-
-				Image::saveHistogramCSV(image.calculateLuminanceHistogram(boxRect), image.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
-			}
-			counter++;
-
-#endif
-			imagePasses = imagePasses && boxPasses;
-
-		}
-
-#ifdef _DEBUG
-		if (appSettings->saveTexboxOutline()) {
-			cv::imwrite(image.getPath().replace_filename(image.getPath().stem().string() + "_contrastChecks.png").string(), ROIs);
-		}
-#endif
-		return imagePasses;
-
-	}
-
-	std::vector<Textbox> TinEye::getTextBoxes(Image & image) {
-		return TextboxDetection::detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
-	}
-
-	TinEye::~TinEye()
+	if (openCVMat.empty())
 	{
-		if (api != nullptr)
-		{
-			api->End();
-			delete api;
-		}
-
-		if (config != nullptr) {
-			delete config;
-		}
-
-		config = nullptr;
-		api = nullptr;
+		return false;
 	}
+
+	guideline->setActiveResolution(openCVMat.rows);
+
+	bool imagePasses = true;
+	int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
+	int padding = 0;
+
+	for (Textbox box : boxes) {
+
+		box.setParentImage(&image);
+		cv::Rect boxRect = box.getRect();
+
+		//Contrast checking with thresholds
+		cv::Mat luminanceRegion = luminanceMap(boxRect);
+		cv::Mat mask;
+		//OTSU threshold automatically calculates best fitting threshold values
+		cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+		//Calculate the mean of the luminance for the light regions of the luminance
+		double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;
+
+		//Invert mask to calculate mean of the darker colors
+		cv::bitwise_not(mask, mask);
+		double meanDark = cv::mean(luminanceRegion, mask)[0] / 255.0;
+
+		double ratio;
+		if (meanLight >= meanDark) {
+			ratio = (meanLight + .05) / (meanDark + .05);
+		}
+		else {
+			ratio = (meanDark + .05) / (meanLight + .05);
+		}
+
+		bool boxPasses = ratio >= guideline->getContrastRequirement();
+
+		if (!boxPasses) {
+			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << guideline->getContrastRequirement()
+				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
+		}
+#ifdef _DEBUG
+		if (appSettings->saveSeparateTextboxes()) {
+			cv::imwrite("contrast_" + image.getPath().replace_filename(image.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
+		}
+		if (appSettings->saveTexboxOutline()) {
+			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (boxPasses) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
+		}
+		if (appSettings->saveHistograms()) {
+			fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
+			Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
+				savePath.string());
+
+			Image::saveHistogramCSV(image.calculateLuminanceHistogram(boxRect), image.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
+		}
+		counter++;
+
+#endif
+		imagePasses = imagePasses && boxPasses;
+
+	}
+
+#ifdef _DEBUG
+	if (appSettings->saveTexboxOutline()) {
+		cv::imwrite(image.getPath().replace_filename(image.getPath().stem().string() + "_contrastChecks.png").string(), ROIs);
+	}
+#endif
+	return imagePasses;
+
+}
+
+std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
+	return TextboxDetection::detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
+}
+
+void TinEye::mergeTextBoxes(std::vector<Textbox>& textBoxes) {
+	std::pair<float, float> threshold = config->getTextDetectionParams()->getMergeThreshold();
+	if (threshold.first < 1.0 || threshold.second < 1.0) {
+		TextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
+	}
+}
+
+TinEye::~TinEye()
+{
+	if (api != nullptr)
+	{
+		api->End();
+		delete api;
+	}
+
+	if (config != nullptr) {
+		delete config;
+	}
+
+	config = nullptr;
+	api = nullptr;
+}

@@ -86,6 +86,8 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSetting
 	[0]---------[3]
 	*/
 
+#ifdef _DEBUG
+
 	if (appSettings->saveRawTexboxOutline()) {
 		// Text Recognition
 		cv::Mat recInput = img.clone();
@@ -111,5 +113,32 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSetting
 		cv::imwrite("resources/raw_EAST_textboxes.png", recInput);
 	}
 
+#endif // _DEBUG
+
 	return boxes;
+}
+
+void TextboxDetection::mergeTextBoxes(std::vector<Textbox>& boxes, const TextDetectionParams* params) {
+	
+	std::pair<float, float> mergeThreshold = params->getMergeThreshold();
+
+	for (auto boxIt = boxes.begin(); boxIt != boxes.end();boxIt++) {
+		for (auto targetIt = boxIt; targetIt != boxes.end(); ) {
+			if (boxIt != targetIt) {
+				auto overlap = Textbox::OverlapAxisPercentage(*boxIt, *targetIt);
+				if (overlap.first >= mergeThreshold.first && overlap.second >= mergeThreshold.second) {
+					BOOST_LOG_TRIVIAL(info) << boxIt->getRect() << "merges with " << targetIt->getRect() << std::endl;
+					*boxIt = Textbox(boxIt->getRect() | targetIt->getRect());
+					targetIt = boxes.erase(targetIt);
+				}
+				else {
+					targetIt++;
+				}
+			}
+			else {
+				targetIt++;
+			}
+		}
+	}
+
 }
