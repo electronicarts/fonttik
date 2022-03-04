@@ -8,6 +8,10 @@ Textbox::Textbox(const std::vector<cv::Point >& points, int padding) : parentIma
 	textboxRect = cv::Rect(points[1].x, points[1].y, boxWidth, boxHeight);
 }
 
+Textbox::Textbox(cv::Rect rect):parentImage(nullptr) {
+	textboxRect = rect;
+}
+
 void Textbox::setParentImage(Image* img) {
 	parentImage = img;
 	submatrix = parentImage->getImageMatrix()(textboxRect);
@@ -33,4 +37,13 @@ cv::Mat Textbox::getSurroundingLuminanceHistogram(int marginX, int marginY)
 	return parentImage->calculateLuminanceHistogram(cv::Rect(textboxRect.x-marginLeft,textboxRect.y - marginTop,
 		textboxRect.width + marginLeft + marginRight,textboxRect.height + marginTop + marginBottom),
 		cv::Rect(marginLeft, marginRight, textboxRect.width, textboxRect.height));
+}
+
+std::pair<float,float> Textbox::OverlapAxisPercentage(const Textbox& a, const Textbox& b) {
+	cv::Rect aRect = a.textboxRect, bRect = b.textboxRect;
+	cv::Rect overlap = aRect & bRect;
+	float xOverlap = static_cast<float>(overlap.width) / std::min(aRect.width, bRect.width);
+	float yOverlap = static_cast<float>(overlap.height) / std::min(aRect.height, bRect.height);
+
+	return { xOverlap,yOverlap };
 }

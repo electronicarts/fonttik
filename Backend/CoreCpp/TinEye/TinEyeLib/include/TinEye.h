@@ -20,6 +20,7 @@ public:
 	void init(fs::path configFile);
 
 	std::vector<Textbox> getTextBoxes(Image& image);
+	void mergeTextBoxes(std::vector<Textbox>& textBoxes);
 
 	void applyFocusMask(Image& image);
 
