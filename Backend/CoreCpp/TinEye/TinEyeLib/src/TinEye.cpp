@@ -16,6 +16,33 @@ void TinEye::init(fs::path configFile)
 	}
 
 	config = new Configuration(configFile.c_str());
+
+	//Initialize EAST detection
+	TextboxDetection::init(config->getTextDetectionParams());
+
+
+	//Initialize text recognition
+	//from https://docs.opencv.org/4.x/d4/d43/tutorial_dnn_text_spotting.html
+
+	// Load models weights
+	model = cv::dnn::TextRecognitionModel("crnn_cs.onnx");
+	model.setDecodeType("CTC-greedy");
+	std::ifstream vocFile;
+	vocFile.open("alphabet_94.txt");
+	CV_Assert(vocFile.is_open());
+	std::string vocLine;
+	std::vector<std::string> vocabulary;
+	while (std::getline(vocFile, vocLine)) {
+		vocabulary.push_back(vocLine);
+	}
+	model.setVocabulary(vocabulary);
+
+	// Normalization parameters
+	double scale = 1.0 / 127.5;
+	cv::Scalar mean = cv::Scalar(127.5, 127.5, 127.5);
+	// The input shape
+	cv::Size inputSize = cv::Size(100, 32);
+	model.setInputParams(scale, inputSize, mean);
 }
 
 void TinEye::applyFocusMask(Image& image) {
@@ -47,28 +74,6 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	cv::Mat ROIs = img.getImageMatrix().clone();
 	int counter = 0;
 #endif
-
-	//from https://docs.opencv.org/4.x/d4/d43/tutorial_dnn_text_spotting.html
-
-	// Load models weights
-	cv::dnn::TextRecognitionModel model("crnn_cs.onnx");
-	model.setDecodeType("CTC-greedy");
-	std::ifstream vocFile;
-	vocFile.open("alphabet_94.txt");
-	CV_Assert(vocFile.is_open());
-	std::string vocLine;
-	std::vector<std::string> vocabulary;
-	while (std::getline(vocFile, vocLine)) {
-		vocabulary.push_back(vocLine);
-	}
-	model.setVocabulary(vocabulary);
-
-	// Normalization parameters
-	double scale = 1.0 / 127.5;
-	cv::Scalar mean = cv::Scalar(127.5, 127.5, 127.5);
-	// The input shape
-	cv::Size inputSize = cv::Size(100, 32);
-	model.setInputParams(scale, inputSize, mean);
 
 
 	for (Textbox box : boxes) {
@@ -203,7 +208,7 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 #endif
 		imagePasses = imagePasses && boxPasses;
 
-}
+	}
 
 #ifdef _DEBUG
 	if (appSettings->saveTexboxOutline()) {
@@ -227,6 +232,7 @@ void TinEye::mergeTextBoxes(std::vector<Textbox>& textBoxes) {
 
 TinEye::~TinEye()
 {
+	TextboxDetection::release();
 
 	if (config != nullptr) {
 		delete config;

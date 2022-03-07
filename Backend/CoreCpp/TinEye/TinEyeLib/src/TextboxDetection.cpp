@@ -8,6 +8,35 @@
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 
+cv::dnn::TextDetectionModel_EAST* TextboxDetection::east = nullptr;
+
+void TextboxDetection::init(const TextDetectionParams* params)
+{
+	east = new cv::dnn::TextDetectionModel_EAST("frozen_east_text_detection.pb");
+
+	BOOST_LOG_TRIVIAL(trace) << "Confidence set to "
+		<< params->getConfidenceThreshold() << std::endl;
+	//Confidence on textbox threshold
+	east->setConfidenceThreshold(params->getConfidenceThreshold());
+	//Non Maximum supression
+	east->setNMSThreshold(params->getNMSThreshold());
+
+	east->setInputScale(params->getDetectionScale());
+
+	//Default values from documentation are (123.68, 116.78, 103.94);
+	auto mean = params->getDetectionMean();
+	cv::Scalar detMean(mean[0], mean[1], mean[2]);
+	east->setInputMean(detMean);
+
+	east->setInputSwapRB(true);
+}
+
+void TextboxDetection::release() {
+	if (east != nullptr) {
+		delete east;
+	}
+}
+
 void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result)
 {
 	const cv::Size outputSize = cv::Size(100, 32);
@@ -31,33 +60,18 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSetting
 	float widthRatio = float(inpWidth) / img.cols;
 	float heightRatio = float(inpHeight) / img.rows;
 
-	cv::dnn::TextDetectionModel_EAST east("frozen_east_text_detection.pb");
-	
-	BOOST_LOG_TRIVIAL(trace) << "Confidence set to " 
-		<< params->getConfidenceThreshold() << std::endl;
-	//Confidence on textbox threshold
-	east.setConfidenceThreshold(params->getConfidenceThreshold());
-	//Non Maximum supression
-	east.setNMSThreshold(params->getNMSThreshold());
-
-	// Parameters for Detection
-	double detScale = params->getDetectionScale();
 	cv::Size detInputSize = cv::Size(inpWidth, inpHeight);
 	
-	//Default values from documentation are (123.68, 116.78, 103.94);
-	auto mean = params->getDetectionMean();
-	cv::Scalar detMean(mean[0], mean[1], mean[2]);
-	bool swapRB = true;
-	east.setInputParams(detScale, detInputSize, detMean, swapRB);
+	east->setInputSize(detInputSize);
 
 	//Image reading
 	cv::Mat resizedImg;
 	cv::resize(img, resizedImg, detInputSize);
 
 	std::vector< std::vector<cv::Point> > detResults;
-	east.detect(resizedImg, detResults);
+	east->detect(resizedImg, detResults);
 
-	BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << "boxes\n";
+	BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << " boxes\n";
 
 	//Return smart pointer?
 

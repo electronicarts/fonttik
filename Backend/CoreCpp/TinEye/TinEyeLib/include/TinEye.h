@@ -9,6 +9,7 @@ class Configuration;
 
 class TinEye {
 	Configuration* config = nullptr;
+	cv::dnn::TextRecognitionModel model;
 public:
 	TinEye() {};
 	~TinEye();
