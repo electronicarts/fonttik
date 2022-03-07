@@ -5,15 +5,10 @@
 
 namespace fs = std::filesystem;
 
-namespace tesseract {
-	class TessBaseAPI;
-}
-
 class Configuration;
 
 class TinEye {
 	Configuration* config = nullptr;
-	tesseract::TessBaseAPI* api = nullptr;
 public:
 	TinEye() {};
 	~TinEye();
