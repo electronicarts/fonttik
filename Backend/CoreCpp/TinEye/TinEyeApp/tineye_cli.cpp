@@ -18,9 +18,9 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
-	boost::log::core::get()->set_filter(
-		boost::log::trivial::severity >= boost::log::trivial::warning
-	);
+	//boost::log::core::get()->set_filter(
+	//	boost::log::trivial::severity >= boost::log::trivial::warning
+	//);
 
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 

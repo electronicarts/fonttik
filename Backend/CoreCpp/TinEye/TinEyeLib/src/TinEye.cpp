@@ -214,7 +214,7 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 #endif
 		imagePasses = imagePasses && boxPasses;
 
-	}
+}
 
 #ifdef _DEBUG
 	if (appSettings->saveTexboxOutline()) {
