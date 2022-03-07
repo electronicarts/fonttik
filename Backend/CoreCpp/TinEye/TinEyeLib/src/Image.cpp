@@ -72,6 +72,7 @@ bool Image::nextFrame()
 			video.release();
 		}
 		else {
+			BOOST_LOG_TRIVIAL(info) << "Loaded next frame" << std::endl;
 			return true;
 		}
 	}
