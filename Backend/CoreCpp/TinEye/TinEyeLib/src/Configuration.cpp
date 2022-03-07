@@ -62,10 +62,11 @@ Configuration::Configuration(fs::path configPath) {
 			json textDetection = config["textDetection"];
 			json  mean = textDetection["detectionMean"];
 			json merge = textDetection["mergeThreshold"];
+			float degreeThreshold = textDetection["rotationThresholdDegrees"];
 			std::pair<float, float> mergeThresh = std::make_pair(merge["x"], merge["y"]);
 			textDetectionParams = new TextDetectionParams(textDetection["confidence"],
 				textDetection["nmsThreshold"],textDetection["detectionScale"],
-				{mean[0],mean[1] ,mean[2] },mergeThresh);
+				{mean[0],mean[1] ,mean[2] },mergeThresh, degreeThreshold*(CV_PI/180));
 		}
 		catch(...) {
 			BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
@@ -104,7 +105,7 @@ void Configuration::setDefaultTextDetectionParams() {
 	if (textDetectionParams != nullptr) {
 		delete textDetectionParams;
 	}
-	textDetectionParams = new TextDetectionParams(0.5, 0.4,1.0,{ 123.68, 116.78, 103.94 },{1.0,1.0});
+	textDetectionParams = new TextDetectionParams(0.5, 0.4,1.0,{ 123.68, 116.78, 103.94 },{1.0,1.0},0.17);
 }
 
 template<typename T>

@@ -75,7 +75,12 @@ std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSetting
 
 	std::vector<Textbox> boxes;
 	for (std::vector<cv::Point > points : detResults) {
-		boxes.emplace_back(points);
+		if (HorizontalTiltAngle(points[1], points[2]) < params->getRotationThresholdRadians()) {
+			boxes.emplace_back(points);
+		}
+		else {
+			BOOST_LOG_TRIVIAL(trace) << "Ignoring tilted text in " << points[1] << std::endl;
+		}
 	}
 
 	//Points are
@@ -141,4 +146,10 @@ void TextboxDetection::mergeTextBoxes(std::vector<Textbox>& boxes, const TextDet
 		}
 	}
 
+}
+
+float TextboxDetection::HorizontalTiltAngle(const cv::Point& a, const cv::Point & b) {
+	double hip = cv::norm(b-a);
+	double h = std::abs(a.y - b.y);
+	return asin(h / hip);
 }
