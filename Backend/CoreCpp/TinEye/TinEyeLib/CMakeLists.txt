@@ -5,7 +5,7 @@ file(GLOB_RECURSE SOURCES ./*.h ./*.cpp)
 #list(REMOVE_ITEM SOURCES Excludethis.cpp)
 
 #Dependency include directories
-include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 
 #Internal include directories
 include_directories("include/" "include_private/")

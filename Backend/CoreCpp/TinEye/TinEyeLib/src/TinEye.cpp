@@ -1,32 +1,21 @@
 #include "TinEye.h"
-#include <leptonica/allheaders.h>
 #include <iostream>
 #include <string>
 #include "Configuration.h"
 #include "Image.h"
 #include "TextboxDetection.h"
 #include "boost/log/trivial.hpp"
-#include <tesseract/baseapi.h>
 #include "Guideline.h"
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 
 void TinEye::init(fs::path configFile)
 {
-	config = new Configuration(configFile.c_str());
-
-	if (api != nullptr)
-		delete api;
-	api = new tesseract::TessBaseAPI();
-	// Initialize tesseract-ocr with language specified by config
-
-	if (api->Init("tessdata/", "eng")) {
-		fprintf(stderr, "Could not initialize tesseract.\n");
-		exit(1);
+	if (config != nullptr) {
+		delete config;
 	}
 
-	//Manually set dpi 
-	api->SetVariable("user_defined_dpi", "70");
+	config = new Configuration(configFile.c_str());
 }
 
 void TinEye::applyFocusMask(Image& image) {
@@ -238,16 +227,10 @@ void TinEye::mergeTextBoxes(std::vector<Textbox>& textBoxes) {
 
 TinEye::~TinEye()
 {
-	if (api != nullptr)
-	{
-		api->End();
-		delete api;
-	}
 
 	if (config != nullptr) {
 		delete config;
 	}
 
 	config = nullptr;
-	api = nullptr;
 }
