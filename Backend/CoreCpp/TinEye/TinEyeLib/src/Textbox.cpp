@@ -2,10 +2,12 @@
 
 Textbox::Textbox(const std::vector<cv::Point >& points, int padding) : parentImage(nullptr) {
 	//Height takes into account possible box skewing when calculating due to letters going down (eg p's)
-	int boxHeight = std::max(points[0].y, points[3].y)-points[1].y;
-	int boxWidth = points[3].x - points[1].x;
+	cv::Point topLeft(std::min(points[0].x, points[1].x), std::min(points[1].y, points[2].y));
+	cv::Point bottomRight(std::max(points[2].x, points[3].x), std::max(points[0].y, points[3].y));
+	int boxHeight = bottomRight.y - topLeft.y;
+	int boxWidth = bottomRight.x - topLeft.x;
 
-	textboxRect = cv::Rect(points[1].x, points[1].y, boxWidth, boxHeight);
+	textboxRect = cv::Rect(topLeft.x,topLeft.y, boxWidth, boxHeight);
 }
 
 Textbox::Textbox(cv::Rect rect):parentImage(nullptr) {
