@@ -67,4 +67,7 @@ public:
 
 	//Path of the original image or the video its coming from
 	std::filesystem::path getPath() { return path; };
+
+	//Saves the data in the image subfolder
+	void saveOutputData(cv::Mat data, std::string name);
 };

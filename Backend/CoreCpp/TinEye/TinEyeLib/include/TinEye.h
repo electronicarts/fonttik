@@ -10,6 +10,9 @@ class Configuration;
 class TinEye {
 	Configuration* config = nullptr;
 	cv::dnn::TextRecognitionModel model;
+
+	bool textboxSizeCheck(const Textbox& textbox);
+	bool textboxContrastCheck(const Textbox& textbox);
 public:
 	TinEye() {};
 	~TinEye();
