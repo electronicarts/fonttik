@@ -66,8 +66,6 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 	guideline->setActiveResolution(openCVMat.rows);
 
 	bool passes = true;
-	int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
-	int padding = 0;
 
 #ifdef _DEBUG
 	//Regions of interest
@@ -77,43 +75,20 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 
 
 	for (Textbox box : boxes) {
-		bool individualPass = true;
 		//Set word detection to word bounding box
 		box.setParentImage(&img);
-		cv::Rect boxRect = box.getRect();
 
-		//Recognize word in region
-		std::string recognitionResult = model.recognize(box.getSubmatrix());
+		bool individualPass = textboxSizeCheck(box);
 
-		//Avoids division by zero
-		int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
-
-		//Check average width
-		if (averageWidth == -1) {
-			BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
-		}
-		else if (averageWidth < minimumWidth) {
-			passes = false;
-			individualPass = false;
-			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
-				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
-		}
-
-
-		//Check height
-		if (boxRect.height < minimumHeight) {
-			passes = false;
-			individualPass = false;
-			BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << boxRect.height <<
-				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
-		}
+		passes = passes && individualPass;
 
 #ifdef _DEBUG
 		if (appSettings->saveTexboxOutline()) {
+			cv::Rect boxRect = box.getRect();
 			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
 		}
 		if (appSettings->saveSeparateTextboxes()) {
-			cv::imwrite(img.getPath().replace_filename("img" + std::to_string(counter) + ".png").string(), box.getSubmatrix());
+			img.saveOutputData(box.getSubmatrix(), "textbox_" + std::to_string(counter) + ".png");
 		}
 		counter++;
 
@@ -124,12 +99,44 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 
 #ifdef _DEBUG
 	if (appSettings->saveTexboxOutline()) {
-		cv::imwrite(img.getPath().replace_filename(img.getPath().stem().string() + "_sizeChecks.png").string(), ROIs);
+		img.saveOutputData(ROIs, "sizeChecks.png");
 	}
 #endif
 
 	return passes;
 
+}
+
+bool TinEye::textboxSizeCheck(const Textbox& textbox) {
+	bool pass = true;
+	cv::Rect boxRect = textbox.getRect();
+
+	//Recognize word in region
+	std::string recognitionResult = model.recognize(textbox.getSubmatrix());
+
+	//Avoids division by zero
+	int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
+
+	//Check average width
+	if (averageWidth == -1) {
+		BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
+	}
+	else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
+		pass = false;
+		BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
+			" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+	}
+
+
+	//Check height
+	int minimumHeight = config->getGuideline()->getHeightRequirement();
+	if (boxRect.height < minimumHeight) {
+		pass = false;
+		BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << boxRect.height <<
+			" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+	}
+
+	return pass;
 }
 
 bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
@@ -155,48 +162,21 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 
 	bool imagePasses = true;
 	int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
-	int padding = 0;
 
 	for (Textbox box : boxes) {
 
 		box.setParentImage(&image);
-		cv::Rect boxRect = box.getRect();
+		
+		bool individualPass = textboxContrastCheck(box);
 
-		//Contrast checking with thresholds
-		cv::Mat luminanceRegion = luminanceMap(boxRect);
-		cv::Mat mask;
-		//OTSU threshold automatically calculates best fitting threshold values
-		cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;
-
-		//Invert mask to calculate mean of the darker colors
-		cv::bitwise_not(mask, mask);
-		double meanDark = cv::mean(luminanceRegion, mask)[0] / 255.0;
-
-		double ratio;
-		if (meanLight >= meanDark) {
-			ratio = (meanLight + .05) / (meanDark + .05);
-		}
-		else {
-			ratio = (meanDark + .05) / (meanLight + .05);
-		}
-
-		bool boxPasses = ratio >= guideline->getContrastRequirement();
-
-		if (!boxPasses) {
-			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << guideline->getContrastRequirement()
-				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
-		}
 #ifdef _DEBUG
-		if (appSettings->saveSeparateTextboxes()) {
-			cv::imwrite("contrast_" + image.getPath().replace_filename(image.getPath().stem().string() + "_inputBoxes.png").string(), ROIs);
-		}
 		if (appSettings->saveTexboxOutline()) {
-			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (boxPasses) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
+			cv::Rect boxRect = box.getRect();
+			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
 		}
 		if (appSettings->saveHistograms()) {
+			cv::Rect boxRect = box.getRect();
 			fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
 			Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
 				savePath.string());
@@ -206,17 +186,51 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 		counter++;
 
 #endif
-		imagePasses = imagePasses && boxPasses;
+		imagePasses = imagePasses && individualPass;
 
 	}
 
 #ifdef _DEBUG
 	if (appSettings->saveTexboxOutline()) {
-		cv::imwrite(image.getPath().replace_filename(image.getPath().stem().string() + "_contrastChecks.png").string(), ROIs);
+		image.saveOutputData(ROIs, "contrastChecks.png");
 	}
 #endif
 	return imagePasses;
 
+}
+
+bool TinEye::textboxContrastCheck(const Textbox& box) {
+	cv::Rect boxRect = box.getRect();
+
+	//Contrast checking with thresholds
+	cv::Mat luminanceRegion = box.getLuminanceMap();
+	cv::Mat mask;
+	//OTSU threshold automatically calculates best fitting threshold values
+	cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+	//Calculate the mean of the luminance for the light regions of the luminance
+	double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;
+
+	//Invert mask to calculate mean of the darker colors
+	cv::bitwise_not(mask, mask);
+	double meanDark = cv::mean(luminanceRegion, mask)[0] / 255.0;
+
+	double ratio;
+	if (meanLight >= meanDark) {
+		ratio = (meanLight + .05) / (meanDark + .05);
+	}
+	else {
+		ratio = (meanDark + .05) / (meanLight + .05);
+	}
+
+	bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
+
+	if (!boxPasses) {
+		BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
+			<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
+	}
+
+	return boxPasses;
 }
 
 std::vector<Textbox> TinEye::getTextBoxes(Image& image) {

@@ -2,6 +2,8 @@
 #include <boost/log/trivial.hpp>
 #include <fstream>
 
+namespace fs = std::filesystem;
+
 void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
 {
 	if (!matrix.empty()) {
@@ -250,4 +252,15 @@ cv::Mat Image::generateLuminanceHistogramImage(cv::Mat histogram)
 
 
 	return histImage;
+}
+
+void Image::saveOutputData(cv::Mat data, std::string name) {
+	fs::path outputPath = path.parent_path() / (path.filename().string() + "_output");
+
+	if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {
+		fs::create_directory(outputPath);
+	}
+
+
+	cv::imwrite(fs::path(outputPath / name).string(), data);
 }

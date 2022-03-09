@@ -29,6 +29,7 @@ public:
 	//Returns the luminance histogram of the area surrounding the textbox rect
 	cv::Mat getSurroundingLuminanceHistogram(int marginX = 3, int marginY = 3);
 
-	cv::Rect getRect() { return textboxRect; }
-	cv::Mat getSubmatrix() { return submatrix; }
+	cv::Rect getRect() const { return textboxRect; }
+	cv::Mat getSubmatrix() const { return submatrix; }
+	cv::Mat getLuminanceMap() const { return parentImage->getLuminanceMap()(textboxRect); };
 };

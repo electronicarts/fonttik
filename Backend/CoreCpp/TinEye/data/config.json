@@ -17,7 +17,7 @@
     "nmsThreshold":0.4,
     "detectionScale":1.0,
     "detectionMean":[123.68, 116.78, 103.94],
-    ":rotationThresholdDegree":10,
+    "rotationThresholdDegree":10,
     "mergeThreshold":{"x":0.3,"y":0.75}
   },
 
