@@ -24,11 +24,11 @@ int main(int argc, char* argv[]) {
 
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 
-	TinEye* tineye = new TinEye();
+	tin::TinEye* tineye = new tin::TinEye();
 	tineye->init("config.json");
 
 	//Open input image with openCV
-	Image img;
+	tin::Image img;
 	img.loadImage(argv[1]);
 
 	bool passesSize  = false;
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
 			tineye->applyFocusMask(img);
-			std::vector<Textbox> textBoxes = tineye->getTextBoxes(img);
+			std::vector<tin::Textbox> textBoxes = tineye->getTextBoxes(img);
 			tineye->mergeTextBoxes(textBoxes);
 			if (textBoxes.empty()) {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;

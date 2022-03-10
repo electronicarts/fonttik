@@ -4,72 +4,74 @@
 #include <string>
 #include <filesystem>
 
-class Image {
-protected:
-	cv::Mat imageMatrix;
-	cv::Mat luminanceMap;
-	std::filesystem::path path;
+namespace tin {
+	class Image {
+	protected:
+		cv::Mat imageMatrix;
+		cv::Mat luminanceMap;
+		std::filesystem::path path;
 
-	cv::VideoCapture video;
+		cv::VideoCapture video;
 
-	bool isVideo = false;
-	std::vector<std::string > imageFormats;
+		bool isVideo = false;
+		std::vector<std::string > imageFormats;
 
-	void convertImageMatrixToBGR();
+		void convertImageMatrixToBGR();
 
-	static float linearize8bitRGB(const uchar& colorBits);
+		static float linearize8bitRGB(const uchar& colorBits);
 
-	static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
+		static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
 
-	static cv::Mat calculateLuminanceMap(cv::Mat src);
-public:
-	Image();
+		static cv::Mat calculateLuminanceMap(cv::Mat src);
+	public:
+		Image();
 
-	bool loadImage(std::filesystem::path filepath);
+		bool loadImage(std::filesystem::path filepath);
 
-	//Returns loaded image matrix
-	cv::Mat getImageMatrix();
+		//Returns loaded image matrix
+		cv::Mat getImageMatrix();
 
-	//Returns loaded image's luminance map, if map hasn't been calculated calculates it as well
-	cv::Mat getLuminanceMap();
+		//Returns loaded image's luminance map, if map hasn't been calculated calculates it as well
+		cv::Mat getLuminanceMap();
 
-	//Saves calculated luminance map to specified filepath
-	void saveLuminanceMap(std::string filepath);
+		//Saves calculated luminance map to specified filepath
+		void saveLuminanceMap(std::string filepath);
 
-	//Flips the luminance of a given region
-	void flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2);
+		//Flips the luminance of a given region
+		void flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2);
 
-	//Flips the luminance of the whole image
-	void flipLuminance();
+		//Flips the luminance of the whole image
+		void flipLuminance();
 
-	//Returns average surrounding luminance of a given bounding box in luminance map
-	uchar getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX = 3, const int& marginY = 3);
+		//Returns average surrounding luminance of a given bounding box in luminance map
+		uchar getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX = 3, const int& marginY = 3);
 
-	//Returns average surrounding luminance of a given bounding box in luminance map
-	uchar getAverageSurroundingLuminance(cv::Rect region, const int& marginX = 3, const int& marginY = 3);
+		//Returns average surrounding luminance of a given bounding box in luminance map
+		uchar getAverageSurroundingLuminance(cv::Rect region, const int& marginX = 3, const int& marginY = 3);
 
-	//Hightlights box in specified matrix
-	static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness = 1);
+		//Hightlights box in specified matrix
+		static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness = 1);
 
-	//Calculates the luminance histogram of a region
-	cv::Mat calculateLuminanceHistogram(cv::Rect, cv::Rect ignoreRegion=cv::Rect(0,0,0,0));
-	
-	//Calculates the luminance histogram of an image
-	cv::Mat calculateLuminanceHistogram();
+		//Calculates the luminance histogram of a region
+		cv::Mat calculateLuminanceHistogram(cv::Rect, cv::Rect ignoreRegion = cv::Rect(0, 0, 0, 0));
 
-	static void displayLuminanceHistogram(cv::Mat histogram);
+		//Calculates the luminance histogram of an image
+		cv::Mat calculateLuminanceHistogram();
 
-	static void saveLuminanceHistogram(cv::Mat histogram, std::string filepath);
+		static void displayLuminanceHistogram(cv::Mat histogram);
 
-	//Saves specified luminance histogram to a csv file
-	static void saveHistogramCSV(cv::Mat histogram, std::string filename);
+		static void saveLuminanceHistogram(cv::Mat histogram, std::string filepath);
 
-	//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
-	bool nextFrame();
+		//Saves specified luminance histogram to a csv file
+		static void saveHistogramCSV(cv::Mat histogram, std::string filename);
 
-	//Path of the original image or the video its coming from
-	std::filesystem::path getPath() { return path; };
+		//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
+		bool nextFrame();
 
-	//Saves the data in the image subfolder
-	void saveOutputData(cv::Mat data, std::string name);
-};
+		//Path of the original image or the video its coming from
+		std::filesystem::path getPath() { return path; };
+
+		//Saves the data in the image subfolder
+		void saveOutputData(cv::Mat data, std::string name);
+	};
+}
