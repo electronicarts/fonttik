@@ -7,25 +7,29 @@
 
 namespace fs = std::filesystem;
 
-struct ResolutionGuidelines {
-	size_t width;
-	size_t height;
-	ResolutionGuidelines() :width(0), height(0) {}
-	ResolutionGuidelines(size_t w, size_t h)
-		:width(w), height(h) {}
-};
+namespace tin {
 
-class Guideline {
-	//Guidelines
-	float contrastRatio;
-	std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
-	ResolutionGuidelines* activeResolution = nullptr;
-public:
-	Guideline(float contrast, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines);
+	struct ResolutionGuidelines {
+		size_t width;
+		size_t height;
+		ResolutionGuidelines() :width(0), height(0) {}
+		ResolutionGuidelines(size_t w, size_t h)
+			:width(w), height(h) {}
+	};
 
-	void setActiveResolution(int resolution);
+	class Guideline {
+		//Guidelines
+		float contrastRatio;
+		std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
+		ResolutionGuidelines* activeResolution = nullptr;
+	public:
+		Guideline(float contrast, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines);
 
-	size_t getHeightRequirement() const { return activeResolution->height; }
-	size_t getWidthRequirement() const { return activeResolution->width; }
-	float getContrastRequirement() const { return contrastRatio; }
-};
+		void setActiveResolution(int resolution);
+
+		size_t getHeightRequirement() const { return activeResolution->height; }
+		size_t getWidthRequirement() const { return activeResolution->width; }
+		float getContrastRequirement() const { return contrastRatio; }
+	};
+
+}

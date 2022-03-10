@@ -5,24 +5,26 @@
 
 namespace fs = std::filesystem;
 
-class Configuration;
+namespace tin {
+	class Configuration;
 
-class TinEye {
-	Configuration* config = nullptr;
-	cv::dnn::TextRecognitionModel model;
+	class TinEye {
+		Configuration* config = nullptr;
+		cv::dnn::TextRecognitionModel model;
 
-	bool textboxSizeCheck(const Textbox& textbox);
-	bool textboxContrastCheck(const Textbox& textbox);
-public:
-	TinEye() {};
-	~TinEye();
-	void init(fs::path configFile);
+		bool textboxSizeCheck(const Textbox& textbox);
+		bool textboxContrastCheck(const Textbox& textbox);
+	public:
+		TinEye() {};
+		~TinEye();
+		void init(fs::path configFile);
 
-	std::vector<Textbox> getTextBoxes(Image& image);
-	void mergeTextBoxes(std::vector<Textbox>& textBoxes);
+		std::vector<Textbox> getTextBoxes(Image& image);
+		void mergeTextBoxes(std::vector<Textbox>& textBoxes);
 
-	void applyFocusMask(Image& image);
+		void applyFocusMask(Image& image);
 
-	bool fontSizeCheck(Image& img, std::vector<Textbox>& boxes);
-	bool textContrastCheck(Image& image, std::vector<Textbox>& boxes);
-};
+		bool fontSizeCheck(Image& img, std::vector<Textbox>& boxes);
+		bool textContrastCheck(Image& image, std::vector<Textbox>& boxes);
+	};
+}

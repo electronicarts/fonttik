@@ -3,112 +3,114 @@
 #include "Guideline.h"
 #include "TextDetectionParams.h"
 
-Configuration::Configuration() {
-	setDefaultAppSettings();
-	setDefaultGuideline();
-}
+namespace tin {
+	Configuration::Configuration() {
+		setDefaultAppSettings();
+		setDefaultGuideline();
+	}
 
-Configuration::Configuration(fs::path configPath) {
-	std::ifstream configFile(configPath);
-	if (configFile) {
-		json config;
-		configFile >> config;
-		//Guidelines
-		try {
-			json guidelineJson = config["guideline"];
-			std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
-			for (auto it = guidelineJson["resolutions"].begin(); it != guidelineJson["resolutions"].end(); ++it)
-			{
-				ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
-				resolutionGuidelines[atoi(it.key().c_str())] = a;
+	Configuration::Configuration(fs::path configPath) {
+		std::ifstream configFile(configPath);
+		if (configFile) {
+			json config;
+			configFile >> config;
+			//Guidelines
+			try {
+				json guidelineJson = config["guideline"];
+				std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
+				for (auto it = guidelineJson["resolutions"].begin(); it != guidelineJson["resolutions"].end(); ++it)
+				{
+					ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
+					resolutionGuidelines[atoi(it.key().c_str())] = a;
+				}
+
+				guideline = new Guideline(guidelineJson["contrast"], resolutionGuidelines);
+
 			}
+			catch (...) {
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration guidelines" << std::endl;
+				setDefaultGuideline();
+			}
+			//AppSettigns
+			try {
+				json settings = config["appSettings"];
 
-			guideline = new Guideline(guidelineJson["contrast"], resolutionGuidelines);
+				std::vector<cv::Rect2f> focus;
+				for (auto it = settings["focusMask"].begin(); it != settings["focusMask"].end(); ++it)
+				{
+					focus.push_back(RectFromJson<float>(*it));
+				}
 
+				std::vector<cv::Rect2f> ignore;
+				for (auto it = settings["ignoreMask"].begin(); it != settings["ignoreMask"].end(); ++it)
+				{
+					ignore.push_back(RectFromJson<float>(*it));
+				}
+
+				appSettings = new AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
+					settings["saveSeparateTexboxes"], settings["saveHistograms"], settings["saveRawTextboxOutline"],
+					settings["resultsPath"], settings["debugInfoPath"]);
+				if (!focus.empty()) {
+					appSettings->setFocusMask(focus, ignore);
+				}
+			}
+			catch (...) {
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
+				setDefaultAppSettings();
+			}
+			//Text Detection
+			try {
+				json textDetection = config["textDetection"];
+				json  mean = textDetection["detectionMean"];
+				json merge = textDetection["mergeThreshold"];
+				float degreeThreshold = textDetection["rotationThresholdDegrees"];
+				std::pair<float, float> mergeThresh = std::make_pair(merge["x"], merge["y"]);
+				textDetectionParams = new TextDetectionParams(textDetection["confidence"],
+					textDetection["nmsThreshold"], textDetection["detectionScale"],
+					{ mean[0],mean[1] ,mean[2] }, mergeThresh, degreeThreshold * (CV_PI / 180));
+			}
+			catch (...) {
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
+				setDefaultTextDetectionParams();
+			}
 		}
-		catch (...) {
-			BOOST_LOG_TRIVIAL(error) << "Malformed configuration guidelines" << std::endl;
+		else {
+			BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
 			setDefaultGuideline();
-		}
-		//AppSettigns
-		try {
-			json settings = config["appSettings"];
-
-			std::vector<cv::Rect2f> focus;
-			for (auto it = settings["focusMask"].begin(); it != settings["focusMask"].end(); ++it)
-			{
-				focus.push_back(RectFromJson<float>(*it));
-			}
-
-			std::vector<cv::Rect2f> ignore;
-			for (auto it = settings["ignoreMask"].begin(); it != settings["ignoreMask"].end(); ++it)
-			{
-				ignore.push_back(RectFromJson<float>(*it));
-			}
-
-			appSettings = new AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
-				settings["saveSeparateTexboxes"], settings["saveHistograms"],settings["saveRawTextboxOutline"],
-				settings["resultsPath"], settings["debugInfoPath"]);
-			if (!focus.empty() ) {
-				appSettings->setFocusMask(focus,ignore);
-			}
-		}
-		catch (...) {
-			BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
+			setDefaultTextDetectionParams();
 			setDefaultAppSettings();
 		}
-		//Text Detection
-		try {
-			json textDetection = config["textDetection"];
-			json  mean = textDetection["detectionMean"];
-			json merge = textDetection["mergeThreshold"];
-			float degreeThreshold = textDetection["rotationThresholdDegrees"];
-			std::pair<float, float> mergeThresh = std::make_pair(merge["x"], merge["y"]);
-			textDetectionParams = new TextDetectionParams(textDetection["confidence"],
-				textDetection["nmsThreshold"],textDetection["detectionScale"],
-				{mean[0],mean[1] ,mean[2] },mergeThresh, degreeThreshold*(CV_PI/180));
+	}
+
+	void Configuration::setDefaultGuideline() {
+		//If file is not found, error and set default values
+		BOOST_LOG_TRIVIAL(error) << "Configuration file not found, falling back to default configuration\n";
+		BOOST_LOG_TRIVIAL(error) << "Contrast ratio: 4.5, language: eng" << std::endl;
+
+		if (guideline != nullptr) {
+			delete guideline;
 		}
-		catch(...) {
-			BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
-			setDefaultTextDetectionParams();
+		guideline = new Guideline(4.5, { {1080,{4,28}} });
+	}
+
+	void Configuration::setDefaultAppSettings() {
+		if (appSettings != nullptr) {
+			delete appSettings;
 		}
-	}
-	else {
-		BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
-		setDefaultGuideline();
-		setDefaultTextDetectionParams();
-		setDefaultAppSettings();
-	}
-}
 
-void Configuration::setDefaultGuideline() {
-	//If file is not found, error and set default values
-	BOOST_LOG_TRIVIAL(error) << "Configuration file not found, falling back to default configuration\n";
-	BOOST_LOG_TRIVIAL(error) << "Contrast ratio: 4.5, language: eng" << std::endl;
-
-	if (guideline != nullptr) {
-		delete guideline;
-	}
-	guideline = new Guideline(4.5, { {1080,{4,28}} });
-}
-
-void Configuration::setDefaultAppSettings() {
-	if (appSettings != nullptr) {
-		delete appSettings;
+		appSettings = new AppSettings(true, true, false, false, false,
+			"./", "./debugInfo");
 	}
 
-	appSettings = new AppSettings(true, true, false, false,false,
-		"./", "./debugInfo");
-}
-
-void Configuration::setDefaultTextDetectionParams() {
-	if (textDetectionParams != nullptr) {
-		delete textDetectionParams;
+	void Configuration::setDefaultTextDetectionParams() {
+		if (textDetectionParams != nullptr) {
+			delete textDetectionParams;
+		}
+		textDetectionParams = new TextDetectionParams(0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
 	}
-	textDetectionParams = new TextDetectionParams(0.5, 0.4,1.0,{ 123.68, 116.78, 103.94 },{1.0,1.0},0.17);
-}
 
-template<typename T>
-cv::Rect_<T> Configuration::RectFromJson(json data) {
-	return { data["x"], data["y"], data["w"], data["h"] };
+	template<typename T>
+	cv::Rect_<T> Configuration::RectFromJson(json data) {
+		return { data["x"], data["y"], data["w"], data["h"] };
+	}
 }
