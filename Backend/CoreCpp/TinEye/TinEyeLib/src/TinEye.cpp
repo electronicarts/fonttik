@@ -8,9 +8,12 @@
 #include "Guideline.h"
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
+#include "Instrumentor.h"
 
 void TinEye::init(fs::path configFile)
 {
+	Instrumentor::Get().BeginSession("Profile");
+	PROFILE_FUNCTION();
 	if (config != nullptr) {
 		delete config;
 	}
@@ -46,12 +49,14 @@ void TinEye::init(fs::path configFile)
 }
 
 void TinEye::applyFocusMask(Image& image) {
+	PROFILE_FUNCTION();
 	cv::Mat img = image.getImageMatrix();
 	cv::Mat mask = config->getAppSettings()->calculateMask(img.cols, img.rows);
 	img = img & mask;
 }
 
 bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
+	PROFILE_FUNCTION();
 	cv::Mat openCVMat = img.getImageMatrix();
 	cv::Mat luminanceMap = img.getLuminanceMap();
 
@@ -84,6 +89,7 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 
 #ifdef _DEBUG
 		if (appSettings->saveTexboxOutline()) {
+			PROFILE_SCOPE("highlight");
 			cv::Rect boxRect = box.getRect();
 			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
 		}
@@ -108,11 +114,13 @@ bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 }
 
 bool TinEye::textboxSizeCheck(const Textbox& textbox) {
+	PROFILE_FUNCTION();
 	bool pass = true;
 	cv::Rect boxRect = textbox.getRect();
 
 	//Recognize word in region
-	std::string recognitionResult = model.recognize(textbox.getSubmatrix());
+	std::string recognitionResult;
+	recognitionResult = model.recognize(textbox.getSubmatrix());
 
 	//Avoids division by zero
 	int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
@@ -140,6 +148,8 @@ bool TinEye::textboxSizeCheck(const Textbox& textbox) {
 }
 
 bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
+	PROFILE_FUNCTION();
+
 	cv::Mat openCVMat = image.getImageMatrix();
 	cv::Mat luminanceMap = image.getLuminanceMap();
 
@@ -166,7 +176,7 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 	for (Textbox box : boxes) {
 
 		box.setParentImage(&image);
-		
+
 		bool individualPass = textboxContrastCheck(box);
 
 
@@ -176,6 +186,7 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 			Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
 		}
 		if (appSettings->saveHistograms()) {
+			PROFILE_SCOPE("saveHistograms");
 			cv::Rect boxRect = box.getRect();
 			fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
 			Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
@@ -200,6 +211,7 @@ bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
 }
 
 bool TinEye::textboxContrastCheck(const Textbox& box) {
+	PROFILE_FUNCTION();
 	cv::Rect boxRect = box.getRect();
 
 	//Contrast checking with thresholds
@@ -234,10 +246,12 @@ bool TinEye::textboxContrastCheck(const Textbox& box) {
 }
 
 std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
+	PROFILE_FUNCTION();
 	return TextboxDetection::detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
 }
 
 void TinEye::mergeTextBoxes(std::vector<Textbox>& textBoxes) {
+	PROFILE_FUNCTION();
 	std::pair<float, float> threshold = config->getTextDetectionParams()->getMergeThreshold();
 	if (threshold.first < 1.0 || threshold.second < 1.0) {
 		TextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
@@ -253,4 +267,5 @@ TinEye::~TinEye()
 	}
 
 	config = nullptr;
+	Instrumentor::Get().EndSession();
 }
