@@ -1,11 +1,13 @@
 #include "Image.h"
 #include <boost/log/trivial.hpp>
 #include <fstream>
+#include "Instrumentor.h"
 
 namespace fs = std::filesystem;
 
 void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
 {
+	PROFILE_FUNCTION();
 	if (!matrix.empty()) {
 		cv::line(matrix, cv::Point(x1, y1), cv::Point(x2, y1), color, thickness);
 		cv::line(matrix, cv::Point(x2, y1), cv::Point(x2, y2), color, thickness);
@@ -16,6 +18,7 @@ void Image::highlightBox(const int& x1, const int& y1, const int& x2, const int&
 
 cv::Mat Image::calculateLuminanceHistogram(cv::Rect rect, cv::Rect ignoreRegion)
 {
+	PROFILE_FUNCTION();
 	if (luminanceMap.empty()) {
 		getLuminanceMap();
 	}
@@ -43,6 +46,7 @@ cv::Mat Image::calculateLuminanceHistogram()
 
 void Image::displayLuminanceHistogram(cv::Mat histogram)
 {
+	PROFILE_FUNCTION();
 	cv::Mat histImage = generateLuminanceHistogramImage(histogram);
 	cv::imshow("histogram", histImage);
 	cv::waitKey();
@@ -56,6 +60,7 @@ void Image::saveLuminanceHistogram(cv::Mat histogram, std::string filepath)
 
 void Image::saveHistogramCSV(cv::Mat histogram, std::string filename)
 {
+	PROFILE_FUNCTION();
 	std::ofstream filestream;
 	filestream.open(filename.c_str());
 	filestream << cv::format(histogram, cv::Formatter::FMT_CSV) << std::endl;
@@ -87,6 +92,7 @@ Image::Image() {
 }
 
 bool Image::loadImage(std::filesystem::path filepath) {
+	PROFILE_FUNCTION();
 	path = filepath;
 
 	std::string fileFormat = filepath.extension().string();
@@ -126,36 +132,42 @@ cv::Mat Image::getImageMatrix()
 cv::Mat Image::getLuminanceMap() {
 	//Make sure that image has been loaded and we haven't previously calculated the luminance already
 	if (!imageMatrix.empty() && luminanceMap.empty()) {
-		//Load pixel information to float matrix (so bgr values go from 0.0 to 1.0)
+		luminanceMap = calculateLuminanceMap(imageMatrix);
+	}
 
-		//Matrix to store linearized rgb
-		cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_32FC3);
+	return luminanceMap;
+}
 
-		for (int y = 0; y < imageMatrix.rows; y++) {
-			for (int x = 0; x < imageMatrix.cols; x++) {
-				cv::Vec3b colorVals = imageMatrix.at<cv::Vec3b>(y, x);
+cv::Mat Image::calculateLuminanceMap(cv::Mat source) {
+	PROFILE_FUNCTION();
+	//Load pixel information to float matrix (so bgr values go from 0.0 to 1.0)
 
-				//TODO lookup table, inexpensive, only 256 values, one for each lum value
-				//Could also use three separate lookup tables and merge them into one result directly
-				linearBGR.at<cv::Vec3f>(y, x) = {
-					linearize8bitRGB(colorVals.val[0]),
-					linearize8bitRGB(colorVals.val[1]),
-					linearize8bitRGB(colorVals.val[2]) };
-			}
-		}
+	//Matrix to store linearized rgb
+	cv::Mat linearBGR = cv::Mat::zeros(source.size(), CV_32FC3);
 
+	for (int y = 0; y < source.rows; y++) {
+		for (int x = 0; x < source.cols; x++) {
+			cv::Vec3b colorVals = source.at<cv::Vec3b>(y, x);
 
-		luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_8UC1); //1 channel (luminance)
-
-		for (int y = 0; y < imageMatrix.rows; y++) {
-			for (int x = 0; x < imageMatrix.cols; x++) {
-				cv::Vec3f lumVals = linearBGR.at<cv::Vec3f>(y, x);
-				//BGR order
-				luminanceMap.at<uchar>(y, x) = cv::saturate_cast<uchar>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126) * 255);
-			}
+			//TODO lookup table, inexpensive, only 256 values, one for each lum value
+			//Could also use three separate lookup tables and merge them into one result directly
+			linearBGR.at<cv::Vec3f>(y, x) = {
+				linearize8bitRGB(colorVals.val[0]),
+				linearize8bitRGB(colorVals.val[1]),
+				linearize8bitRGB(colorVals.val[2]) };
 		}
 	}
 
+
+	cv::Mat luminanceMap= cv::Mat::zeros(source.size(), CV_8UC1); //1 channel (luminance)
+
+	for (int y = 0; y < source.rows; y++) {
+		for (int x = 0; x < source.cols; x++) {
+			cv::Vec3f lumVals = linearBGR.at<cv::Vec3f>(y, x);
+			//BGR order
+			luminanceMap.at<uchar>(y, x) = cv::saturate_cast<uchar>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126) * 255);
+		}
+	}
 	return luminanceMap;
 }
 
@@ -169,6 +181,7 @@ void Image::saveLuminanceMap(std::string filepath) {
 
 void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2)
 {
+	PROFILE_FUNCTION();
 	if (!luminanceMap.empty()) {
 		cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
 		cv::bitwise_not(subMatrix, subMatrix);
@@ -177,6 +190,7 @@ void Image::flipLuminance(const int& x1, const int& y1, const int& x2, const int
 
 void Image::flipLuminance()
 {
+
 	if (!luminanceMap.empty()) {
 		flipLuminance(0, 0, luminanceMap.cols - 1, luminanceMap.rows - 1);
 	}
@@ -184,6 +198,7 @@ void Image::flipLuminance()
 
 uchar Image::getAverageSurroundingLuminance(const int& x1, const int& y1, const int& x2, const int& y2, const int& marginX, const int& marginY)
 {
+	PROFILE_FUNCTION();
 	uchar lum = 0;
 	//TODO use more efficient ROI operations
 	if (!luminanceMap.empty()) {
@@ -217,6 +232,7 @@ uchar Image::getAverageSurroundingLuminance(cv::Rect region, const int& marginX,
 
 void Image::convertImageMatrixToBGR()
 {
+	PROFILE_FUNCTION();
 	if (imageMatrix.channels() == 1) {
 		cv::cvtColor(imageMatrix, imageMatrix, cv::COLOR_GRAY2BGR);
 	}
@@ -226,6 +242,8 @@ void Image::convertImageMatrixToBGR()
 }
 
 float Image::linearize8bitRGB(const uchar& colorBits) {
+	//Profiling this function kills performance
+	//PROFILE_FUNCTION();
 	//ref https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance
 	float color = colorBits / 255.0f;
 
@@ -239,6 +257,7 @@ float Image::linearize8bitRGB(const uchar& colorBits) {
 
 cv::Mat Image::generateLuminanceHistogramImage(cv::Mat histogram)
 {
+	PROFILE_FUNCTION();
 	//Display the histogram
 	int hist_w = 512, hist_h = 400;
 	int bin_w = cvRound((double)hist_w / 256);
@@ -255,6 +274,7 @@ cv::Mat Image::generateLuminanceHistogramImage(cv::Mat histogram)
 }
 
 void Image::saveOutputData(cv::Mat data, std::string name) {
+	PROFILE_FUNCTION();
 	fs::path outputPath = path.parent_path() / (path.filename().string() + "_output");
 
 	if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {
