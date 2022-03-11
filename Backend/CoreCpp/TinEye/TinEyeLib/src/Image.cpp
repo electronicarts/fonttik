@@ -140,6 +140,35 @@ namespace tin {
 		return luminanceMap;
 	}
 
+	cv::Mat Image::getLuminanceMap(std::vector<double>* lookUpTable)
+	{
+		//Make sure that image has been loaded and we haven't previously calculated the luminance already
+		if (!imageMatrix.empty() && luminanceMap.empty()) {
+			//Matrix to store linearized rgb
+			cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_64FC3);
+
+			cv::LUT(imageMatrix, *lookUpTable, linearBGR);
+
+			cv::Mat luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_64FC1); //1 channel (luminance)
+
+			//Adds up all three channels into one luminance value channel 
+			//from https://stackoverflow.com/questions/30666224/how-can-i-turn-a-three-channel-mat-into-a-summed-up-one-channel-mat
+			//cv::transform(linearBGR, luminanceMap, cv::Matx13f(1, 1, 1));
+
+			for (int y = 0; y < imageMatrix.rows; y++) {
+				for (int x = 0; x < imageMatrix.cols; x++) {
+					cv::Vec3d lumVals = linearBGR.at<cv::Vec3d>(y, x);
+					//BGR order
+					luminanceMap.at<double>(y, x) = cv::saturate_cast<double>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126));
+				}
+			}
+
+			std::cout << luminanceMap << std::endl;
+		}
+
+		return luminanceMap;
+	}
+
 	cv::Mat Image::calculateLuminanceMap(cv::Mat source) {
 		PROFILE_FUNCTION();
 		//Load pixel information to float matrix (so bgr values go from 0.0 to 1.0)

@@ -60,7 +60,6 @@ namespace tin {
 	bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
 		PROFILE_FUNCTION();
 		cv::Mat openCVMat = img.getImageMatrix();
-		cv::Mat luminanceMap = img.getLuminanceMap();
 
 		AppSettings* appSettings = config->getAppSettings();
 		Guideline* guideline = config->getGuideline();
@@ -153,7 +152,7 @@ namespace tin {
 		PROFILE_FUNCTION();
 
 		cv::Mat openCVMat = image.getImageMatrix();
-		cv::Mat luminanceMap = image.getLuminanceMap();
+		cv::Mat luminanceMap = image.getLuminanceMap(config->getRGBLookupTable());
 
 		AppSettings* appSettings = config->getAppSettings();
 		Guideline* guideline = config->getGuideline();
@@ -223,11 +222,13 @@ namespace tin {
 		cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
 		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;
+		double meanLight = cv::mean(luminanceRegion, mask)[0];
 
 		//Invert mask to calculate mean of the darker colors
 		cv::bitwise_not(mask, mask);
-		double meanDark = cv::mean(luminanceRegion, mask)[0] / 255.0;
+		double meanDark = cv::mean(luminanceRegion, mask)[0];
+
+		BOOST_LOG_TRIVIAL(info) << "Mean light " << meanLight << std::endl;
 
 		double ratio;
 		if (meanLight >= meanDark) {

@@ -73,6 +73,16 @@ namespace tin {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
 				setDefaultTextDetectionParams();
 			}
+			//RGB lookup tables
+			try {
+				rgbLookUp = new std::vector<double>();
+
+				for (auto& elem : config["sRGBLinearizationValues"])
+					rgbLookUp->push_back(elem);
+			}
+			catch (...) {
+				//TODO
+			}
 		}
 		else {
 			BOOST_LOG_TRIVIAL(error) << "Configuration file not found" << std::endl;
