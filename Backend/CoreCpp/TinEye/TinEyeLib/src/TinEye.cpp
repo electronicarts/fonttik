@@ -220,17 +220,18 @@ namespace tin {
 		cv::Mat luminanceRegion = box.getLuminanceMap();
 		cv::Mat maskA, maskB;
 		//OTSU threshold automatically calculates best fitting threshold values
-		cv::threshold(luminanceRegion, maskA, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		//TODO convert to 8bit unsigned for otsu
+		cv::threshold(luminanceRegion, maskA, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 		cv::bitwise_not(maskA, maskB);
 
-		//image.saveOutputData(luminanceRegion, "lum.png");
-		//image.saveOutputData(maskA, "mask.png");
+		image.saveOutputData(luminanceRegion, "lum.png");
+		image.saveOutputData(maskA, "mask.png");
 
 		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
 
 		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
 
-		if (!boxPasses) {
+		if (boxPasses) {
 			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
 				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
 		}
@@ -302,8 +303,7 @@ namespace tin {
 				}
 			}
 
-			//luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_64FC1); //1 channel (luminance)
-			luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_8UC1);
+			luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_64FC1); //1 channel (luminance)
 
 			// Possible improvement by having a different LUT for each color channel and then adding themp up with:
 			//from https://stackoverflow.com/questions/30666224/how-can-i-turn-a-three-channel-mat-into-a-summed-up-one-channel-mat
@@ -314,10 +314,10 @@ namespace tin {
 				for (int x = 0; x < imageMatrix.cols; x++) {
 					cv::Vec3d lumVals = linearBGR.at<cv::Vec3d>(y, x);
 					//BGR order
-					luminanceMap.at<uchar>(y, x) = cv::saturate_cast<uchar>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126));
+					luminanceMap.at<double>(y, x) = cv::saturate_cast<double>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126));
 				}
 			}
-		}
+		} 
 
 		return luminanceMap;
 	}
