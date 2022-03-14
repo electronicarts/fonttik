@@ -170,16 +170,13 @@ namespace tin {
 			return false;
 		}
 
-		guideline->setActiveResolution(openCVMat.rows);
-
 		bool imagePasses = true;
-		int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
 
 		for (Textbox box : boxes) {
 
 			box.setParentImage(&image);
 
-			bool individualPass = textboxContrastCheck(box);
+			bool individualPass = textboxContrastCheck(box,image);
 
 
 #ifdef _DEBUG
@@ -212,7 +209,7 @@ namespace tin {
 
 	}
 
-	bool TinEye::textboxContrastCheck(const Textbox& box) {
+	bool TinEye::textboxContrastCheck(const Textbox& box, Image& image) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = box.getRect();
 
@@ -220,7 +217,10 @@ namespace tin {
 		cv::Mat luminanceRegion = box.getLuminanceMap();
 		cv::Mat mask;
 		//OTSU threshold automatically calculates best fitting threshold values
-		cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::threshold(luminanceRegion, mask, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+		//image.saveOutputData(luminanceRegion, "lum.png");
+		//image.saveOutputData(mask, "mask.png");
 
 		//Calculate the mean of the luminance for the light regions of the luminance
 		double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;

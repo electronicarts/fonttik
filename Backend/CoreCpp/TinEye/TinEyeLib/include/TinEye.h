@@ -13,7 +13,7 @@ namespace tin {
 		cv::dnn::TextRecognitionModel model;
 
 		bool textboxSizeCheck(const Textbox& textbox);
-		bool textboxContrastCheck(const Textbox& textbox);
+		bool textboxContrastCheck(const Textbox& textbox, Image& image);
 	public:
 		TinEye() {};
 		~TinEye();
