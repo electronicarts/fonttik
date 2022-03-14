@@ -1,7 +1,8 @@
-﻿#pragma once
+#pragma once
 #include <filesystem>
 #include "Image.h"
 #include "Textbox.h"
+#include <gtest/gtest.h>
 
 namespace fs = std::filesystem;
 
@@ -14,6 +15,12 @@ namespace tin {
 
 		bool textboxSizeCheck(const Textbox& textbox);
 		bool textboxContrastCheck(const Textbox& textbox, Image& image);
+		bool textboxContrastCheck(const Textbox& textbox);
+
+		static double ContrastBetweenRegions(const cv::Mat& luminance, const cv::Mat& maskA, const cv::Mat& maskB);
+
+		FRIEND_TEST(ContrastRegions, MaxContrast);
+		FRIEND_TEST(ContrastRegions, Commutative);
 	public:
 		TinEye() {};
 		~TinEye();

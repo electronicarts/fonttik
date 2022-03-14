@@ -215,27 +215,15 @@ namespace tin {
 
 		//Contrast checking with thresholds
 		cv::Mat luminanceRegion = box.getLuminanceMap();
-		cv::Mat mask;
+		cv::Mat maskA,maskB;
 		//OTSU threshold automatically calculates best fitting threshold values
-		cv::threshold(luminanceRegion, mask, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::threshold(luminanceRegion, maskA, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::bitwise_not(maskA, maskB);
 
 		//image.saveOutputData(luminanceRegion, "lum.png");
 		//image.saveOutputData(mask, "mask.png");
 
-		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = cv::mean(luminanceRegion, mask)[0] / 255.0;
-
-		//Invert mask to calculate mean of the darker colors
-		cv::bitwise_not(mask, mask);
-		double meanDark = cv::mean(luminanceRegion, mask)[0] / 255.0;
-
-		double ratio;
-		if (meanLight >= meanDark) {
-			ratio = (meanLight + .05) / (meanDark + .05);
-		}
-		else {
-			ratio = (meanDark + .05) / (meanLight + .05);
-		}
+		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
 
 		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
 
@@ -245,6 +233,16 @@ namespace tin {
 		}
 
 		return boxPasses;
+	}
+
+	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
+		//Calculate the mean of the luminance for the light regions of the luminance
+		double meanLight = Image::LuminanceMeanWithMask(luminanceMap, maskA);
+
+		//Invert mask to calculate mean of the darker colors
+		double meanDark = Image::LuminanceMeanWithMask(luminanceMap, maskB);
+
+		return (std::max(meanLight,meanDark) + 0.05) / (std::min(meanLight,meanDark) + 0.05);
 	}
 
 	std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
