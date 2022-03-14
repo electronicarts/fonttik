@@ -120,6 +120,11 @@ namespace tin {
 		}
 		else {
 			convertImageMatrixToBGR();
+
+			//make sure luminance map is reset if loading new media into previously existing object
+			if (!luminanceMap.empty()) {
+				luminanceMap.release();
+			}
 			return true;
 		}
 
@@ -276,14 +281,19 @@ namespace tin {
 		//Profiling this function kills performance
 		//PROFILE_FUNCTION();
 		//ref https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance
-		float color = colorBits / 255.0f;
+		double color = colorBits / 255.0;
 
 		if (color <= 0.04045) {
-			return color / 12.92f;
+			return color / 12.92;
 		}
 		else {
-			return pow((color + 0.055f) / 1.1055f, 2.4f);
+			double topo = ((color + 0.055) / 1.1055);
+			return pow(topo, 2.4);
 		}
+	}
+
+	double Image::LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask) {
+		return cv::mean(mat, mask)[0] / 255.0f;
 	}
 
 	cv::Mat Image::generateLuminanceHistogramImage(cv::Mat histogram)

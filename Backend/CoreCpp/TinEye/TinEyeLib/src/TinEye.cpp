@@ -169,16 +169,13 @@ namespace tin {
 			return false;
 		}
 
-		guideline->setActiveResolution(openCVMat.rows);
-
 		bool imagePasses = true;
-		int minimumHeight = guideline->getHeightRequirement(), minimumWidth = guideline->getWidthRequirement();
 
 		for (Textbox box : boxes) {
 
 			box.setParentImage(&image);
 
-			bool individualPass = textboxContrastCheck(box);
+			bool individualPass = textboxContrastCheck(box,image);
 
 
 #ifdef _DEBUG
@@ -211,32 +208,21 @@ namespace tin {
 
 	}
 
-	bool TinEye::textboxContrastCheck(const Textbox& box) {
+	bool TinEye::textboxContrastCheck(const Textbox& box, Image& image) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = box.getRect();
 
 		//Contrast checking with thresholds
 		cv::Mat luminanceRegion = box.getLuminanceMap();
-		cv::Mat mask;
+		cv::Mat maskA,maskB;
 		//OTSU threshold automatically calculates best fitting threshold values
-		cv::threshold(luminanceRegion, mask, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::threshold(luminanceRegion, maskA, 30, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::bitwise_not(maskA, maskB);
 
-		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = cv::mean(luminanceRegion, mask)[0];
+		//image.saveOutputData(luminanceRegion, "lum.png");
+		//image.saveOutputData(mask, "mask.png");
 
-		//Invert mask to calculate mean of the darker colors
-		cv::bitwise_not(mask, mask);
-		double meanDark = cv::mean(luminanceRegion, mask)[0];
-
-		BOOST_LOG_TRIVIAL(info) << "Mean light " << meanLight << std::endl;
-
-		double ratio;
-		if (meanLight >= meanDark) {
-			ratio = (meanLight + .05) / (meanDark + .05);
-		}
-		else {
-			ratio = (meanDark + .05) / (meanLight + .05);
-		}
+		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
 
 		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
 
@@ -246,6 +232,16 @@ namespace tin {
 		}
 
 		return boxPasses;
+	}
+
+	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
+		//Calculate the mean of the luminance for the light regions of the luminance
+		double meanLight = Image::LuminanceMeanWithMask(luminanceMap, maskA);
+
+		//Invert mask to calculate mean of the darker colors
+		double meanDark = Image::LuminanceMeanWithMask(luminanceMap, maskB);
+
+		return (std::max(meanLight,meanDark) + 0.05) / (std::min(meanLight,meanDark) + 0.05);
 	}
 
 	std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
