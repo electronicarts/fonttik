@@ -120,6 +120,11 @@ namespace tin {
 		}
 		else {
 			convertImageMatrixToBGR();
+
+			//make sure luminance map is reset if loading new media into previously existing object
+			if (!luminanceMap.empty()) {
+				luminanceMap.release();
+			}
 			return true;
 		}
 
