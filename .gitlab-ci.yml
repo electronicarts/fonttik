@@ -64,6 +64,8 @@ build-corecpp:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Tests
+            - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Tests
+            - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/AddressSanitizer.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-release/CTestTestfile.cmake
 #test corecpp project
 test-corecpp:
@@ -71,29 +73,8 @@ test-corecpp:
     image: docker.artifactory.ea.com/gcc:latest
     tags:
         - docker
-    #only:
-        #changes:
-        #    - "Backend/CoreCpp/*" 
-        #refs:
-        #    - development-migration@eacc-tech/iris # only trigger from the migration repo
-    script:
-        # install latest CMake version
-        - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
-        - sh cmake-3.22.2-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
-        # run tests
-        - echo "Start testing CoreCpp"
-        - cd Backend/CoreCpp
-        - ctest --preset tineyelib-linux
-
-
-#test corecpp project
-test-corecpp:
-    stage: test-corecpp
-    image: docker.artifactory.ea.com/gcc:latest
-    tags:
-        - docker
     dependencies:
-        - build-corecpp-linux
+        - build-corecpp
     only:
         changes:
             - "Backend/CoreCpp/**/*"
@@ -112,7 +93,7 @@ test-memory-corecpp:
     tags:
         - docker
     dependencies:
-        - build-corecpp-linux
+        - build-corecpp
     only:
         changes:
             - "Backend/CoreCpp/**/*"
@@ -128,7 +109,7 @@ test-saddress-corecpp:
     tags:
         - docker
     dependencies:
-        - build-corecpp-linux
+        - build-corecpp
     only:
         changes:
             - "Backend/CoreCpp/**/*" 
