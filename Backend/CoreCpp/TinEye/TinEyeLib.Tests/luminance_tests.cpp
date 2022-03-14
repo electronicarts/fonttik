@@ -10,7 +10,7 @@ namespace tin {
 		img.loadImage("resources/luminance/white.png");
 		cv::Mat luminanceMap = img.getLuminanceMap();
 
-		cv::Mat mask = cv::Mat::zeros({ luminanceMap.cols, luminanceMap.rows }, CV_8UC1);
+		cv::Mat mask = cv::Mat::ones({ luminanceMap.cols, luminanceMap.rows }, CV_8UC1);
 
 		double mean = Image::LuminanceMeanWithMask(luminanceMap, mask);
 

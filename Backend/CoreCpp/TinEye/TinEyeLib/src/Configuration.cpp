@@ -77,11 +77,16 @@ namespace tin {
 			try {
 				rgbLookUp = new std::vector<double>();
 
-				for (auto& elem : config["sRGBLinearizationValues"])
+				for (auto& elem : config["sRGBLinearizationValues"]) {
 					rgbLookUp->push_back(elem);
+				}	
 			}
 			catch (...) {
-				//TODO
+				if (rgbLookUp != nullptr) {
+					delete rgbLookUp;
+				}
+
+				rgbLookUp = nullptr;
 			}
 		}
 		else {

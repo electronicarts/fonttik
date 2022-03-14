@@ -18,11 +18,7 @@ namespace tin {
 
 		void convertImageMatrixToBGR();
 
-		static float linearize8bitRGB(const uchar& colorBits);
-
 		static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
-
-		static cv::Mat calculateLuminanceMap(cv::Mat src);
 	public:
 		Image();
 
@@ -33,9 +29,6 @@ namespace tin {
 
 		//Returns loaded image's luminance map, if map hasn't been calculated calculates it as well
 		cv::Mat getLuminanceMap();
-
-		//Returns loaded image's luminance map, if map hasn't been calculated calculates it using provided look up table
-		cv::Mat getLuminanceMap(std::vector<double>* lookUpTable);
 
 		//Saves calculated luminance map to specified filepath
 		void saveLuminanceMap(std::string filepath);
