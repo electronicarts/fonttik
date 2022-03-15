@@ -5,7 +5,10 @@ find_package(GTest CONFIG REQUIRED)
 
 add_executable(${TEST_PROJECT} ${SOURCES} )
 
-target_link_libraries(${TEST_PROJECT} PRIVATE TinEyeLib GTest::gtest_main)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+
+target_link_libraries(${TEST_PROJECT} PUBLIC TinEyeLib GTest::gtest_main PRIVATE -fsanitize=address)
 
 target_include_directories(${TEST_PROJECT} PRIVATE "../TinEyeLib/include" "../TinEyeLib/include_private")
 

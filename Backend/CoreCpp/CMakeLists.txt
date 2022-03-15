@@ -22,3 +22,4 @@ add_subdirectory ("TinEye")
 
 enable_testing()
 add_subdirectory("TinEye/TinEyeLib.Tests")
+add_subdirectory("TinEye/AddressSanitizer.Tests")
