@@ -219,19 +219,22 @@ namespace tin {
 		//Contrast checking with thresholds
 		cv::Mat luminanceRegion = box.getLuminanceMap();
 		cv::Mat maskA, maskB;
+
 		//OTSU threshold automatically calculates best fitting threshold values
+		cv::Mat unsignedLuminance;
+		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
 		//TODO convert to 8bit unsigned for otsu
-		cv::threshold(luminanceRegion, maskA, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::threshold(unsignedLuminance, maskA, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 		cv::bitwise_not(maskA, maskB);
 
-		image.saveOutputData(luminanceRegion, "lum.png");
-		image.saveOutputData(maskA, "mask.png");
+		//image.saveOutputData(unsignedLuminance, "lum.png");
+		//image.saveOutputData(maskA, "mask.png");
 
 		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
 
 		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
 
-		if (boxPasses) {
+		if (!boxPasses) {
 			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
 				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
 		}

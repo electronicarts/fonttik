@@ -6,6 +6,9 @@ namespace tin {
 
 	//White Luminance is 1
 	TEST(LuminanceMean, WhiteImage) {
+		TinEye* tineye = new TinEye();
+		tineye->init("config.json");
+
 		Image img;
 		img.loadImage("resources/luminance/white.png");
 		cv::Mat luminanceMap = img.getLuminanceMap();
@@ -15,11 +18,16 @@ namespace tin {
 		double mean = Image::LuminanceMeanWithMask(luminanceMap, mask);
 
 		ASSERT_DOUBLE_EQ(mean, 1);
+
+		delete tineye;
 	}
 
 	//Mean of both images is different
 	//Mean of left half of blackWhite is the same as white
 	TEST(LuminanceMean, ApplyMask) {
+		TinEye* tineye = new TinEye();
+		tineye->init("config.json");
+
 		Image imgHalf, imgWhite;
 		imgHalf.loadImage("resources/luminance/blackWhite.png");
 		imgWhite.loadImage("resources/luminance/white.png");
@@ -45,10 +53,15 @@ namespace tin {
 
 		ASSERT_DOUBLE_EQ(meanHalf, meanWhite);
 		ASSERT_NE(meanWhite, meanTwoHalves);
+
+		delete tineye;
 	}
 
 	//Black on White has a contrast of 21 according to current legal procedure https://snook.ca/technical/colour_contrast/colour.html#fg=FFFFFF,bg=000000
 	TEST(ContrastRegions, MaxContrast) {
+		TinEye* tineye = new TinEye();
+		tineye->init("config.json");
+
 		Image img;
 		img.loadImage("resources/luminance/blackWhite.png");
 
@@ -65,6 +78,8 @@ namespace tin {
 		double contrast = TinEye::ContrastBetweenRegions(luminanceMap, a, b);
 
 		ASSERT_DOUBLE_EQ(contrast, 21);
+
+		delete tineye;
 	}
 
 	//The order of the regions should not affect the contrast ratio

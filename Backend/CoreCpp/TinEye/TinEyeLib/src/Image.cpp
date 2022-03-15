@@ -159,7 +159,7 @@ namespace tin {
 		PROFILE_FUNCTION();
 		if (!luminanceMap.empty()) {
 			cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
-			cv::bitwise_not(subMatrix, subMatrix);
+			subMatrix = 1 - subMatrix;
 		}
 	}
 
