@@ -18,11 +18,7 @@ namespace tin {
 
 		void convertImageMatrixToBGR();
 
-		static float linearize8bitRGB(const uchar& colorBits);
-
 		static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
-
-		static cv::Mat calculateLuminanceMap(cv::Mat src);
 	public:
 		Image();
 

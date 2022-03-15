@@ -16,6 +16,7 @@ namespace tin {
 		AppSettings* appSettings = nullptr;
 		Guideline* guideline = nullptr;
 		TextDetectionParams* textDetectionParams = nullptr;
+		std::vector<double>* rgbLookUp = nullptr;
 
 		void setDefaultGuideline();
 
@@ -38,15 +39,20 @@ namespace tin {
 			if (textDetectionParams != nullptr) {
 				delete textDetectionParams;
 			}
+			if (rgbLookUp != nullptr) {
+				delete rgbLookUp;
+			}
 
 			appSettings = nullptr;
 			guideline = nullptr;
 			textDetectionParams = nullptr;
+			rgbLookUp = nullptr;
 		}
 
 		AppSettings* getAppSettings() const { return appSettings; }
 		Guideline* getGuideline() const { return guideline; }
 		TextDetectionParams* getTextDetectionParams() const { return textDetectionParams; }
+		std::vector<double>* getRGBLookupTable() const { return rgbLookUp; }
 	};
 
 }
