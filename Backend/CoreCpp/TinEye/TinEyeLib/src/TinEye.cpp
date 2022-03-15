@@ -275,8 +275,8 @@ namespace tin {
 			return color / 12.92;
 		}
 		else {
-			double topo = ((color + 0.055) / 1.1055);
-			return pow(topo, 2.4);
+			double base = ((color + 0.055) / 1.1055);
+			return pow(base, 2.4);
 		}
 	}
 
