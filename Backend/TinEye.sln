@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1700.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gitlab-CI", "Gitlab-CI", "{A62E25A8-8AF5-40D9-940A-F2802DEFA2BE}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitlab-ci.yml = ..\.gitlab-ci.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {45FC5EB7-50A7-4586-9E61-B9D3EA18DE2D}
+	EndGlobalSection
+EndGlobal

@@ -5,6 +5,7 @@ variables:
 stages:
     - build-corecpp
     - test-corecpp
+    - test-memory-corecpp
 
 #build CoreCpp project
 build-corecpp:
@@ -63,6 +64,8 @@ build-corecpp:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Tests
+            - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Tests
+            - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/AddressSanitizer.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-release/CTestTestfile.cmake
 #test corecpp project
 test-corecpp:
@@ -70,11 +73,11 @@ test-corecpp:
     image: docker.artifactory.ea.com/gcc:latest
     tags:
         - docker
-    #only:
-        #changes:
-        #    - "Backend/CoreCpp/*" 
-        #refs:
-        #    - development-migration@eacc-tech/iris # only trigger from the migration repo
+    dependencies:
+        - build-corecpp
+    only:
+        changes:
+            - "Backend/CoreCpp/**/*"
     script:
         # install latest CMake version
         - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
@@ -83,3 +86,37 @@ test-corecpp:
         - echo "Start testing CoreCpp"
         - cd Backend/CoreCpp
         - ctest --preset tineyelib-linux
+#test memory leak in corecpp project
+test-memory-corecpp:
+    stage: test-memory-corecpp
+    image: docker.artifactory.ea.com/gcc:latest
+    tags:
+        - docker
+    dependencies:
+        - build-corecpp
+    only:
+        changes:
+            - "Backend/CoreCpp/**/*"
+    script:
+        # run tests
+        - echo "Start testing CoreCpp for memory leak"
+        - cd Backend/CoreCpp/bin/build/linux-debug/TinEyeLib.Tests
+        - ./TinEyeLib.Tests
+#test Address Sanitizer in corecpp project
+test-saddress-corecpp:
+    stage: test-memory-corecpp
+    image: docker.artifactory.ea.com/gcc:latest
+    tags:
+        - docker
+    dependencies:
+        - build-corecpp
+    only:
+        changes:
+            - "Backend/CoreCpp/**/*" 
+    script:
+        # run tests
+        - echo "Start testing CoreCpp for memory leak"
+        - cd Backend/CoreCpp/bin/build/linux-debug/AddressSanitizer.Tests
+        - ./AddressSanitizer.Tests 2> err.txt || true
+        - cat err.txt
+        - "grep 'ERROR: LeakSanitizer' err.txt"
