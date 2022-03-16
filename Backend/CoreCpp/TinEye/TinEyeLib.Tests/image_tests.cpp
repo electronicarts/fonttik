@@ -52,8 +52,8 @@ namespace tin {
 
 	//Image should remain unchaged if luminance is flipped twice
 	TEST(LuminanceFlip, FlipTwice) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye;
+		tineye.init("config.json");
 
 		Image image;
 		image.loadImage("resources/bf2042/chat_window_closed.png");
@@ -66,6 +66,7 @@ namespace tin {
 		doubleFlip.convertTo(doubleFlip, CV_8UC1, 255);
 
 		ASSERT_TRUE(std::equal(original.begin<uchar>(), original.end<uchar>(), doubleFlip.begin<uchar>()));
+
 	}
 
 	//A region should remain unchaged if luminance is flipped twice

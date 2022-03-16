@@ -7,19 +7,20 @@ namespace fs = std::filesystem;
 
 namespace tin {
 	class AppSettings {
-		bool dbgSaveLuminanceMap,
-			dbgSaveTexboxOutline,
-			dbgSaveSeparateTextboxes,
-			dbgSaveHistograms,
-			dbgSaveRawTextboxOutline;
-		fs::path resultsPath, debugInfoPath;
+		bool dbgSaveLuminanceMap=false,
+			dbgSaveTexboxOutline = false,
+			dbgSaveSeparateTextboxes = false,
+			dbgSaveHistograms = false,
+			dbgSaveRawTextboxOutline = false;
+		fs::path resultsPath = "./", debugInfoPath = "./debug/";
 
 
 		//All mask measurement range from 0 to 1, this will be scaled in functino of image size
 		std::vector<cv::Rect2f> focusMasks = { {0,0,1,1} }; //If not provided, the whole screen will be the focus region
-		std::vector<cv::Rect2f> ignoreMasks; //Data inside here will be always ignored
+		std::vector<cv::Rect2f> ignoreMasks = {}; //Data inside here will be always ignored
 
 	public:
+		AppSettings() {};
 		AppSettings(bool saveLum, bool saveTextbox, bool saveSeparateTexbox, bool saveHist, bool saveRawTextbox,
 			fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
 			dbgSaveTexboxOutline(dbgSaveTexboxOutline), dbgSaveRawTextboxOutline(saveRawTextbox),

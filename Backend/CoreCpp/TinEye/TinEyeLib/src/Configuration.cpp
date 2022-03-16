@@ -7,6 +7,7 @@ namespace tin {
 	Configuration::Configuration() {
 		setDefaultAppSettings();
 		setDefaultGuideline();
+		setDefaultTextDetectionParams();
 	}
 
 	Configuration::Configuration(fs::path configPath) {
@@ -24,7 +25,7 @@ namespace tin {
 					resolutionGuidelines[atoi(it.key().c_str())] = a;
 				}
 
-				guideline = new Guideline(guidelineJson["contrast"], resolutionGuidelines);
+				guideline = Guideline(guidelineJson["contrast"], resolutionGuidelines);
 
 			}
 			catch (...) {
@@ -47,11 +48,11 @@ namespace tin {
 					ignore.push_back(RectFromJson<float>(*it));
 				}
 
-				appSettings = new AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
+				appSettings = AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
 					settings["saveSeparateTexboxes"], settings["saveHistograms"], settings["saveRawTextboxOutline"],
 					settings["resultsPath"], settings["debugInfoPath"]);
 				if (!focus.empty()) {
-					appSettings->setFocusMask(focus, ignore);
+					appSettings.setFocusMask(focus, ignore);
 				}
 			}
 			catch (...) {
@@ -65,7 +66,7 @@ namespace tin {
 				json merge = textDetection["mergeThreshold"];
 				float degreeThreshold = textDetection["rotationThresholdDegrees"];
 				std::pair<float, float> mergeThresh = std::make_pair(merge["x"], merge["y"]);
-				textDetectionParams = new TextDetectionParams(textDetection["confidence"],
+				textDetectionParams = TextDetectionParams(textDetection["confidence"],
 					textDetection["nmsThreshold"], textDetection["detectionScale"],
 					{ mean[0],mean[1] ,mean[2] }, mergeThresh, degreeThreshold * (CV_PI / 180));
 			}
@@ -75,18 +76,12 @@ namespace tin {
 			}
 			//RGB lookup tables
 			try {
-				rgbLookUp = new std::vector<double>();
 
 				for (auto& elem : config["sRGBLinearizationValues"]) {
-					rgbLookUp->push_back(elem);
+					rgbLookUp.push_back(elem);
 				}	
 			}
 			catch (...) {
-				if (rgbLookUp != nullptr) {
-					delete rgbLookUp;
-				}
-
-				rgbLookUp = nullptr;
 			}
 		}
 		else {
@@ -102,26 +97,18 @@ namespace tin {
 		BOOST_LOG_TRIVIAL(error) << "Configuration file not found, falling back to default configuration\n";
 		BOOST_LOG_TRIVIAL(error) << "Contrast ratio: 4.5, language: eng" << std::endl;
 
-		if (guideline != nullptr) {
-			delete guideline;
-		}
-		guideline = new Guideline(4.5, { {1080,{4,28}} });
+		guideline = Guideline(4.5, { {1080,{4,28}} });
 	}
 
 	void Configuration::setDefaultAppSettings() {
-		if (appSettings != nullptr) {
-			delete appSettings;
-		}
 
-		appSettings = new AppSettings(true, true, false, false, false,
+		appSettings = AppSettings(true, true, false, false, false,
 			"./", "./debugInfo");
 	}
 
 	void Configuration::setDefaultTextDetectionParams() {
-		if (textDetectionParams != nullptr) {
-			delete textDetectionParams;
-		}
-		textDetectionParams = new TextDetectionParams(0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
+
+		textDetectionParams = TextDetectionParams(0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
 	}
 
 	template<typename T>
