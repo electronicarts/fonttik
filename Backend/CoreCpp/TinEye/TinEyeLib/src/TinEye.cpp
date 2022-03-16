@@ -288,7 +288,7 @@ namespace tin {
 			cv::Mat linearBGR = cv::Mat::zeros(imageMatrix.size(), CV_64FC3);
 
 			//Use look up tables if they have been correctly loaded during initialization
-			if (linearizationLUT != nullptr) {
+			if (linearizationLUT != nullptr && !linearizationLUT->empty()) {
 				cv::LUT(imageMatrix, *linearizationLUT, linearBGR);
 			}
 			else {

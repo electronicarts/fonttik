@@ -84,6 +84,9 @@ namespace tin {
 
 	//The order of the regions should not affect the contrast ratio
 	TEST(ContrastRegions, Commutative) {
+		TinEye* tineye = new TinEye();
+		tineye->init("config.json");
+
 		Image img;
 		img.loadImage("resources/luminance/blackWhite.png");
 
@@ -101,6 +104,8 @@ namespace tin {
 		double contrastB = TinEye::ContrastBetweenRegions(luminanceMap, b, a);
 
 		ASSERT_DOUBLE_EQ(contrastA, contrastB);
+
+		delete tineye;
 	}
 
 }
