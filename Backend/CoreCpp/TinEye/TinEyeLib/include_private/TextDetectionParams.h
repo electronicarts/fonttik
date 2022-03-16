@@ -12,6 +12,7 @@ namespace tin {
 		float rotationThresholdRadians; //Text that excedes this inclination will be ignored (not part of the HUD)
 
 	public:
+		TextDetectionParams() {}
 		TextDetectionParams(float confidenceThreshold, float NMSThreshold,
 			double detectionScale, std::array<double, 3> detectionMean, std::pair<float, float> mergeThreshold,
 			float rotationThresholdRadians) :

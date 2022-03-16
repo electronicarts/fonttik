@@ -2,21 +2,23 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <opencv2/core/types.hpp>
+#include "AppSettings.h"
+#include "TextDetectionParams.h"
+#include "Guideline.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 namespace tin {
-	class AppSettings;
-	class Guideline;
-	class TextDetectionParams;
 
 	class Configuration {
 	private:
-		AppSettings* appSettings = nullptr;
-		Guideline* guideline = nullptr;
-		TextDetectionParams* textDetectionParams = nullptr;
-
+		AppSettings appSettings;
+		Guideline guideline;
+		TextDetectionParams textDetectionParams;
+		std::vector<double> rgbLookUp;
+		
+		
 		void setDefaultGuideline();
 
 		void setDefaultAppSettings();
@@ -28,25 +30,11 @@ namespace tin {
 	public:
 		Configuration();
 		Configuration(fs::path configPath);
-		~Configuration() {
-			if (appSettings != nullptr) {
-				delete appSettings;
-			}
-			if (guideline != nullptr) {
-				delete guideline;
-			}
-			if (textDetectionParams != nullptr) {
-				delete textDetectionParams;
-			}
 
-			appSettings = nullptr;
-			guideline = nullptr;
-			textDetectionParams = nullptr;
-		}
-
-		AppSettings* getAppSettings() const { return appSettings; }
-		Guideline* getGuideline() const { return guideline; }
-		TextDetectionParams* getTextDetectionParams() const { return textDetectionParams; }
+		AppSettings* getAppSettings() { return &appSettings; }
+		Guideline* getGuideline() { return &guideline; }
+		TextDetectionParams* getTextDetectionParams() { return &textDetectionParams; }
+		std::vector<double>* getRGBLookupTable() { return &rgbLookUp; }
 	};
 
 }

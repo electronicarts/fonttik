@@ -55,5 +55,5 @@ namespace tin {
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 28);
-	}
+	}	
 }

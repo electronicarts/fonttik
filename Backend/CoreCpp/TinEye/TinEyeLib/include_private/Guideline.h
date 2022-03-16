@@ -24,6 +24,7 @@ namespace tin {
 		std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
 		ResolutionGuidelines* activeResolution = nullptr;
 	public:
+		Guideline() {}
 		Guideline(float contrast, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines);
 
 		void setActiveResolution(int resolution);

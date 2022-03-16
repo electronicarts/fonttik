@@ -2,6 +2,7 @@
 #include <boost/log/trivial.hpp>
 #include <fstream>
 #include "Instrumentor.h"
+#include "TinEye.h"
 
 namespace fs = std::filesystem;
 
@@ -139,42 +140,9 @@ namespace tin {
 	cv::Mat Image::getLuminanceMap() {
 		//Make sure that image has been loaded and we haven't previously calculated the luminance already
 		if (!imageMatrix.empty() && luminanceMap.empty()) {
-			luminanceMap = calculateLuminanceMap(imageMatrix);
+			luminanceMap = TinEye::calculateLuminance(imageMatrix);
 		}
 
-		return luminanceMap;
-	}
-
-	cv::Mat Image::calculateLuminanceMap(cv::Mat source) {
-		PROFILE_FUNCTION();
-		//Load pixel information to float matrix (so bgr values go from 0.0 to 1.0)
-
-		//Matrix to store linearized rgb
-		cv::Mat linearBGR = cv::Mat::zeros(source.size(), CV_32FC3);
-
-		for (int y = 0; y < source.rows; y++) {
-			for (int x = 0; x < source.cols; x++) {
-				cv::Vec3b colorVals = source.at<cv::Vec3b>(y, x);
-
-				//TODO lookup table, inexpensive, only 256 values, one for each lum value
-				//Could also use three separate lookup tables and merge them into one result directly
-				linearBGR.at<cv::Vec3f>(y, x) = {
-					linearize8bitRGB(colorVals.val[0]),
-					linearize8bitRGB(colorVals.val[1]),
-					linearize8bitRGB(colorVals.val[2]) };
-			}
-		}
-
-
-		cv::Mat luminanceMap = cv::Mat::zeros(source.size(), CV_8UC1); //1 channel (luminance)
-
-		for (int y = 0; y < source.rows; y++) {
-			for (int x = 0; x < source.cols; x++) {
-				cv::Vec3f lumVals = linearBGR.at<cv::Vec3f>(y, x);
-				//BGR order
-				luminanceMap.at<uchar>(y, x) = cv::saturate_cast<uchar>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126) * 255);
-			}
-		}
 		return luminanceMap;
 	}
 
@@ -191,7 +159,7 @@ namespace tin {
 		PROFILE_FUNCTION();
 		if (!luminanceMap.empty()) {
 			cv::Mat subMatrix = luminanceMap(cv::Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1));
-			cv::bitwise_not(subMatrix, subMatrix);
+			subMatrix = 1 - subMatrix;
 		}
 	}
 
@@ -248,23 +216,8 @@ namespace tin {
 		}
 	}
 
-	float Image::linearize8bitRGB(const uchar& colorBits) {
-		//Profiling this function kills performance
-		//PROFILE_FUNCTION();
-		//ref https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance
-		double color = colorBits / 255.0;
-
-		if (color <= 0.04045) {
-			return color / 12.92;
-		}
-		else {
-			double topo = ((color + 0.055) / 1.1055);
-			return pow(topo, 2.4);
-		}
-	}
-
 	double Image::LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask) {
-		return cv::mean(mat, mask)[0] / 255.0f;
+		return cv::mean(mat, mask)[0];
 	}
 
 	cv::Mat Image::generateLuminanceHistogramImage(cv::Mat histogram)
