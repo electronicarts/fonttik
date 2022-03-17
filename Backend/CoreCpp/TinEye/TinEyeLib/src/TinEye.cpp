@@ -83,12 +83,15 @@ namespace tin {
 		int counter = 0;
 #endif
 
+		//add entry for this image in result struct
+		Results* testResults = img.getResultsPointer();
+		testResults->sizeResults.push_back(std::vector<ResultBox>());
 
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
 			box.setParentImage(&img);
 
-			bool individualPass = textboxSizeCheck(box);
+			bool individualPass = textboxSizeCheck(img, box);
 
 			passes = passes && individualPass;
 
@@ -104,8 +107,6 @@ namespace tin {
 			counter++;
 
 #endif
-
-
 		}
 
 #ifdef _DEBUG
@@ -115,10 +116,9 @@ namespace tin {
 #endif
 
 		return passes;
-
 	}
 
-	bool TinEye::textboxSizeCheck(const Textbox& textbox) {
+	bool TinEye::textboxSizeCheck(Image& image, const Textbox& textbox) {
 		PROFILE_FUNCTION();
 		bool pass = true;
 		cv::Rect boxRect = textbox.getRect();
@@ -130,9 +130,12 @@ namespace tin {
 		//Avoids division by zero
 		int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
 
+		ResultType type = ResultType::PASS;
+
 		//Check average width
 		if (averageWidth == -1) {
 			BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
+			type = ResultType::UNRECOGNIZED;
 		}
 		else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
 			pass = false;
@@ -148,6 +151,11 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << boxRect.height <<
 				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
 		}
+
+		type = (pass) ? type : ResultType::FAIL;
+		Results* testResults = image.getResultsPointer();
+		testResults->sizeResults.back().push_back(ResultBox(type,boxRect.x,boxRect.y,boxRect.width,boxRect.height));
+		testResults->overallSizePass = testResults->overallSizePass && pass;
 
 		return pass;
 	}
@@ -175,11 +183,15 @@ namespace tin {
 
 		bool imagePasses = true;
 
+		//add entry for this image in result struct
+		Results* testResults = image.getResultsPointer();
+		testResults->contrastResults.push_back(std::vector<ResultBox>());
+
 		for (Textbox box : boxes) {
 
 			box.setParentImage(&image);
 
-			bool individualPass = textboxContrastCheck(box, image);
+			bool individualPass = textboxContrastCheck(image, box);
 
 
 #ifdef _DEBUG
@@ -212,7 +224,7 @@ namespace tin {
 
 	}
 
-	bool TinEye::textboxContrastCheck(const Textbox& box, Image& image) {
+	bool TinEye::textboxContrastCheck(Image& image, const Textbox& box) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = box.getRect();
 
@@ -238,6 +250,11 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
 				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
 		}
+
+		ResultType type = (boxPasses) ? ResultType::PASS : ResultType::FAIL;
+		Results* testResults = image.getResultsPointer();
+		testResults->contrastResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height));
+		testResults->overallContrastPass = testResults->overallContrastPass && boxPasses;
 
 		return boxPasses;
 	}

@@ -3,6 +3,8 @@
 #include <opencv2/imgproc.hpp>
 #include <string>
 #include <filesystem>
+#include "Image.h"
+#include "Results.h"
 
 namespace tin {
 	class Image {
@@ -19,6 +21,8 @@ namespace tin {
 		void convertImageMatrixToBGR();
 
 		static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
+
+		Results mediaResults;
 	public:
 		Image();
 
@@ -71,5 +75,8 @@ namespace tin {
 
 		//Saves the data in the image subfolder
 		void saveOutputData(cv::Mat data, std::string name);
+
+		//Returns a pointer to the image's results struct for editing or reviewing
+		Results* getResultsPointer() { return &mediaResults; }
 	};
 }

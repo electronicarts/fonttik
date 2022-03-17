@@ -24,39 +24,32 @@ int main(int argc, char* argv[]) {
 
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 
-	tin::TinEye* tineye = new tin::TinEye();
-	tineye->init("config.json");
+	tin::TinEye tineye = tin::TinEye();
+	tineye.init("config.json");
 
 	//Open input image with openCV
 	tin::Image img;
 	img.loadImage(argv[1]);
-
-	bool passesSize  = false;
-	bool passesContrast = false;
 
 	do {
 
 
 			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
 			//Check if image has text recognized by OCR
-			tineye->applyFocusMask(img);
-			std::vector<tin::Textbox> textBoxes = tineye->getTextBoxes(img);
-			tineye->mergeTextBoxes(textBoxes);
+			tineye.applyFocusMask(img);
+			std::vector<tin::Textbox> textBoxes = tineye.getTextBoxes(img);
+			tineye.mergeTextBoxes(textBoxes);
 			if (textBoxes.empty()) {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
 			}
 			else {
 				// Get OCR result
-				passesSize = tineye->fontSizeCheck(img, textBoxes);
-				passesContrast = tineye->textContrastCheck(img, textBoxes);
+				tineye.fontSizeCheck(img, textBoxes);
+				tineye.textContrastCheck(img, textBoxes);
 			}
 	} while (img.nextFrame());
 
-
-
-	delete tineye;
-
-	std::cout << "SIZE: " << ((passesSize) ? "PASS" : "FAIL") <<
-		"\tCONTRAST: " << ((passesContrast) ? "PASS" : "FAIL")  << std::endl;;
-	std::cin.get();
+	tin::Results* results = img.getResultsPointer();
+	std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
+		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
 }
