@@ -102,7 +102,7 @@ test-memory-corecpp:
     script:
         # run tests
         - echo "Start testing CoreCpp for memory leak"
-        - cd Backend/CoreCpp/bin/build/linux-debug/TinEyeLib.Tests
+        - cd Backend/CoreCpp/bin/build/linux-debug/TinEye/TinEyeLib.Tests
         - ./TinEyeLib.Tests
 #test Address Sanitizer in corecpp project
 test-saddress-corecpp:
@@ -118,7 +118,7 @@ test-saddress-corecpp:
     script:
         # run tests
         - echo "Start testing CoreCpp for memory leak"
-        - cd Backend/CoreCpp/bin/build/linux-debug/AddressSanitizer.Tests
+        - cd Backend/CoreCpp/bin/build/linux-debug/TinEye/AddressSanitizer.Tests
         - ./AddressSanitizer.Tests 2> err.txt || true
         - cat err.txt
         - "grep 'ERROR: LeakSanitizer' err.txt"
