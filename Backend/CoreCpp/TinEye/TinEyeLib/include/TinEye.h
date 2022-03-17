@@ -13,9 +13,8 @@ namespace tin {
 		Configuration* config = nullptr;
 		cv::dnn::TextRecognitionModel model;
 
-		bool textboxSizeCheck(const Textbox& textbox);
-		bool textboxContrastCheck(const Textbox& textbox, Image& image);
-		bool textboxContrastCheck(const Textbox& textbox);
+		bool textboxSizeCheck(Image& image, const Textbox& textbox);
+		bool textboxContrastCheck(Image& image, const Textbox& textbox);
 
 		static double ContrastBetweenRegions(const cv::Mat& luminance, const cv::Mat& maskA, const cv::Mat& maskB);
 
