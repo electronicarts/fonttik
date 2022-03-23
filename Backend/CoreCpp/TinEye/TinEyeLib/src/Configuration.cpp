@@ -78,7 +78,7 @@ namespace tin {
 			try {
 
 				for (auto& elem : config["sRGBLinearizationValues"]) {
-					rgbLookUp.push_back(elem);
+					rgbLookUp.emplace_back(elem);
 				}	
 			}
 			catch (...) {

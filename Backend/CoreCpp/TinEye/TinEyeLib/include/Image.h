@@ -65,6 +65,8 @@ namespace tin {
 		//Saves specified luminance histogram to a csv file
 		static void saveHistogramCSV(cv::Mat histogram, std::string filename);
 
+		//Operator method
+		//Calculates the mean luminance of a given region of a matrix
 		static double LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask);
 
 		//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
