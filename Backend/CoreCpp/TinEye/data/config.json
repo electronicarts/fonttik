@@ -34,7 +34,6 @@
   },
   "guideline": {
     "contrast": 4.5,
-    "tessdataPath": "tessdata",
     "resolutions": {
       "720": {
         "width": 4,
