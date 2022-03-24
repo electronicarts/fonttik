@@ -4,8 +4,11 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <filesystem>
+#include <regex>
 
 namespace fs = std::filesystem;
+
+const std::regex outputDir("_output$");
 
 bool cmdOptionExists(char** begin, char** end, const std::string& option)
 {
@@ -39,6 +42,23 @@ void processImage(tin::TinEye& tineye, fs::path path) {
 		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
 }
 
+void processFolder(tin::TinEye& tineye, fs::path path) {
+	for (const auto& directoryEntry : fs::directory_iterator(path)) {
+		if (fs::is_regular_file(directoryEntry)) {
+			processImage(tineye, directoryEntry);
+		}
+		//Ignore output results
+		else if (fs::is_directory(directoryEntry)) {
+			if (std::regex_search(directoryEntry.path().string(), outputDir)) {
+				std::cout << directoryEntry << "is already a results folder" << std::endl;
+			}
+			else {
+				processFolder(tineye, directoryEntry);
+			}
+		}
+	}
+}
+
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
 		std::cout << "Usage: \"./tineye_cli media_path/ [options] \n"
@@ -48,9 +68,6 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
-	//boost::log::core::get()->set_filter(
-	//	boost::log::trivial::severity >= boost::log::trivial::warning
-	//);
 
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 
@@ -65,11 +82,7 @@ int main(int argc, char* argv[]) {
 			processImage(tineye, path);
 		}
 		else {
-			for (auto const& directoryEntry : fs::recursive_directory_iterator(path)) {
-				if (fs::is_regular_file(directoryEntry)) {
-					processImage(tineye, directoryEntry);
-				}
-			}
+			processFolder(tineye, path);
 		}
 	}
 	else {
