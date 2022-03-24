@@ -1,7 +1,5 @@
 {
-  "language": "eng",
   "contrast": 4.5,
-  "tessdataPath": "eastdata",
 
   "resolutions": {
     "720": {
