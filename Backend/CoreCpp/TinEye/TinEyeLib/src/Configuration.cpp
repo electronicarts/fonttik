@@ -66,7 +66,7 @@ namespace tin {
 				json merge = textDetection["mergeThreshold"];
 				float degreeThreshold = textDetection["rotationThresholdDegrees"];
 				std::pair<float, float> mergeThresh = std::make_pair(merge["x"], merge["y"]);
-				textDetectionParams = TextDetectionParams(textDetection["confidence"],
+				textDetectionParams = TextDetectionParams(textDetection["detectionModel"],textDetection["confidence"],
 					textDetection["nmsThreshold"], textDetection["detectionScale"],
 					{ mean[0],mean[1] ,mean[2] }, mergeThresh, degreeThreshold * (CV_PI / 180));
 			}
@@ -108,7 +108,7 @@ namespace tin {
 
 	void Configuration::setDefaultTextDetectionParams() {
 
-		textDetectionParams = TextDetectionParams(0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
+		textDetectionParams = TextDetectionParams("frozen_east_text_detection.pb",0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
 	}
 
 	template<typename T>

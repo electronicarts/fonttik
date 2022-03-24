@@ -1,9 +1,11 @@
 #pragma once
 #include <array>
+#include <string>
 
 namespace tin {
 	class TextDetectionParams {
 	private:
+		std::string detectionModel;
 		float confThreshold; //Confidence threshold
 		float nmsThreshold; //Non maximum supresison threshold
 		double detScale; //Scaes pixel individually after mean substraction
@@ -13,13 +15,15 @@ namespace tin {
 
 	public:
 		TextDetectionParams() {}
-		TextDetectionParams(float confidenceThreshold, float NMSThreshold,
+		TextDetectionParams(std::string model,float confidenceThreshold, float NMSThreshold,
 			double detectionScale, std::array<double, 3> detectionMean, std::pair<float, float> mergeThreshold,
 			float rotationThresholdRadians) :
+			detectionModel(model),
 			confThreshold(confidenceThreshold), nmsThreshold(NMSThreshold),
 			detScale(detectionScale), detMean(detectionMean), mergeThreshold(mergeThreshold),
 			rotationThresholdRadians(rotationThresholdRadians) {};
 
+		std::string getDetectionModel() const { return detectionModel; }
 		float getConfidenceThreshold() const { return confThreshold; }
 		float getNMSThreshold() const { return nmsThreshold; }
 		float getRotationThresholdRadians() const { return rotationThresholdRadians; }
