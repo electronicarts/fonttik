@@ -4,10 +4,60 @@
 #include <algorithm>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
+#include <filesystem>
+#include <regex>
+
+namespace fs = std::filesystem;
+
+const std::regex outputDir("_output$");
 
 bool cmdOptionExists(char** begin, char** end, const std::string& option)
 {
 	return std::find(begin, end, option) != end;
+}
+
+void processImage(tin::TinEye& tineye, fs::path path) {
+	tin::Image img;
+	img.loadImage(path);
+
+	do {
+
+
+		BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
+		//Check if image has text recognized by OCR
+		tineye.applyFocusMask(img);
+		std::vector<tin::Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.mergeTextBoxes(textBoxes);
+		if (textBoxes.empty()) {
+			BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+		}
+		else {
+			// Get OCR result
+			tineye.fontSizeCheck(img, textBoxes);
+			tineye.textContrastCheck(img, textBoxes);
+		}
+	} while (img.nextFrame());
+
+	tin::Results* results = img.getResultsPointer();
+	std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
+		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
+}
+
+void processFolder(tin::TinEye& tineye, fs::path path) {
+	for (const auto& directoryEntry : fs::directory_iterator(path)) {
+		if (fs::is_regular_file(directoryEntry)) {
+			processImage(tineye, directoryEntry);
+		}
+		//Ignore output results
+		else if (fs::is_directory(directoryEntry)) {
+			if (std::regex_search(directoryEntry.path().string(), outputDir)) {
+				std::cout << directoryEntry << "is already a results folder" << std::endl;
+			}
+			else {
+				processFolder(tineye, directoryEntry);
+			}
+		}
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -19,9 +69,6 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
-	//boost::log::core::get()->set_filter(
-	//	boost::log::trivial::severity >= boost::log::trivial::warning
-	//);
 
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 
@@ -29,29 +76,20 @@ int main(int argc, char* argv[]) {
 	tin::Configuration config = tin::Configuration("config.json");
 	tineye.init(&config);
 
-	//Open input image with openCV
-	tin::Image img;
-	img.loadImage(argv[1]);
+	fs::path path(argv[1]);
 
-	do {
+	if (fs::exists(path)) {
+
+		if (!fs::is_directory(path)) {
+			processImage(tineye, path);
+		}
+		else {
+			processFolder(tineye, path);
+		}
+	}
+	else {
+		std::cerr << "Path not found " << std::endl;
+	}
 
 
-			BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
-			//Check if image has text recognized by OCR
-			tineye.applyFocusMask(img);
-			std::vector<tin::Textbox> textBoxes = tineye.getTextBoxes(img);
-			tineye.mergeTextBoxes(textBoxes);
-			if (textBoxes.empty()) {
-				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
-			}
-			else {
-				// Get OCR result
-				tineye.fontSizeCheck(img, textBoxes);
-				tineye.textContrastCheck(img, textBoxes);
-			}
-	} while (img.nextFrame());
-
-	tin::Results* results = img.getResultsPointer();
-	std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
-		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
 }
