@@ -100,6 +100,10 @@ namespace tin {
 
 		std::string fileFormat = filepath.extension().string();
 
+		//Transforms fileformat to lowercase to make sure its found in imageFormats vector
+		std::transform(fileFormat.begin(), fileFormat.end(), fileFormat.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+
 		//Check if given file is an admitted image type, if not, attempt to load as video
 		if (std::find(imageFormats.begin(), imageFormats.end(), fileFormat) != imageFormats.end()) {
 			isVideo = false;
