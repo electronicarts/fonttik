@@ -23,7 +23,7 @@ namespace tin {
 		linearizationLUT = config->getRGBLookupTable();
 
 		//Initialize EAST detection
-		TextboxDetection::init(config->getTextDetectionParams());
+		textboxDetection = new TextboxDetection(config->getTextDetectionParams());
 
 
 		//Initialize text recognition
@@ -269,7 +269,7 @@ namespace tin {
 
 	std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
 		PROFILE_FUNCTION();
-		return TextboxDetection::detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
+		return textboxDetection->detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
 	}
 
 	void TinEye::mergeTextBoxes(std::vector<Textbox>& textBoxes) {
@@ -342,7 +342,11 @@ namespace tin {
 
 	TinEye::~TinEye()
 	{
-		TextboxDetection::release();
+		if (textboxDetection != nullptr) {
+			delete textboxDetection;
+		}
+		textboxDetection = nullptr;
+		
 
 		config = nullptr;
 		Instrumentor::Get().EndSession();

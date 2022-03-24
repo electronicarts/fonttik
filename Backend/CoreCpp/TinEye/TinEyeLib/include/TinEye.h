@@ -8,9 +8,11 @@ namespace fs = std::filesystem;
 
 namespace tin {
 	class Configuration;
+	class TextboxDetection;
 
 	class TinEye {
 		Configuration* config = nullptr;
+		TextboxDetection* textboxDetection = nullptr;
 		cv::dnn::TextRecognitionModel model;
 
 		bool textboxSizeCheck(Image& image, const Textbox& textbox);
