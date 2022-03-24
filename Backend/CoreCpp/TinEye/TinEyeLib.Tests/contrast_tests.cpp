@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include "TinEye.h"
+#include "Configuration.h"
 
 namespace tin {
 	TEST(ContrastRatioChecks, PassingContrastFlat) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -18,14 +20,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, PassingContrastGradient) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -39,14 +40,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, PassingContrastStripes) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -60,14 +60,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastFlat) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -81,14 +80,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastGradient) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -102,14 +100,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastStripes) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -123,14 +120,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, HighContrast) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -144,14 +140,13 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, lowContrast) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image img;
 
@@ -165,8 +160,6 @@ namespace tin {
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye->textContrastCheck(img, textBoxes));
-
-		delete tineye;
+		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
 	}
 }

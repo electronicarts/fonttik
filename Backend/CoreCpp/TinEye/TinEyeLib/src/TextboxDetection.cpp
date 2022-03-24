@@ -9,10 +9,7 @@
 #include "TextDetectionParams.h"
 
 namespace tin {
-
-	cv::dnn::TextDetectionModel_EAST* TextboxDetection::east = nullptr;
-
-	void TextboxDetection::init(const TextDetectionParams* params)
+	TextboxDetection::TextboxDetection(const TextDetectionParams* params)
 	{
 		east = new cv::dnn::TextDetectionModel_EAST("frozen_east_text_detection.pb");
 
@@ -33,7 +30,7 @@ namespace tin {
 		east->setInputSwapRB(true);
 	}
 
-	void TextboxDetection::release() {
+	TextboxDetection::~TextboxDetection() {
 		if (east != nullptr) {
 			delete east;
 		}

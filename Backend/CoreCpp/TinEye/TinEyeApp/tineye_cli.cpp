@@ -1,4 +1,5 @@
 #include "TinEye.h"
+#include "Configuration.h"
 #include <iostream>
 #include <algorithm>
 #include <boost/log/trivial.hpp>
@@ -72,7 +73,8 @@ int main(int argc, char* argv[]) {
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 
 	tin::TinEye tineye = tin::TinEye();
-	tineye.init("config.json");
+	tin::Configuration config = tin::Configuration("config.json");
+	tineye.init(&config);
 
 	fs::path path(argv[1]);
 
