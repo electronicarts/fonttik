@@ -2,9 +2,9 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <opencv2/core/types.hpp>
-#include "AppSettings.h"
-#include "TextDetectionParams.h"
-#include "Guideline.h"
+#include "../include_private/AppSettings.h"
+#include "../include_private/TextDetectionParams.h"
+#include "../include_private/Guideline.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;

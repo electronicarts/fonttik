@@ -1,12 +1,14 @@
 #include <gtest/gtest.h>
 #include "Image.h"
 #include "TinEye.h"
+#include "Configuration.h"
 
 namespace tin {
 	//All flipped pixels should be max luminance(255)-original value
 	TEST(LuminanceFlip, FlipImage) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image image;
 		image.loadImage("resources/bf2042/chat_window_closed.png");
@@ -18,14 +20,13 @@ namespace tin {
 				ASSERT_EQ(1 - original.at<double>(i, j), flipped.at<double>(i, j));
 			}
 		}
-
-		delete tineye;
 	}
 	//All flipped pixels inside region should be max luminance(255)-original value
 	//Outer pixels should remain unchanged
 	TEST(LuminanceFlip, FlipRegion) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image image;
 		image.loadImage("resources/bf2042/chat_window_closed.png");
@@ -45,15 +46,14 @@ namespace tin {
 				}
 			}
 		}
-
-		delete tineye;
 	}
 
 
 	//Image should remain unchaged if luminance is flipped twice
 	TEST(LuminanceFlip, FlipTwice) {
-		TinEye tineye;
-		tineye.init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image image;
 		image.loadImage("resources/bf2042/chat_window_closed.png");
@@ -66,13 +66,13 @@ namespace tin {
 		doubleFlip.convertTo(doubleFlip, CV_8UC1, 255);
 
 		ASSERT_TRUE(std::equal(original.begin<uchar>(), original.end<uchar>(), doubleFlip.begin<uchar>()));
-
 	}
 
 	//A region should remain unchaged if luminance is flipped twice
 	TEST(LuminanceFlip, FlipTwiceRegion) {
-		TinEye* tineye = new TinEye();
-		tineye->init("config.json");
+		TinEye tineye = TinEye();
+		Configuration config = Configuration("config.json");
+		tineye.init(&config);
 
 		Image image;
 		cv::Rect region(0, 0, 150, 150);
@@ -86,7 +86,5 @@ namespace tin {
 		doubleFlip.convertTo(doubleFlip, CV_8UC1, 255);
 
 		ASSERT_TRUE(std::equal(original.begin<uchar>(), original.end<uchar>(), doubleFlip.begin<uchar>()));
-
-		delete tineye;
 	}
 }

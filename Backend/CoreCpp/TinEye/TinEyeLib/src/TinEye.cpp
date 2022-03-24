@@ -13,15 +13,11 @@
 namespace tin {
 	std::vector<double>* TinEye::linearizationLUT = nullptr;
 
-	void TinEye::init(fs::path configFile)
+	void TinEye::init(Configuration* configuration)
 	{
 		Instrumentor::Get().BeginSession("Profile");
 		PROFILE_FUNCTION();
-		if (config != nullptr) {
-			delete config;
-		}
-
-		config = new Configuration(configFile.c_str());
+		config = configuration;
 
 		//load LUT for rgb linearization
 		linearizationLUT = config->getRGBLookupTable();
@@ -154,7 +150,7 @@ namespace tin {
 
 		type = (pass) ? type : ResultType::FAIL;
 		Results* testResults = image.getResultsPointer();
-		testResults->sizeResults.back().push_back(ResultBox(type,boxRect.x,boxRect.y,boxRect.width,boxRect.height));
+		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height));
 		testResults->overallSizePass = testResults->overallSizePass && pass;
 
 		return pass;
@@ -236,11 +232,13 @@ namespace tin {
 		cv::Mat unsignedLuminance;
 		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
 		//TODO convert to 8bit unsigned for otsu
-		cv::threshold(unsignedLuminance, maskA, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+		cv::threshold(unsignedLuminance, maskA, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
 		cv::bitwise_not(maskA, maskB);
 
-		//image.saveOutputData(unsignedLuminance, "lum.png");
-		//image.saveOutputData(maskA, "mask.png");
+#ifdef _DEBUG
+		image.saveOutputData(unsignedLuminance, "lum.png");
+		image.saveOutputData(maskA, "mask.png");
+#endif // _DEBUG
 
 		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
 
@@ -337,7 +335,7 @@ namespace tin {
 					luminanceMap.at<double>(y, x) = cv::saturate_cast<double>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126));
 				}
 			}
-		} 
+		}
 
 		return luminanceMap;
 	}
@@ -345,10 +343,6 @@ namespace tin {
 	TinEye::~TinEye()
 	{
 		TextboxDetection::release();
-
-		if (config != nullptr) {
-			delete config;
-		}
 
 		config = nullptr;
 		Instrumentor::Get().EndSession();
