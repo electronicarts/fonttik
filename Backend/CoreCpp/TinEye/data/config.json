@@ -46,7 +46,7 @@
       116.78,
       103.94
     ],
-    "rotationThresholdDegree": 10,
+    "rotationThresholdDegrees": 10,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
