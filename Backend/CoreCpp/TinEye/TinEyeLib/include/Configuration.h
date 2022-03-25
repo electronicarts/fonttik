@@ -5,6 +5,7 @@
 #include "../include_private/AppSettings.h"
 #include "../include_private/TextDetectionParams.h"
 #include "../include_private/Guideline.h"
+#include "../include_private/TextRecognitionParams.h"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -16,14 +17,14 @@ namespace tin {
 		AppSettings appSettings;
 		Guideline guideline;
 		TextDetectionParams textDetectionParams;
+		TextRecognitionParams textRecognitionParams;
 		std::vector<double> rgbLookUp;
 		
 		
 		void setDefaultGuideline();
-
 		void setDefaultAppSettings();
-
 		void setDefaultTextDetectionParams();
+		void setDefaultTextRecognitionParams();
 
 		template<typename T>
 		static cv::Rect_<T> RectFromJson(json data);
@@ -34,6 +35,7 @@ namespace tin {
 		AppSettings* getAppSettings() { return &appSettings; }
 		Guideline* getGuideline() { return &guideline; }
 		TextDetectionParams* getTextDetectionParams() { return &textDetectionParams; }
+		TextRecognitionParams* getTextRecognitionParams() { return &textRecognitionParams; }
 		std::vector<double>* getRGBLookupTable() { return &rgbLookUp; }
 	};
 

@@ -7,6 +7,7 @@
     "saveSeparateTexboxes": false,
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
+    "saveLuminanceMasks": false,
     "focusMask": [
       {
         "x": 0,
@@ -17,7 +18,26 @@
     ],
     "ignoreMask": []
   },
+  "textRecognition": {
+    "recognitionModel": "crnn_cs.onnx",
+    "decodeType": "CTC-greedy",
+    "vocabularyFile": "alphabet_94.txt",
+    "scale": {
+      "numerator": 1.0,
+      "denominator": 127.5
+    },
+    "mean": [
+      127.5,
+      127.5,
+      127.5
+    ],
+    "inputSize": {
+      "width": 100,
+      "height": 32
+    }
+  },
   "textDetection": {
+    "detectionModel": "frozen_east_text_detection.pb",
     "confidence": 0.5,
     "nmsThreshold": 0.4,
     "detectionScale": 1.0,

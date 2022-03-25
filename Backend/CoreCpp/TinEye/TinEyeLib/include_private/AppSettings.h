@@ -7,11 +7,12 @@ namespace fs = std::filesystem;
 
 namespace tin {
 	class AppSettings {
-		bool dbgSaveLuminanceMap=false,
+		bool dbgSaveLuminanceMap = false,
 			dbgSaveTexboxOutline = false,
 			dbgSaveSeparateTextboxes = false,
 			dbgSaveHistograms = false,
-			dbgSaveRawTextboxOutline = false;
+			dbgSaveRawTextboxOutline = false,
+			dbgSaveLuminanceMasks = false;
 		fs::path resultsPath = "./", debugInfoPath = "./debug/";
 
 
@@ -21,13 +22,15 @@ namespace tin {
 
 	public:
 		AppSettings() {};
-		AppSettings(bool saveLum, bool saveTextbox, bool saveSeparateTexbox, bool saveHist, bool saveRawTextbox,
+		AppSettings(bool saveLum, bool saveTextbox, bool saveSeparateTexbox, bool saveHist, bool saveRawTextbox, bool saveLumMasks,
 			fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
-			dbgSaveTexboxOutline(dbgSaveTexboxOutline), dbgSaveRawTextboxOutline(saveRawTextbox),
+			dbgSaveTexboxOutline(saveTextbox), dbgSaveRawTextboxOutline(saveRawTextbox),
 			dbgSaveSeparateTextboxes(saveSeparateTexbox), dbgSaveHistograms(saveHist),
+			dbgSaveLuminanceMasks(saveLumMasks),
 			resultsPath(resultsPath), debugInfoPath(dbgInfoPath) {}
 
 		//AppSettigs
+		bool saveLuminanceMasks() const { return dbgSaveLuminanceMasks; }
 		bool saveLuminanceMap() const { return dbgSaveLuminanceMap; }
 		bool saveTexboxOutline() const { return dbgSaveTexboxOutline; }
 		bool saveSeparateTextboxes() const { return dbgSaveSeparateTextboxes; }

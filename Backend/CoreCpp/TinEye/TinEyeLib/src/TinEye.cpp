@@ -30,10 +30,11 @@ namespace tin {
 		//from https://docs.opencv.org/4.x/d4/d43/tutorial_dnn_text_spotting.html
 
 		// Load models weights
-		model = cv::dnn::TextRecognitionModel("crnn_cs.onnx");
-		model.setDecodeType("CTC-greedy");
+		TextRecognitionParams* recognitionParams = config->getTextRecognitionParams();
+		model = cv::dnn::TextRecognitionModel(recognitionParams->getRecognitionModel());
+		model.setDecodeType(recognitionParams->getDecodeType());
 		std::ifstream vocFile;
-		vocFile.open("alphabet_94.txt");
+		vocFile.open(recognitionParams->getVocabularyFilepath());
 		CV_Assert(vocFile.is_open());
 		std::string vocLine;
 		std::vector<std::string> vocabulary;
@@ -43,11 +44,10 @@ namespace tin {
 		model.setVocabulary(vocabulary);
 
 		// Normalization parameters
-		double scale = 1.0 / 127.5;
-		cv::Scalar mean = cv::Scalar(127.5, 127.5, 127.5);
+		auto mean = recognitionParams->getMean();
 		// The input shape
-		cv::Size inputSize = cv::Size(100, 32);
-		model.setInputParams(scale, inputSize, mean);
+		std::pair<int, int> size = recognitionParams->getSize();
+		model.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
 	}
 
 	void TinEye::applyFocusMask(Image& image) {
@@ -236,8 +236,10 @@ namespace tin {
 		cv::bitwise_not(maskA, maskB);
 
 #ifdef _DEBUG
-		image.saveOutputData(unsignedLuminance, "lum.png");
-		image.saveOutputData(maskA, "mask.png");
+		if (config->getAppSettings()->saveLuminanceMasks()) {
+			image.saveOutputData(unsignedLuminance, "lum.png");
+			image.saveOutputData(maskA, "mask.png");
+		}
 #endif // _DEBUG
 
 		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);

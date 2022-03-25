@@ -11,7 +11,7 @@
 namespace tin {
 	TextboxDetection::TextboxDetection(const TextDetectionParams* params)
 	{
-		east = new cv::dnn::TextDetectionModel_EAST("frozen_east_text_detection.pb");
+		east = new cv::dnn::TextDetectionModel_EAST(params->getDetectionModel());
 
 		BOOST_LOG_TRIVIAL(trace) << "Confidence set to "
 			<< params->getConfidenceThreshold() << std::endl;

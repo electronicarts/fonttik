@@ -50,6 +50,7 @@ namespace tin {
 
 				appSettings = AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
 					settings["saveSeparateTexboxes"], settings["saveHistograms"], settings["saveRawTextboxOutline"],
+					settings["saveLuminanceMasks"],
 					settings["resultsPath"], settings["debugInfoPath"]);
 				if (!focus.empty()) {
 					appSettings.setFocusMask(focus, ignore);
@@ -66,7 +67,7 @@ namespace tin {
 				json merge = textDetection["mergeThreshold"];
 				float degreeThreshold = textDetection["rotationThresholdDegrees"];
 				std::pair<float, float> mergeThresh = std::make_pair(merge["x"], merge["y"]);
-				textDetectionParams = TextDetectionParams(textDetection["confidence"],
+				textDetectionParams = TextDetectionParams(textDetection["detectionModel"], textDetection["confidence"],
 					textDetection["nmsThreshold"], textDetection["detectionScale"],
 					{ mean[0],mean[1] ,mean[2] }, mergeThresh, degreeThreshold * (CV_PI / 180));
 			}
@@ -74,12 +75,27 @@ namespace tin {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
 				setDefaultTextDetectionParams();
 			}
+			//text recognition
+			try {
+				json textRecognition = config["textRecognition"];
+				json scale = textRecognition["scale"];
+				json mean = textRecognition["mean"];
+				json size = textRecognition["inputSize"];
+				textRecognitionParams = TextRecognitionParams(textRecognition["recognitionModel"],
+					textRecognition["decodeType"], textRecognition["vocabularyFile"],
+					(double)scale["numerator"] / (double)scale["denominator"],
+					{ mean[0],mean[1] ,mean[2] }, { size["width"],size["height"] });
+			}
+			catch (...) {
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration: Text recognition params" << std::endl;
+				setDefaultTextRecognitionParams();
+			}
 			//RGB lookup tables
 			try {
 
 				for (auto& elem : config["sRGBLinearizationValues"]) {
 					rgbLookUp.emplace_back(elem);
-				}	
+				}
 			}
 			catch (...) {
 			}
@@ -102,13 +118,18 @@ namespace tin {
 
 	void Configuration::setDefaultAppSettings() {
 
-		appSettings = AppSettings(true, true, false, false, false,
+		appSettings = AppSettings(true, true, false, false, false, false,
 			"./", "./debugInfo");
 	}
 
 	void Configuration::setDefaultTextDetectionParams() {
 
-		textDetectionParams = TextDetectionParams(0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
+		textDetectionParams = TextDetectionParams("frozen_east_text_detection.pb", 0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
+	}
+
+	void Configuration::setDefaultTextRecognitionParams()
+	{
+		textRecognitionParams = TextRecognitionParams("crnn_cs.onnx", "CTC-greedy", "alphabet_94.txt", 1.0 / 127.5, { 127.5 ,127.5 ,127.5 }, { 100,32 });
 	}
 
 	template<typename T>
