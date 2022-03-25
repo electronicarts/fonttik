@@ -236,8 +236,10 @@ namespace tin {
 		cv::bitwise_not(maskA, maskB);
 
 #ifdef _DEBUG
-		image.saveOutputData(unsignedLuminance, "lum.png");
-		image.saveOutputData(maskA, "mask.png");
+		if (config->getAppSettings()->saveLuminanceMasks()) {
+			image.saveOutputData(unsignedLuminance, "lum.png");
+			image.saveOutputData(maskA, "mask.png");
+		}
 #endif // _DEBUG
 
 		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
