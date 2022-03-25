@@ -1,7 +1,7 @@
 #pragma once
 
 #include <opencv2/core.hpp>
-#include "Image.h"
+#include "Media.h"
 
 namespace tin {
 	class Textbox {
@@ -11,7 +11,7 @@ namespace tin {
 		cv::Mat submatrix;
 		cv::Mat luminanceHistogram;
 
-		Image* parentImage;
+		Media* parentImage;
 	public:
 		/* Operator method
 		* Returns the percentage of overlap in each axis between two rectangles in relation to the smallest one
@@ -23,7 +23,7 @@ namespace tin {
 		Textbox(cv::Rect rect);
 
 		//Sets textbox's parent image and calculates its submatrix
-		void setParentImage(Image* img);
+		void setParentMedia(Media* media);
 
 		//Returns and saves the luminance histogram of the specified textbox rect
 		cv::Mat getLuminanceHistogram();
@@ -33,6 +33,6 @@ namespace tin {
 
 		cv::Rect getRect() const { return textboxRect; }
 		cv::Mat getSubmatrix() const { return submatrix; }
-		cv::Mat getLuminanceMap() const { return parentImage->getLuminanceMap()(textboxRect); };
+		cv::Mat getLuminanceMap() const { return parentImage->getFrameLuminance()(textboxRect); };
 	};
 }

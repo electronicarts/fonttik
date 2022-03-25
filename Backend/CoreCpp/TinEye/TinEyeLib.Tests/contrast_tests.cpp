@@ -8,19 +8,19 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
 
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/flatPass.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
+		ASSERT_TRUE(tineye.textContrastCheck(*img, textBoxes));
 
-		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, PassingContrastGradient) {
@@ -28,19 +28,19 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/gradientPass.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_TRUE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, PassingContrastStripes) {
@@ -48,19 +48,19 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/stripesPass.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_TRUE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastFlat) {
@@ -68,19 +68,20 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
 
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/flatFail.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_FALSE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastGradient) {
@@ -88,19 +89,17 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/gradientFail.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_FALSE(tineye.textContrastCheck(*img, textBoxes));
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastStripes) {
@@ -108,19 +107,20 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
 
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/stripesFail.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_FALSE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, HighContrast) {
@@ -128,19 +128,19 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/highContrast.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_TRUE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_TRUE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, lowContrast) {
@@ -148,18 +148,18 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-
 		//Open input image with openCV
 		std::string path = "resources/Contrasts/lowContrast.png";
-		img.loadImage(path);
+		Media* img = Media::CreateMedia(path);
 
 		//get matrix to know size of the image to be tested
-		cv::Mat matrix = img.getImageMatrix();
+		cv::Mat matrix = img->getImageMatrix();
 
 		std::vector<Textbox> textBoxes;
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
-		ASSERT_FALSE(tineye.textContrastCheck(img, textBoxes));
+		ASSERT_FALSE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 }

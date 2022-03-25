@@ -18,8 +18,8 @@ namespace tin {
 		textboxRect = rect;
 	}
 
-	void Textbox::setParentImage(Image* img) {
-		parentImage = img;
+	void Textbox::setParentMedia(Media* media) {
+		parentImage = media;
 		submatrix = parentImage->getImageMatrix()(textboxRect);
 	}
 

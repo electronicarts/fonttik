@@ -10,16 +10,15 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Image img;
-		img.loadImage("resources/sizes/PassingSizeTest720.png");
+		Media* img = Media::CreateMedia("resources / sizes / PassingSizeTest720.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.applyFocusMask(*img);
+		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
 		tineye.mergeTextBoxes(textBoxes);
 
-		passesSize = tineye.fontSizeCheck(img, textBoxes);
+		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_TRUE(passesSize);
 	}
@@ -30,18 +29,19 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Image img;
-		img.loadImage("resources/sizes/PassingSizeTest1080.png");
+		Media* img = Media::CreateMedia("resources/sizes/PassingSizeTest1080.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.applyFocusMask(*img);
+		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
 		tineye.mergeTextBoxes(textBoxes);
 
-		passesSize = tineye.fontSizeCheck(img, textBoxes);
+		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_TRUE(passesSize);
+
+		delete img;
 	}
 
 	TEST(SizeTests, 4kPass) {
@@ -50,18 +50,19 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Image img;
-		img.loadImage("resources/sizes/PassingSizeTest4k.png");
+		Media* img = Media::CreateMedia("resources/sizes/PassingSizeTest4k.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.applyFocusMask(*img);
+		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
 		tineye.mergeTextBoxes(textBoxes);
 
-		passesSize = tineye.fontSizeCheck(img, textBoxes);
+		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_TRUE(passesSize);
+
+		delete img;
 	}
 
 	//All failing tests should fail with default configuration
@@ -71,18 +72,20 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Image img;
-		img.loadImage("resources/sizes/NotPassingSizeTest720.png");
+		Media* img = Media::CreateMedia("resources/sizes/NotPassingSizeTest720.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.applyFocusMask(*img);
+		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
 		tineye.mergeTextBoxes(textBoxes);
 
-		passesSize = tineye.fontSizeCheck(img, textBoxes);
+		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_FALSE(passesSize);
+
+		delete img;
+
 	}
 
 	TEST(SizeTests, 1080Fail) {
@@ -91,18 +94,20 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Image img;
-		img.loadImage("resources/sizes/NotPassingSizeTest1080.png");
+		Media* img = Media::CreateMedia("resources/sizes/NotPassingSizeTest1080.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.applyFocusMask(*img);
+		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
 		tineye.mergeTextBoxes(textBoxes);
 
-		passesSize = tineye.fontSizeCheck(img, textBoxes);
+		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_FALSE(passesSize);
+
+		delete img;
+
 	}
 
 	TEST(SizeTests, 4kFail) {
@@ -111,17 +116,18 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Image img;
-		img.loadImage("resources/sizes/NotPassingSizeTest4k.png");
+		Media* img = Media::CreateMedia("resources/sizes/NotPassingSizeTest4k.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(img);
+		tineye.applyFocusMask(*img);
+		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
 		tineye.mergeTextBoxes(textBoxes);
 
-		passesSize = tineye.fontSizeCheck(img, textBoxes);
+		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_FALSE(passesSize);
+
+		delete img;
 	}
 }
