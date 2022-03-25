@@ -9,9 +9,9 @@
     "saveRawTextboxOutline": false,
     "focusMask": [
       {
-        "x": 0,
-        "y": 0,
-        "w": 1,
+        "x": 0.3,
+        "y": 0.6,
+        "w": 0.7,
         "h": 1
       }
     ],
@@ -26,7 +26,7 @@
       116.78,
       103.94
     ],
-    "rotationThresholdDegree": 10,
+    "rotationThresholdDegrees": 10,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
@@ -34,6 +34,7 @@
   },
   "guideline": {
     "contrast": 4.5,
+    "tessdataPath": "tessdata",
     "resolutions": {
       "720": {
         "width": 4,
