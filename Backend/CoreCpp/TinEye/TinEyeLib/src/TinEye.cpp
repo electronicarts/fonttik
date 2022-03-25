@@ -30,10 +30,11 @@ namespace tin {
 		//from https://docs.opencv.org/4.x/d4/d43/tutorial_dnn_text_spotting.html
 
 		// Load models weights
-		model = cv::dnn::TextRecognitionModel("crnn_cs.onnx");
-		model.setDecodeType("CTC-greedy");
+		TextRecognitionParams* recognitionParams = config->getTextRecognitionParams();
+		model = cv::dnn::TextRecognitionModel(recognitionParams->getRecognitionModel());
+		model.setDecodeType(recognitionParams->getDecodeType());
 		std::ifstream vocFile;
-		vocFile.open("alphabet_94.txt");
+		vocFile.open(recognitionParams->getVocabularyFilepath());
 		CV_Assert(vocFile.is_open());
 		std::string vocLine;
 		std::vector<std::string> vocabulary;

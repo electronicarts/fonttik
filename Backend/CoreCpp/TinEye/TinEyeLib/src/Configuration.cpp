@@ -75,6 +75,16 @@ namespace tin {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
 				setDefaultTextDetectionParams();
 			}
+			//text recognition
+			try {
+				json textRecognition = config["textRecognition"];
+				textRecognitionParams = TextRecognitionParams(textRecognition["recognitionModel"],
+					textRecognition["decodeType"], textRecognition["vocabularyFile"]);
+			}
+			catch (...) {
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration: Text recognition params" << std::endl;
+				setDefaultTextRecognitionParams();
+			}
 			//RGB lookup tables
 			try {
 
@@ -110,6 +120,11 @@ namespace tin {
 	void Configuration::setDefaultTextDetectionParams() {
 
 		textDetectionParams = TextDetectionParams("frozen_east_text_detection.pb", 0.5, 0.4, 1.0, { 123.68, 116.78, 103.94 }, { 1.0,1.0 }, 0.17);
+	}
+
+	void Configuration::setDefaultTextRecognitionParams()
+	{
+		textRecognitionParams = TextRecognitionParams("crnn_cs.onnx", "CTC-greedy", "alphabet_94.txt");
 	}
 
 	template<typename T>
