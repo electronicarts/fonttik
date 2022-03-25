@@ -100,6 +100,8 @@ namespace tin {
 		textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 
 		ASSERT_FALSE(tineye.textContrastCheck(*img, textBoxes));
+
+		delete img;
 	}
 
 	TEST(ContrastRatioChecks, FailingContrastStripes) {

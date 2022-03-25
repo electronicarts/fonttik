@@ -21,6 +21,8 @@ namespace tin {
 		passesSize = tineye.fontSizeCheck(*img, textBoxes);
 
 		ASSERT_TRUE(passesSize);
+
+		delete img;
 	}
 
 	TEST(SizeTests, 1080Pass) {

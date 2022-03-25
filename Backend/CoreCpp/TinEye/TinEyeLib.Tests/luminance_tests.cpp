@@ -55,6 +55,9 @@ namespace tin {
 
 		ASSERT_DOUBLE_EQ(meanHalf, meanWhite);
 		ASSERT_NE(meanWhite, meanTwoHalves);
+
+		delete imgHalf;
+		delete imgWhite;
 	}
 
 	//Black on White has a contrast of 21 according to current legal procedure https://snook.ca/technical/colour_contrast/colour.html#fg=FFFFFF,bg=000000
@@ -107,5 +110,4 @@ namespace tin {
 
 		delete img;
 	}
-
 }
