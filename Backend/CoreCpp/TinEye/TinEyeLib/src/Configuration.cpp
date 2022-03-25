@@ -78,8 +78,13 @@ namespace tin {
 			//text recognition
 			try {
 				json textRecognition = config["textRecognition"];
+				json scale = textRecognition["scale"];
+				json mean = textRecognition["mean"];
+				json size = textRecognition["inputSize"];
 				textRecognitionParams = TextRecognitionParams(textRecognition["recognitionModel"],
-					textRecognition["decodeType"], textRecognition["vocabularyFile"]);
+					textRecognition["decodeType"], textRecognition["vocabularyFile"],
+					(double)scale["numerator"] / (double)scale["denominator"],
+					{ mean[0],mean[1] ,mean[2] }, { size["width"],size["height"] });
 			}
 			catch (...) {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration: Text recognition params" << std::endl;
@@ -124,7 +129,7 @@ namespace tin {
 
 	void Configuration::setDefaultTextRecognitionParams()
 	{
-		textRecognitionParams = TextRecognitionParams("crnn_cs.onnx", "CTC-greedy", "alphabet_94.txt");
+		textRecognitionParams = TextRecognitionParams("crnn_cs.onnx", "CTC-greedy", "alphabet_94.txt", 1.0 / 127.5, { 127.5 ,127.5 ,127.5 }, { 100,32 });
 	}
 
 	template<typename T>

@@ -44,11 +44,10 @@ namespace tin {
 		model.setVocabulary(vocabulary);
 
 		// Normalization parameters
-		double scale = 1.0 / 127.5;
-		cv::Scalar mean = cv::Scalar(127.5, 127.5, 127.5);
+		auto mean = recognitionParams->getMean();
 		// The input shape
-		cv::Size inputSize = cv::Size(100, 32);
-		model.setInputParams(scale, inputSize, mean);
+		std::pair<int, int> size = recognitionParams->getSize();
+		model.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
 	}
 
 	void TinEye::applyFocusMask(Image& image) {
