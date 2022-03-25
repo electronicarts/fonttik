@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Image.h"
+#include "Media.h"
 #include "TinEye.h"
 #include "Configuration.h"
 
@@ -11,15 +11,17 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-		img.loadImage("resources/luminance/white.png");
-		cv::Mat luminanceMap = img.getLuminanceMap();
+		//Image img;
+		Media* img = Media::CreateMedia("resources/luminance/white.png");
+		cv::Mat luminanceMap = img->getFrameLuminance();
 
 		cv::Mat mask = cv::Mat::ones({ luminanceMap.cols, luminanceMap.rows }, CV_8UC1);
 
-		double mean = Image::LuminanceMeanWithMask(luminanceMap, mask);
+		double mean = Media::LuminanceMeanWithMask(luminanceMap, mask);
 
 		ASSERT_DOUBLE_EQ(mean, 1);
+
+		delete img;
 	}
 
 	//Mean of both images is different
@@ -29,31 +31,33 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image imgHalf, imgWhite;
-		imgHalf.loadImage("resources/luminance/blackWhite.png");
-		imgWhite.loadImage("resources/luminance/white.png");
+		Media* imgHalf = Media::CreateMedia("resources/luminance/blackWhite.png");
+		Media* imgWhite = Media::CreateMedia("resources/luminance/white.png");
 
-		cv::Mat luminanceMap = imgHalf.getLuminanceMap();
+		cv::Mat luminanceMap = imgHalf->getFrameLuminance();
 
 		cv::Mat mask = cv::Mat::zeros({ luminanceMap.cols, luminanceMap.rows }, CV_8UC1);
 
 		//Black and white mean
-		double meanTwoHalves = Image::LuminanceMeanWithMask(luminanceMap, mask);
+		double meanTwoHalves = Media::LuminanceMeanWithMask(luminanceMap, mask);
 
 		cv::Mat half = mask({ 0,0,luminanceMap.cols / 2,luminanceMap.rows });
 		cv::bitwise_not(half, half);
 
 		//White half mean
-		double meanHalf = Image::LuminanceMeanWithMask(luminanceMap, mask);
+		double meanHalf = Media::LuminanceMeanWithMask(luminanceMap, mask);
 
-		luminanceMap = imgWhite.getLuminanceMap();
+		luminanceMap = imgWhite->getFrameLuminance();
 		mask = cv::Mat::ones({ luminanceMap.cols, luminanceMap.rows }, CV_8UC1 );
 
 		//White image
-		double meanWhite = Image::LuminanceMeanWithMask(luminanceMap, mask);
+		double meanWhite = Media::LuminanceMeanWithMask(luminanceMap, mask);
 
 		ASSERT_DOUBLE_EQ(meanHalf, meanWhite);
 		ASSERT_NE(meanWhite, meanTwoHalves);
+
+		delete imgHalf;
+		delete imgWhite;
 	}
 
 	//Black on White has a contrast of 21 according to current legal procedure https://snook.ca/technical/colour_contrast/colour.html#fg=FFFFFF,bg=000000
@@ -62,10 +66,9 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-		img.loadImage("resources/luminance/blackWhite.png");
+		Media* img = Media::CreateMedia("resources/luminance/blackWhite.png");
 
-		cv::Mat luminanceMap = img.getLuminanceMap();
+		cv::Mat luminanceMap = img->getFrameLuminance();
 		cv::Size size = { luminanceMap.cols,luminanceMap.rows };
 
 		cv::Mat a = cv::Mat::zeros(size, CV_8UC1);
@@ -78,6 +81,8 @@ namespace tin {
 		double contrast = TinEye::ContrastBetweenRegions(luminanceMap, a, b);
 
 		ASSERT_DOUBLE_EQ(contrast, 21);
+
+		delete img;
 	}
 
 	//The order of the regions should not affect the contrast ratio
@@ -86,10 +91,9 @@ namespace tin {
 		Configuration config = Configuration("config.json");
 		tineye.init(&config);
 
-		Image img;
-		img.loadImage("resources/luminance/blackWhite.png");
+		Media* img = Media::CreateMedia("resources/luminance/blackWhite.png");
 
-		cv::Mat luminanceMap = img.getLuminanceMap();
+		cv::Mat luminanceMap = img->getFrameLuminance();
 		cv::Size size = { luminanceMap.cols,luminanceMap.rows };
 
 		cv::Mat a = cv::Mat::zeros(size, CV_8UC1);
@@ -103,6 +107,7 @@ namespace tin {
 		double contrastB = TinEye::ContrastBetweenRegions(luminanceMap, b, a);
 
 		ASSERT_DOUBLE_EQ(contrastA, contrastB);
-	}
 
+		delete img;
+	}
 }

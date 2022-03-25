@@ -50,14 +50,14 @@ namespace tin {
 		model.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
 	}
 
-	void TinEye::applyFocusMask(Image& image) {
+	void TinEye::applyFocusMask(Media& image) {
 		PROFILE_FUNCTION();
 		cv::Mat img = image.getImageMatrix();
 		cv::Mat mask = config->getAppSettings()->calculateMask(img.cols, img.rows);
 		img = img & mask;
 	}
 
-	bool TinEye::fontSizeCheck(Image& img, std::vector<Textbox>& boxes) {
+	bool TinEye::fontSizeCheck(Media& img, std::vector<Textbox>& boxes) {
 		PROFILE_FUNCTION();
 		cv::Mat openCVMat = img.getImageMatrix();
 
@@ -85,7 +85,7 @@ namespace tin {
 
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
-			box.setParentImage(&img);
+			box.setParentMedia(&img);
 
 			bool individualPass = textboxSizeCheck(img, box);
 
@@ -114,7 +114,7 @@ namespace tin {
 		return passes;
 	}
 
-	bool TinEye::textboxSizeCheck(Image& image, const Textbox& textbox) {
+	bool TinEye::textboxSizeCheck(Media& image, const Textbox& textbox) {
 		PROFILE_FUNCTION();
 		bool pass = true;
 		cv::Rect boxRect = textbox.getRect();
@@ -156,11 +156,11 @@ namespace tin {
 		return pass;
 	}
 
-	bool TinEye::textContrastCheck(Image& image, std::vector<Textbox>& boxes) {
+	bool TinEye::textContrastCheck(Media& image, std::vector<Textbox>& boxes) {
 		PROFILE_FUNCTION();
 
 		cv::Mat openCVMat = image.getImageMatrix();
-		cv::Mat luminanceMap = image.getLuminanceMap();
+		cv::Mat luminanceMap = image.getFrameLuminance();
 
 		AppSettings* appSettings = config->getAppSettings();
 		Guideline* guideline = config->getGuideline();
@@ -185,7 +185,7 @@ namespace tin {
 
 		for (Textbox box : boxes) {
 
-			box.setParentImage(&image);
+			box.setParentMedia(&image);
 
 			bool individualPass = textboxContrastCheck(image, box);
 
@@ -220,7 +220,7 @@ namespace tin {
 
 	}
 
-	bool TinEye::textboxContrastCheck(Image& image, const Textbox& box) {
+	bool TinEye::textboxContrastCheck(Media& image, const Textbox& box) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = box.getRect();
 
@@ -261,15 +261,15 @@ namespace tin {
 
 	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
 		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = Image::LuminanceMeanWithMask(luminanceMap, maskA);
+		double meanLight = Media::LuminanceMeanWithMask(luminanceMap, maskA);
 
 		//Invert mask to calculate mean of the darker colors
-		double meanDark = Image::LuminanceMeanWithMask(luminanceMap, maskB);
+		double meanDark = Media::LuminanceMeanWithMask(luminanceMap, maskB);
 
 		return (std::max(meanLight, meanDark) + 0.05) / (std::min(meanLight, meanDark) + 0.05);
 	}
 
-	std::vector<Textbox> TinEye::getTextBoxes(Image& image) {
+	std::vector<Textbox> TinEye::getTextBoxes(Media& image) {
 		PROFILE_FUNCTION();
 		return textboxDetection->detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
 	}

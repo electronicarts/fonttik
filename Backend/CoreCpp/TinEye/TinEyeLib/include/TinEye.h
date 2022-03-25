@@ -1,6 +1,6 @@
 #pragma once
 #include <filesystem>
-#include "Image.h"
+#include "Media.h"
 #include "Textbox.h"
 #include <gtest/gtest.h>
 
@@ -15,8 +15,8 @@ namespace tin {
 		TextboxDetection* textboxDetection = nullptr;
 		cv::dnn::TextRecognitionModel model;
 
-		bool textboxSizeCheck(Image& image, const Textbox& textbox);
-		bool textboxContrastCheck(Image& image, const Textbox& textbox);
+		bool textboxSizeCheck(Media& image, const Textbox& textbox);
+		bool textboxContrastCheck(Media& image, const Textbox& textbox);
 
 		//Operator method
 		//Calculates the contrast ratio of two given regions of a luminance matrix
@@ -32,13 +32,13 @@ namespace tin {
 		~TinEye();
 		void init(Configuration* configuration);
 
-		std::vector<Textbox> getTextBoxes(Image& image);
+		std::vector<Textbox> getTextBoxes(Media& image);
 		void mergeTextBoxes(std::vector<Textbox>& textBoxes);
 
-		void applyFocusMask(Image& image);
+		void applyFocusMask(Media& image);
 
-		bool fontSizeCheck(Image& img, std::vector<Textbox>& boxes);
-		bool textContrastCheck(Image& image, std::vector<Textbox>& boxes);
+		bool fontSizeCheck(Media& img, std::vector<Textbox>& boxes);
+		bool textContrastCheck(Media& image, std::vector<Textbox>& boxes);
 
 		//Operator
 		//Calculates the luminance of a given image matrix
