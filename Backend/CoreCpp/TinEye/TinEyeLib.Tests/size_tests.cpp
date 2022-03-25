@@ -10,7 +10,7 @@ namespace tin {
 		tineye.init(&config);
 
 		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources / sizes / PassingSizeTest720.png");
+		Media* img = Media::CreateMedia("resources/sizes/PassingSizeTest720.png");
 
 		bool passesSize = false;
 		//Check if image has text recognized by OCR
