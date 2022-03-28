@@ -39,6 +39,7 @@ namespace tin {
 
 		bool fontSizeCheck(Media& img, std::vector<Textbox>& boxes);
 		bool textContrastCheck(Media& image, std::vector<Textbox>& boxes);
+		Results* processMedia(Media& media);
 
 		//Operator
 		//Calculates the luminance of a given image matrix
