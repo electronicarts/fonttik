@@ -13,6 +13,25 @@
 namespace tin {
 	std::vector<double>* TinEye::linearizationLUT = nullptr;
 
+	Results* TinEye::processMedia(Media& media) {
+		do {
+			//Check if image has text recognized by OCR
+			applyFocusMask(media);
+			std::vector<tin::Textbox> textBoxes = getTextBoxes(media);
+			mergeTextBoxes(textBoxes);
+			if (textBoxes.empty()) {
+				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+			}
+			else {
+				// Get OCR result
+				fontSizeCheck(media, textBoxes);
+				textContrastCheck(media, textBoxes);
+			}
+		} while (media.nextFrame());
+
+		return media.getResultsPointer();
+	}
+
 	void TinEye::init(Configuration* configuration)
 	{
 		Instrumentor::Get().BeginSession("Profile");

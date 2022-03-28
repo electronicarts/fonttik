@@ -19,28 +19,12 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 void processMedia(tin::TinEye& tineye, fs::path path) {
 	tin::Media* media = tin::Media::CreateMedia(path);
-
-	do {
-
-
-		BOOST_LOG_TRIVIAL(debug) << "Using EAST preprocessing" << std::endl;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*media);
-		std::vector<tin::Textbox> textBoxes = tineye.getTextBoxes(*media);
-		tineye.mergeTextBoxes(textBoxes);
-		if (textBoxes.empty()) {
-			BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
-		}
-		else {
-			// Get OCR result
-			tineye.fontSizeCheck(*media, textBoxes);
-			tineye.textContrastCheck(*media, textBoxes);
-		}
-	} while (media->nextFrame());
-
-	tin::Results* results = media->getResultsPointer();
+	
+	tin::Results* results = tineye.processMedia(*media);
+	
 	std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
 		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
+	
 	delete media;
 }
 
