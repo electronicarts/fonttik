@@ -29,6 +29,9 @@ namespace tin {
 		//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 		virtual bool nextFrame() = 0;
 
+		//Generates outlines for the image's results and saves them
+		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName) = 0;
+
 		//Path of the original image or the video its coming from
 		fs::path getPath() { return path; };
 

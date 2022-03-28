@@ -74,8 +74,6 @@ namespace tin {
 		bool passes = true;
 
 #ifdef _DEBUG
-		//Regions of interest
-		cv::Mat ROIs = img.getImageMatrix().clone();
 		int counter = 0;
 #endif
 
@@ -92,11 +90,6 @@ namespace tin {
 			passes = passes && individualPass;
 
 #ifdef _DEBUG
-			if (appSettings->saveTexboxOutline()) {
-				PROFILE_SCOPE("highlight");
-				cv::Rect boxRect = box.getRect();
-				Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
-			}
 			if (appSettings->saveSeparateTextboxes()) {
 				img.saveOutputData(box.getSubmatrix(), "textbox_" + std::to_string(counter) + ".png");
 			}
@@ -104,12 +97,6 @@ namespace tin {
 
 #endif
 		}
-
-#ifdef _DEBUG
-		if (appSettings->saveTexboxOutline()) {
-			img.saveOutputData(ROIs, "sizeChecks.png");
-		}
-#endif
 
 		return passes;
 	}
@@ -166,8 +153,6 @@ namespace tin {
 		Guideline* guideline = config->getGuideline();
 
 #ifdef _DEBUG
-		//Regions of interest
-		cv::Mat ROIs = image.getImageMatrix().clone();
 		int counter = 0;
 #endif // _DEBUG
 
@@ -191,10 +176,6 @@ namespace tin {
 
 
 #ifdef _DEBUG
-			if (appSettings->saveTexboxOutline()) {
-				cv::Rect boxRect = box.getRect();
-				Image::highlightBox(boxRect.x, boxRect.y, boxRect.x + boxRect.width, boxRect.y + boxRect.height, (individualPass) ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), ROIs, 2);
-			}
 			if (appSettings->saveHistograms()) {
 				PROFILE_SCOPE("saveHistograms");
 				cv::Rect boxRect = box.getRect();
@@ -211,13 +192,7 @@ namespace tin {
 
 		}
 
-#ifdef _DEBUG
-		if (appSettings->saveTexboxOutline()) {
-			image.saveOutputData(ROIs, "contrastChecks.png");
-		}
-#endif
 		return imagePasses;
-
 	}
 
 	bool TinEye::textboxContrastCheck(Media& image, const Textbox& box) {

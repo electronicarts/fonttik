@@ -10,7 +10,7 @@ namespace tin {
 
 	Video::~Video()
 	{
-		
+
 		if (videoCapture.isOpened()) {
 			videoCapture.release();
 		}
@@ -28,6 +28,10 @@ namespace tin {
 		else {
 			return false;
 		}
+	}
+
+	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName) {
+
 	}
 }
 
