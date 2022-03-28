@@ -57,7 +57,8 @@ namespace tin {
 			frameCopy = frameMat.clone();
 
 			for (ResultBox& box : results[i]) {
-				highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, box.getResultColor(), frameCopy, 2);
+				cv::Scalar color = box.getResultColor();
+				highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
 			}
 
 			//output frame to video

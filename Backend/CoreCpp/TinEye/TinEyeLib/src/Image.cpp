@@ -15,7 +15,8 @@ namespace tin {
 		cv::Mat highlights = imageMatrix.clone();
 
 		for (ResultBox& box : results.back()) {
-			highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, box.getResultColor(), highlights, 2);
+			cv::Scalar color = box.getResultColor();
+			highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, highlights, 2);
 		}
 		saveOutputData(highlights, fileName+".png");
 	}
