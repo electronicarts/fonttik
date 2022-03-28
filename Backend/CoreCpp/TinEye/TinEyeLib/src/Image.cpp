@@ -15,23 +15,8 @@ namespace tin {
 		cv::Mat highlights = imageMatrix.clone();
 
 		for (ResultBox& box : results.back()) {
-			cv::Scalar color;
-			switch (box.type) {
-			case ResultType::PASS:
-				color = cv::Scalar(0, 255, 0);
-				break;
-			case ResultType::FAIL:
-				color = cv::Scalar(0, 0, 255);
-				break;
-			case ResultType::UNRECOGNIZED:
-				color = cv::Scalar(255, 0, 0);
-				break;
-			case ResultType::WARNING:
-				color = cv::Scalar(0, 170, 255);
-				break;
-			}
-			highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, highlights, 2);
+			highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, box.getResultColor(), highlights, 2);
 		}
-		saveOutputData(highlights, fileName);
+		saveOutputData(highlights, fileName+".png");
 	}
 }

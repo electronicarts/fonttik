@@ -42,8 +42,8 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 
 	//if specified in config, save outlines for both size and contrast
 	if (config.getAppSettings()->saveTexboxOutline()) {
-		media->saveResultsOutlines(results->contrastResults, "contrastChecks.png");
-		media->saveResultsOutlines(results->sizeResults, "sizeChecks.png");
+		media->saveResultsOutlines(results->contrastResults, "contrastChecks");
+		media->saveResultsOutlines(results->sizeResults, "sizeChecks");
 	}
 
 	delete media;

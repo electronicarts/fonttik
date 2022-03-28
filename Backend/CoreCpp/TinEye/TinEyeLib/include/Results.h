@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <opencv2/opencv.hpp>
 
 namespace tin {
 	enum ResultType
@@ -16,6 +17,25 @@ namespace tin {
 
 		ResultBox(ResultType type, int x, int y, int w, int h) :
 			type(type), x(x), y(y), width(w), height(h) {}
+
+		cv::Scalar getResultColor() {
+			cv::Scalar color;
+			switch (type) {
+			case ResultType::PASS:
+				color = cv::Scalar(0, 255, 0);
+				break;
+			case ResultType::FAIL:
+				color = cv::Scalar(0, 0, 255);
+				break;
+			case ResultType::UNRECOGNIZED:
+				color = cv::Scalar(255, 0, 0);
+				break;
+			case ResultType::WARNING:
+				color = cv::Scalar(0, 170, 255);
+				break;
+			}
+			return color;
+		}
 	};
 
 	struct Results {
