@@ -146,13 +146,19 @@ namespace tin {
 
 	void Media::saveOutputData(cv::Mat data, std::string name) {
 		PROFILE_FUNCTION();
+		fs::path outputPath = getOutputPath();
+
+
+		cv::imwrite((outputPath / name).string(), data);
+	}
+
+	fs::path Media::getOutputPath() {
 		fs::path outputPath = path.parent_path() / (path.filename().string() + "_output");
 
 		if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {
 			fs::create_directory(outputPath);
 		}
 
-
-		cv::imwrite(fs::path(outputPath / name).string(), data);
+		return outputPath;
 	}
 }

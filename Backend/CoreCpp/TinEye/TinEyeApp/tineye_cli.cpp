@@ -17,7 +17,7 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 	return std::find(begin, end, option) != end;
 }
 
-void processMedia(tin::TinEye& tineye, fs::path path) {
+void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config) {
 	tin::Media* media = tin::Media::CreateMedia(path);
 	
 	tin::Results* results = tineye.processMedia(*media);
@@ -25,13 +25,19 @@ void processMedia(tin::TinEye& tineye, fs::path path) {
 	std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
 		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
 	
+	//if specified in config, save outlines for both size and contrast
+	if (config.getAppSettings()->saveTexboxOutline()) {
+		media->saveResultsOutlines(results->contrastResults, "contrastChecks");
+		media->saveResultsOutlines(results->sizeResults, "sizeChecks");
+	}
+	
 	delete media;
 }
 
-void processFolder(tin::TinEye& tineye, fs::path path) {
+void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& config) {
 	for (const auto& directoryEntry : fs::directory_iterator(path)) {
 		if (fs::is_regular_file(directoryEntry)) {
-			processMedia(tineye, directoryEntry);
+			processMedia(tineye, directoryEntry, config);
 		}
 		//Ignore output results
 		else if (fs::is_directory(directoryEntry)) {
@@ -39,7 +45,7 @@ void processFolder(tin::TinEye& tineye, fs::path path) {
 				std::cout << directoryEntry << "is already a results folder" << std::endl;
 			}
 			else {
-				processFolder(tineye, directoryEntry);
+				processFolder(tineye, directoryEntry, config);
 			}
 		}
 	}
@@ -66,10 +72,10 @@ int main(int argc, char* argv[]) {
 	if (fs::exists(path)) {
 
 		if (!fs::is_directory(path)) {
-			processMedia(tineye, path);
+			processMedia(tineye, path, config);
 		}
 		else {
-			processFolder(tineye, path);
+			processFolder(tineye, path, config);
 		}
 	}
 	else {
