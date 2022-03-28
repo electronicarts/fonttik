@@ -69,6 +69,9 @@ namespace tin {
 		//Saves the data in the image sub folder
 		void saveOutputData(cv::Mat data, std::string name);
 
+		//Returns output path and if it doesn't exist creates it
+		fs::path getOutputPath();
+
 		//Returns a pointer to the image's results struct for editing or reviewing
 		Results* getResultsPointer() { return &results; }
 

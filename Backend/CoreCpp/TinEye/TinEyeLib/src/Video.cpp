@@ -32,11 +32,7 @@ namespace tin {
 
 	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName) {
 		//Create output path
-		fs::path outputPath = path.parent_path() / (path.filename().string() + "_output");
-
-		if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {
-			fs::create_directory(outputPath);
-		}
+		fs::path outputPath = getOutputPath();
 
 		//Set source video to first frame
 		videoCapture.set(cv::CAP_PROP_POS_FRAMES, 0);
