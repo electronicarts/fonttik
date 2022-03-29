@@ -6,6 +6,7 @@ namespace tin {
 	TEST(TinEyeTests, PassingContrast) {
 		tin::TinEye tineye = tin::TinEye();
 		tin::Configuration config = tin::Configuration("config.json");
+		tineye.init(&config);
 
 		tin::Media* media = tin::Media::CreateMedia("resources/contrasts/gradientPass.png");
 
@@ -19,6 +20,7 @@ namespace tin {
 	TEST(TinEyeTests, FailingContrast) {
 		tin::TinEye tineye = tin::TinEye();
 		tin::Configuration config = tin::Configuration("config.json");
+		tineye.init(&config);
 
 		tin::Media* media = tin::Media::CreateMedia("resources/Contrasts/gradientFail.png");
 
@@ -32,6 +34,7 @@ namespace tin {
 	TEST(TinEyeTests, PassingSize) {
 		tin::TinEye tineye = tin::TinEye();
 		tin::Configuration config = tin::Configuration("config.json");
+		tineye.init(&config);
 
 		tin::Media* media = tin::Media::CreateMedia("resources/sizes/PassingSizeTest720.png");
 
@@ -45,6 +48,7 @@ namespace tin {
 	TEST(TinEyeTests, FailingSize) {
 		tin::TinEye tineye = tin::TinEye();
 		tin::Configuration config = tin::Configuration("config.json");
+		tineye.init(&config);
 
 		tin::Media* media = tin::Media::CreateMedia("resources/sizes/NotPassingSizeTest720.png");
 
