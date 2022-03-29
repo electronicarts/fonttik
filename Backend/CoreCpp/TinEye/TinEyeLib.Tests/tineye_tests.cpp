@@ -24,7 +24,7 @@ namespace tin {
 
 		tin::Results* results = tineye.processMedia(*media);
 
-		ASSERT_TRUE(results->overallContrastPass);
+		ASSERT_FALSE(results->overallContrastPass);
 
 		delete media;
 	}
@@ -37,7 +37,7 @@ namespace tin {
 
 		tin::Results* results = tineye.processMedia(*media);
 
-		ASSERT_TRUE(results->overallContrastPass);
+		ASSERT_TRUE(results->overallSizePass);
 	
 		delete media;
 	}
@@ -50,7 +50,7 @@ namespace tin {
 
 		tin::Results* results = tineye.processMedia(*media);
 
-		ASSERT_TRUE(results->overallContrastPass);
+		ASSERT_FALSE(results->overallSizePass);
 	
 		delete media;
 	}
