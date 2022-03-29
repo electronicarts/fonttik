@@ -8,7 +8,7 @@ namespace tin {
 		tin::Configuration config = tin::Configuration("config.json");
 		tineye.init(&config);
 
-		tin::Media* media = tin::Media::CreateMedia("resources/contrasts/highContrast.png");
+		tin::Media* media = tin::Media::CreateMedia("resources/Contrasts/highContrast.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
