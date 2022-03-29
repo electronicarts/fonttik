@@ -8,7 +8,7 @@ namespace tin {
 		tin::Configuration config = tin::Configuration("config.json");
 		tineye.init(&config);
 
-		tin::Media* media = tin::Media::CreateMedia("resources/contrasts/gradientPass.png");
+		tin::Media* media = tin::Media::CreateMedia("resources/contrasts/highContrast.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
@@ -22,7 +22,7 @@ namespace tin {
 		tin::Configuration config = tin::Configuration("config.json");
 		tineye.init(&config);
 
-		tin::Media* media = tin::Media::CreateMedia("resources/Contrasts/gradientFail.png");
+		tin::Media* media = tin::Media::CreateMedia("resources/Contrasts/lowContrast.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
