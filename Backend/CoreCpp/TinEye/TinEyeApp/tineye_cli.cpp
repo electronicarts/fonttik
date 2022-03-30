@@ -19,19 +19,25 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config) {
 	tin::Media* media = tin::Media::CreateMedia(path);
-	
-	tin::Results* results = tineye.processMedia(*media);
-	
-	std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
-		"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
-	
-	//if specified in config, save outlines for both size and contrast
-	if (config.getAppSettings()->saveTexboxOutline()) {
-		media->saveResultsOutlines(results->contrastResults, "contrastChecks");
-		media->saveResultsOutlines(results->sizeResults, "sizeChecks");
+
+	if (media != nullptr) {
+		tin::Results* results = tineye.processMedia(*media);
+
+		std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
+			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
+
+		//if specified in config, save outlines for both size and contrast
+		if (config.getAppSettings()->saveTexboxOutline()) {
+			media->saveResultsOutlines(results->contrastResults, "contrastChecks");
+			media->saveResultsOutlines(results->sizeResults, "sizeChecks");
+		}
+
+		delete media;
 	}
-	
-	delete media;
+	else
+	{
+		std::cout << path.filename() << " format is not supported" << std::endl;
+	}
 }
 
 void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& config) {
