@@ -36,7 +36,7 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 	}
 	else
 	{
-		std::cout << path.filename() << " format is not supported" << std::endl;
+		std::cerr << path.filename() << " format is not supported" << std::endl;
 	}
 }
 
