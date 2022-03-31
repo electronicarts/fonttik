@@ -1,9 +1,11 @@
 #include "Video.h"
+#include "boost/log/trivial.hpp"
 
 namespace tin {
 	Video::Video(fs::path filePath, cv::VideoCapture capture) : Media(filePath), videoCapture(capture)
 	{
 		if (videoCapture.isOpened()) {
+			frameCount = 0;
 			videoCapture >> imageMatrix;
 		}
 	}
@@ -22,6 +24,7 @@ namespace tin {
 		luminanceMap.release();
 
 		if (videoCapture.isOpened()) {
+			BOOST_LOG_TRIVIAL(trace) << "Processing video frame " << ++frameCount << std::endl;
 			videoCapture >> imageMatrix;
 			return !imageMatrix.empty();
 		}

@@ -45,28 +45,30 @@ namespace tin {
 		textboxDetection = new TextboxDetection(config->getTextDetectionParams());
 
 
-		//Initialize text recognition
+		//Initialize text recognition only if text recognition is enabled in config
+
 		//from https://docs.opencv.org/4.x/d4/d43/tutorial_dnn_text_spotting.html
+		if (config->getAppSettings()->textRecognitionActive()) {
+			// Load models weights
+			TextRecognitionParams* recognitionParams = config->getTextRecognitionParams();
+			textRecognition = cv::dnn::TextRecognitionModel(recognitionParams->getRecognitionModel());
+			textRecognition.setDecodeType(recognitionParams->getDecodeType());
+			std::ifstream vocFile;
+			vocFile.open(recognitionParams->getVocabularyFilepath());
+			CV_Assert(vocFile.is_open());
+			std::string vocLine;
+			std::vector<std::string> vocabulary;
+			while (std::getline(vocFile, vocLine)) {
+				vocabulary.push_back(vocLine);
+			}
+			textRecognition.setVocabulary(vocabulary);
 
-		// Load models weights
-		TextRecognitionParams* recognitionParams = config->getTextRecognitionParams();
-		model = cv::dnn::TextRecognitionModel(recognitionParams->getRecognitionModel());
-		model.setDecodeType(recognitionParams->getDecodeType());
-		std::ifstream vocFile;
-		vocFile.open(recognitionParams->getVocabularyFilepath());
-		CV_Assert(vocFile.is_open());
-		std::string vocLine;
-		std::vector<std::string> vocabulary;
-		while (std::getline(vocFile, vocLine)) {
-			vocabulary.push_back(vocLine);
+			// Normalization parameters
+			auto mean = recognitionParams->getMean();
+			// The input shape
+			std::pair<int, int> size = recognitionParams->getSize();
+			textRecognition.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
 		}
-		model.setVocabulary(vocabulary);
-
-		// Normalization parameters
-		auto mean = recognitionParams->getMean();
-		// The input shape
-		std::pair<int, int> size = recognitionParams->getSize();
-		model.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
 	}
 
 	void TinEye::applyFocusMask(Media& image) {
@@ -125,24 +127,26 @@ namespace tin {
 		bool pass = true;
 		cv::Rect boxRect = textbox.getRect();
 
-		//Recognize word in region
-		std::string recognitionResult;
-		recognitionResult = model.recognize(textbox.getSubmatrix());
-
-		//Avoids division by zero
-		int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
-
 		ResultType type = ResultType::PASS;
 
-		//Check average width
-		if (averageWidth == -1) {
-			BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
-			type = ResultType::UNRECOGNIZED;
-		}
-		else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
-			pass = false;
-			BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
-				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+		if (config->getAppSettings()->textRecognitionActive()) {
+			//Recognize word in region
+			std::string recognitionResult;
+			recognitionResult = textRecognition.recognize(textbox.getSubmatrix());
+
+			//Avoids division by zero
+			int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
+
+			//Check average width
+			if (averageWidth == -1) {
+				BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
+				type = ResultType::UNRECOGNIZED;
+			}
+			else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
+				pass = false;
+				BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
+					" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+			}
 		}
 
 
@@ -150,8 +154,8 @@ namespace tin {
 		int minimumHeight = config->getGuideline()->getHeightRequirement();
 		if (boxRect.height < minimumHeight) {
 			pass = false;
-			BOOST_LOG_TRIVIAL(info) << "Word: '" << recognitionResult << "' doesn't comply with minimum height " << minimumHeight << ", detected height : " << boxRect.height <<
-				" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height " 
+				<< minimumHeight << ", detected height : " << boxRect.height << std::endl;
 		}
 
 		type = (pass) ? type : ResultType::FAIL;
@@ -342,7 +346,7 @@ namespace tin {
 			delete textboxDetection;
 		}
 		textboxDetection = nullptr;
-		
+
 
 		config = nullptr;
 		Instrumentor::Get().EndSession();
