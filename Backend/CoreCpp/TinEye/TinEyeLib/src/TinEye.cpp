@@ -136,6 +136,16 @@ namespace tin {
 
 			//Avoids division by zero
 			int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
+
+			//Check average width
+			if (averageWidth == -1) {
+				BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
+				type = ResultType::UNRECOGNIZED;
+			}
+			else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
+				pass = false;
+				BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
+					" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
 		}
 
 
