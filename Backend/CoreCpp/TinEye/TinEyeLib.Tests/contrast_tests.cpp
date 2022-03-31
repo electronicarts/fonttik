@@ -9,7 +9,6 @@ namespace tin {
 			tineye = TinEye();
 			config = Configuration("config.json");
 			tineye.init(&config);
-			str = "setup";
 		}
 
 		bool checkContrast(fs::path path) {
@@ -18,8 +17,7 @@ namespace tin {
 			//get matrix to know size of the image to be tested
 			cv::Mat matrix = img->getImageMatrix();
 			bool a = matrix.empty();
-			//ASSERT_FALSE(matrix.empty());
-
+			
 			std::vector<Textbox> textBoxes;
 			textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
 			bool contrastPass = tineye.textContrastCheck(*img, textBoxes);
@@ -32,12 +30,10 @@ namespace tin {
 		TinEye tineye;
 		Media* img;
 		Configuration config;
-		std::string str = "default";
 	};
 
 	TEST_F(ContrastRatioChecks, PassingContrastFlat) {
 
-		SetUp();
 		std::string path = "resources/Contrasts/flatPass.png";
 		ASSERT_TRUE(checkContrast(path));
 	}
@@ -77,7 +73,6 @@ namespace tin {
 
 	TEST_F(ContrastRatioChecks, lowContrast) {
 		std::string path = "resources/Contrasts/lowContrast.png";
-		img = Media::CreateMedia(path);
 		ASSERT_FALSE(checkContrast(path));
 	}
 }
