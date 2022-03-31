@@ -7,6 +7,7 @@
 
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
+#include "Instrumentor.h"
 
 namespace tin {
 	TextboxDetection::TextboxDetection(const TextDetectionParams* params)
@@ -68,21 +69,27 @@ namespace tin {
 		cv::resize(img, resizedImg, detInputSize);
 
 		std::vector< std::vector<cv::Point> > detResults;
-		east->detect(resizedImg, detResults);
+		{	
+			PROFILE_SCOPE("EAST DNN");
+			east->detect(resizedImg, detResults);
+		}
 
 		BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << " boxes\n";
 
 		//Return smart pointer?
 
 		//Transform points to original image size
-		for (int i = 0; i < detResults.size(); i++) {
-			for (int j = 0; j < detResults[i].size(); j++) {
-				detResults[i][j].x /= widthRatio;
-				detResults[i][j].y /= heightRatio;
+		{
+			PROFILE_SCOPE("Point scaling");
+			for (int i = 0; i < detResults.size(); i++) {
+				for (int j = 0; j < detResults[i].size(); j++) {
+					detResults[i][j].x /= widthRatio;
+					detResults[i][j].y /= heightRatio;
 
-				//Make sure points are within bounds
-				detResults[i][j].x = std::min(std::max(0, detResults[i][j].x), img.cols);
-				detResults[i][j].y = std::min(std::max(0, detResults[i][j].y), img.rows);
+					//Make sure points are within bounds
+					detResults[i][j].x = std::min(std::max(0, detResults[i][j].x), img.cols);
+					detResults[i][j].y = std::min(std::max(0, detResults[i][j].y), img.rows);
+				}
 			}
 		}
 
@@ -137,7 +144,7 @@ namespace tin {
 	}
 
 	void TextboxDetection::mergeTextBoxes(std::vector<Textbox>& boxes, const TextDetectionParams* params) {
-
+		PROFILE_FUNCTION();
 		std::pair<float, float> mergeThreshold = params->getMergeThreshold();
 
 		for (auto boxIt = boxes.begin(); boxIt != boxes.end(); boxIt++) {
