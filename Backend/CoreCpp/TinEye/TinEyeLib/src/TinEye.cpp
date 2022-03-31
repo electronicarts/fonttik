@@ -146,6 +146,7 @@ namespace tin {
 				pass = false;
 				BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
 					" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+			}
 		}
 
 
