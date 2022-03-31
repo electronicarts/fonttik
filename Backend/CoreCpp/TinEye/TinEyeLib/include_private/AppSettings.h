@@ -12,7 +12,8 @@ namespace tin {
 			dbgSaveSeparateTextboxes = false,
 			dbgSaveHistograms = false,
 			dbgSaveRawTextboxOutline = false,
-			dbgSaveLuminanceMasks = false;
+			dbgSaveLuminanceMasks = false,
+			useTextRecognition = false;
 		fs::path resultsPath = "./", debugInfoPath = "./debug/";
 
 
@@ -23,10 +24,10 @@ namespace tin {
 	public:
 		AppSettings() {};
 		AppSettings(bool saveLum, bool saveTextbox, bool saveSeparateTexbox, bool saveHist, bool saveRawTextbox, bool saveLumMasks,
-			fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
+			bool textRecognition, fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
 			dbgSaveTexboxOutline(saveTextbox), dbgSaveRawTextboxOutline(saveRawTextbox),
 			dbgSaveSeparateTextboxes(saveSeparateTexbox), dbgSaveHistograms(saveHist),
-			dbgSaveLuminanceMasks(saveLumMasks),
+			dbgSaveLuminanceMasks(saveLumMasks), useTextRecognition(textRecognition),
 			resultsPath(resultsPath), debugInfoPath(dbgInfoPath) {}
 
 		//AppSettigs

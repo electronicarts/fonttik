@@ -8,6 +8,7 @@
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
+    "useTextRecognition": true,
     "focusMask": [
       {
         "x": 0,
