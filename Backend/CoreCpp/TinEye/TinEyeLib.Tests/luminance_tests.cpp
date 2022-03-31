@@ -11,8 +11,8 @@ namespace tin {
 			config = Configuration("config.json");
 			tineye.init(&config);
 
-			whiteImg = Media::CreateMedia("resources/luminance/White.png");
-			blackWhiteImg = Media::CreateMedia("resources/luminance/blackwhite.png");
+			whiteImg = Media::CreateMedia("resources/luminance/white.png");
+			blackWhiteImg = Media::CreateMedia("resources/luminance/blackWhite.png");
 		}
 
 		void TearDown() override {
