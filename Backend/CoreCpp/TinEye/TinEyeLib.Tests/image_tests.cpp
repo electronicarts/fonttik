@@ -4,13 +4,28 @@
 #include "Configuration.h"
 
 namespace tin {
-	//All flipped pixels should be max luminance(255)-original value
-	TEST(LuminanceFlip, FlipImage) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
+	class LuminanceFlipTests : public ::testing::Test {
+	protected:
+		void SetUp() override {
+			tineye = TinEye();
+			config = Configuration("config.json");
+			tineye.init(&config);
 
-		Media* image = Media::CreateMedia("resources/bf2042/chat_window_closed.png");
+			image = Media::CreateMedia("resources/bf2042/chat_window_closed.png");
+
+		}
+
+		void TearDown() override {
+			delete image;
+		}
+
+		TinEye tineye;
+		Configuration config;
+		Media* image;
+	};
+
+	//All flipped pixels should be max luminance(255)-original value
+	TEST_F(LuminanceFlipTests, FlipImage) {
 		cv::Mat original = image->getFrameLuminance().clone();
 		image->flipLuminance();
 		cv::Mat flipped = image->getFrameLuminance().clone();
@@ -20,16 +35,10 @@ namespace tin {
 			}
 		}
 
-		delete image;
 	}
 	//All flipped pixels inside region should be max luminance(255)-original value
 	//Outer pixels should remain unchanged
-	TEST(LuminanceFlip, FlipRegion) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		Media* image = Media::CreateMedia("resources/bf2042/chat_window_closed.png");
+	TEST_F(LuminanceFlipTests, FlipRegion) {
 		cv::Mat original = image->getFrameLuminance().clone();
 		int x1 = 100, y1 = 100, x2 = 300, y2 = 400;
 		image->flipLuminance(x1, y1, x2, y2);
@@ -47,16 +56,10 @@ namespace tin {
 			}
 		}
 
-		delete image;
 	}
 
 	//Image should remain unchanged if luminance is flipped twice
-	TEST(LuminanceFlip, FlipTwice) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		Media* image = Media::CreateMedia("resources/bf2042/chat_window_closed.png");
+	TEST_F(LuminanceFlipTests, FlipTwice) {
 		cv::Mat original = image->getFrameLuminance().clone();
 		image->flipLuminance();
 		image->flipLuminance();
@@ -67,17 +70,12 @@ namespace tin {
 
 		ASSERT_TRUE(std::equal(original.begin<uchar>(), original.end<uchar>(), doubleFlip.begin<uchar>()));
 	
-		delete image;
 	}
 
 	//A region should remain unchanged if luminance is flipped twice
-	TEST(LuminanceFlip, FlipTwiceRegion) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
+	TEST_F(LuminanceFlipTests, FlipTwiceRegion) {
+		
 		cv::Rect region(0, 0, 150, 150);
-		Media* image = Media::CreateMedia("resources/bf2042/chat_window_closed.png");
 		cv::Mat original = image->getFrameLuminance()(region).clone();
 		image->flipLuminance(region.x, region.y, region.x + region.width, region.y + region.height);
 		image->flipLuminance(region.x, region.y, region.x + region.width, region.y + region.height);
@@ -87,7 +85,5 @@ namespace tin {
 		doubleFlip.convertTo(doubleFlip, CV_8UC1, 255);
 
 		ASSERT_TRUE(std::equal(original.begin<uchar>(), original.end<uchar>(), doubleFlip.begin<uchar>()));
-	
-		delete image;
 	}
 }

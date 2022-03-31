@@ -3,133 +3,58 @@
 #include "Configuration.h"
 
 namespace tin {
+	class SizeTests : public ::testing::Test {
+	protected:
+		void SetUp() override {
+			tineye = TinEye();
+			config = Configuration("config.json");
+			tineye.init(&config);
+		}
+
+		bool passesSize(fs::path path) {
+			//Open input image with openCV
+			Media* img = Media::CreateMedia(path);
+
+			bool passesSize = false;
+			//Check if image has text recognized by OCR
+			tineye.applyFocusMask(*img);
+			std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
+			tineye.mergeTextBoxes(textBoxes);
+
+			passesSize = tineye.fontSizeCheck(*img, textBoxes);
+
+			delete img;
+
+			return passesSize;
+		}
+
+		TinEye tineye;
+		Configuration config;
+	};
+
 	//All passing tests should pass with default configuration 
-	TEST(SizeTests, 720Pass) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources/sizes/PassingSizeTest720.png");
-
-		bool passesSize = false;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
-		tineye.mergeTextBoxes(textBoxes);
-
-		passesSize = tineye.fontSizeCheck(*img, textBoxes);
-
-		ASSERT_TRUE(passesSize);
-
-		delete img;
+	TEST_F(SizeTests, 720Pass) {
+		ASSERT_TRUE(passesSize("resources/sizes/PassingSizeTest720.png"));
 	}
 
-	TEST(SizeTests, 1080Pass) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources/sizes/PassingSizeTest1080.png");
-
-		bool passesSize = false;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
-		tineye.mergeTextBoxes(textBoxes);
-
-		passesSize = tineye.fontSizeCheck(*img, textBoxes);
-
-		ASSERT_TRUE(passesSize);
-
-		delete img;
+	TEST_F(SizeTests, 1080Pass) {
+		ASSERT_TRUE(passesSize("resources/sizes/PassingSizeTest1080.png"));
 	}
 
-	TEST(SizeTests, 4kPass) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources/sizes/PassingSizeTest4k.png");
-
-		bool passesSize = false;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
-		tineye.mergeTextBoxes(textBoxes);
-
-		passesSize = tineye.fontSizeCheck(*img, textBoxes);
-
-		ASSERT_TRUE(passesSize);
-
-		delete img;
+	TEST_F(SizeTests, 4kPass) {
+		ASSERT_TRUE(passesSize("resources/sizes/PassingSizeTest4k.png"));
 	}
 
 	//All failing tests should fail with default configuration
-	TEST(SizeTests, 720Fail) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources/sizes/NotPassingSizeTest720.png");
-
-		bool passesSize = false;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
-		tineye.mergeTextBoxes(textBoxes);
-
-		passesSize = tineye.fontSizeCheck(*img, textBoxes);
-
-		ASSERT_FALSE(passesSize);
-
-		delete img;
-
+	TEST_F(SizeTests, 720Fail) {
+		ASSERT_FALSE(passesSize("resources/sizes/NotPassingSizeTest720.png"));
 	}
 
-	TEST(SizeTests, 1080Fail) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources/sizes/NotPassingSizeTest1080.png");
-
-		bool passesSize = false;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
-		tineye.mergeTextBoxes(textBoxes);
-
-		passesSize = tineye.fontSizeCheck(*img, textBoxes);
-
-		ASSERT_FALSE(passesSize);
-
-		delete img;
-
+	TEST_F(SizeTests, 1080Fail) {
+		ASSERT_FALSE(passesSize("resources/sizes/NotPassingSizeTest1080.png"));
 	}
 
-	TEST(SizeTests, 4kFail) {
-		TinEye tineye = TinEye();
-		Configuration config = Configuration("config.json");
-		tineye.init(&config);
-
-		//Open input image with openCV
-		Media* img = Media::CreateMedia("resources/sizes/NotPassingSizeTest4k.png");
-
-		bool passesSize = false;
-		//Check if image has text recognized by OCR
-		tineye.applyFocusMask(*img);
-		std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
-		tineye.mergeTextBoxes(textBoxes);
-
-		passesSize = tineye.fontSizeCheck(*img, textBoxes);
-
-		ASSERT_FALSE(passesSize);
-
-		delete img;
+	TEST_F(SizeTests, 4kFail) {
+		ASSERT_FALSE(passesSize("resources/sizes/NotPassingSizeTest4k.png"));
 	}
 }
