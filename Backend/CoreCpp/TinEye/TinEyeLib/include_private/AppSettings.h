@@ -37,6 +37,7 @@ namespace tin {
 		bool saveSeparateTextboxes() const { return dbgSaveSeparateTextboxes; }
 		bool saveHistograms() const { return dbgSaveHistograms; }
 		bool saveRawTexboxOutline() const { return dbgSaveRawTextboxOutline; }
+		bool textRecognitionActive() const { return useTextRecognition; }
 		fs::path getResultsPath() const { return resultsPath; }
 		fs::path getDebugInfoPath() const { return debugInfoPath; }
 

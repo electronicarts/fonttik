@@ -13,7 +13,7 @@ namespace tin {
 	class TinEye {
 		Configuration* config = nullptr;
 		TextboxDetection* textboxDetection = nullptr;
-		cv::dnn::TextRecognitionModel model;
+		cv::dnn::TextRecognitionModel textRecognition;
 
 		bool textboxSizeCheck(Media& image, const Textbox& textbox);
 		bool textboxContrastCheck(Media& image, const Textbox& textbox);
@@ -29,6 +29,8 @@ namespace tin {
 		FRIEND_TEST(ContrastRegions, Commutative);
 	public:
 		TinEye() {};
+		//Overloaded constructor that automatically calls init with provided configuration
+		TinEye(Configuration* configuration) { init(configuration); }
 		~TinEye();
 		void init(Configuration* configuration);
 

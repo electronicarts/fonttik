@@ -118,7 +118,7 @@ namespace tin {
 
 	void Configuration::setDefaultAppSettings() {
 
-		appSettings = AppSettings(true, true, false, false, false, false,
+		appSettings = AppSettings(true, true, false, false, false, false, false,
 			"./", "./debugInfo");
 	}
 
