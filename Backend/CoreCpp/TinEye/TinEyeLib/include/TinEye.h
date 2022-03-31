@@ -25,8 +25,8 @@ namespace tin {
 		static std::vector<double>* linearizationLUT;
 		static double linearize8bitRGB(const uchar& colorBits);
 
-		FRIEND_TEST(ContrastRegions, MaxContrast);
-		FRIEND_TEST(ContrastRegions, Commutative);
+		FRIEND_TEST(LuminanceTests, MaxContrast);
+		FRIEND_TEST(LuminanceTests, Commutative);
 	public:
 		TinEye() {};
 		~TinEye();
