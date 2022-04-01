@@ -36,7 +36,7 @@ namespace tin {
 	}
 
 	TEST_F(TinEyeTests, PassingSize) {
-		tin::Media* media = tin::Media::CreateMedia("resources/sizes/PassingSizeTest720.png");
+		tin::Media* media = tin::Media::CreateMedia("resources/sizes/720SerifPass.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
@@ -46,7 +46,7 @@ namespace tin {
 	}
 
 	TEST_F(TinEyeTests, FailingSize) {
-		tin::Media* media = tin::Media::CreateMedia("resources/sizes/NotPassingSizeTest720.png");
+		tin::Media* media = tin::Media::CreateMedia("resources/sizes/720SerifFail.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
