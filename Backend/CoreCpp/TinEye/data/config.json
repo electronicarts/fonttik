@@ -55,6 +55,7 @@
   },
   "guideline": {
     "contrast": 4.5,
+    "textBackgroundRadius": 5,
     "resolutions": {
       "720": {
         "width": 4,

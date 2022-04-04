@@ -25,7 +25,7 @@ namespace tin {
 					resolutionGuidelines[atoi(it.key().c_str())] = a;
 				}
 
-				guideline = Guideline(guidelineJson["contrast"], resolutionGuidelines);
+				guideline = Guideline(guidelineJson["contrast"], guidelineJson["textBackgroundRadius"], resolutionGuidelines);
 
 			}
 			catch (...) {
@@ -111,14 +111,14 @@ namespace tin {
 	void Configuration::setDefaultGuideline() {
 		//If file is not found, error and set default values
 		BOOST_LOG_TRIVIAL(error) << "Configuration file not found, falling back to default configuration\n";
-		BOOST_LOG_TRIVIAL(error) << "Contrast ratio: 4.5, language: eng" << std::endl;
+		BOOST_LOG_TRIVIAL(error) << "Contrast ratio: 4.5" << std::endl;
 
-		guideline = Guideline(4.5, { {1080,{4,28}} });
+		guideline = Guideline(4.5, 100, { {1080,{4,28}} });
 	}
 
 	void Configuration::setDefaultAppSettings() {
 
-		appSettings = AppSettings(true, true, false, false, false, false, false,
+		appSettings = AppSettings(true, true, false, false, false, true, true,
 			"./", "./debugInfo");
 	}
 

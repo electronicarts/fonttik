@@ -229,14 +229,20 @@ namespace tin {
 		//OTSU threshold automatically calculates best fitting threshold values
 		cv::Mat unsignedLuminance;
 		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
-		//TODO convert to 8bit unsigned for otsu
 		cv::threshold(unsignedLuminance, maskA, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
-		cv::bitwise_not(maskA, maskB);
+		//Dilate and then substract maskA to get the outline of the mask
+		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
+		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
+		//To prevent antialising messing with measurements we expand the mask to be subtracted
+		cv::Mat substraction;
+		cv::dilate(maskA, substraction, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
+		maskB -= substraction;
 
 #ifdef _DEBUG
 		if (config->getAppSettings()->saveLuminanceMasks()) {
 			image.saveOutputData(unsignedLuminance, "lum.png");
 			image.saveOutputData(maskA, "mask.png");
+			image.saveOutputData(maskB, "outlineMask.png");
 		}
 #endif // _DEBUG
 

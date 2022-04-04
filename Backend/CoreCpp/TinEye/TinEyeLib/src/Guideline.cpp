@@ -1,8 +1,8 @@
 #include "Guideline.h"
 
 namespace tin {
-	Guideline::Guideline(float contrast, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines) :
-		contrastRatio(contrast),
+	Guideline::Guideline(float contrast, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines) :
+		contrastRatio(contrast), textBackgroundRadius(textRadius),
 		resolutionGuidelines(resolutionGuidelines) {}
 
 	void Guideline::setActiveResolution(int resolution) {
