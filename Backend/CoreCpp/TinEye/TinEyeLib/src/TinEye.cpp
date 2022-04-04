@@ -231,8 +231,12 @@ namespace tin {
 		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
 		cv::threshold(unsignedLuminance, maskA, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
 		//Dilate and then substract maskA to get the outline of the mask
-		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7,7)));
-		maskB -= maskA;
+		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
+		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
+		//To prevent antialising messing with measurements we expand the mask to be subtracted
+		cv::Mat substraction;
+		cv::dilate(maskA, substraction, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
+		maskB -= substraction;
 
 #ifdef _DEBUG
 		if (config->getAppSettings()->saveLuminanceMasks()) {

@@ -21,17 +21,19 @@ namespace tin {
 	class Guideline {
 		//Guidelines
 		float contrastRatio;
+		int textBackgroundRadius;
 		std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines;
 		ResolutionGuidelines* activeResolution = nullptr;
 	public:
 		Guideline() {}
-		Guideline(float contrast, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines);
+		Guideline(float contrast, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines);
 
 		void setActiveResolution(int resolution);
 
 		size_t getHeightRequirement() const { return activeResolution->height; }
 		size_t getWidthRequirement() const { return activeResolution->width; }
 		float getContrastRequirement() const { return contrastRatio; }
+		int getTextBackgroundRadius() { return textBackgroundRadius; }
 	};
 
 }
