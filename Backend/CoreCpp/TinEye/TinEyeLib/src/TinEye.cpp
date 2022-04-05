@@ -150,8 +150,9 @@ namespace tin {
 			std::string recognitionResult;
 			recognitionResult = textRecognition.recognize(textbox.getSubmatrix());
 
+			int width = maxX - minX;
 			//Avoids division by zero
-			int averageWidth = (recognitionResult.size() > 0) ? (maxX-minX) / recognitionResult.size() : -1;
+			int averageWidth = (recognitionResult.size() > 0) ? width / recognitionResult.size() : -1;
 
 			//Check average width
 			if (averageWidth == -1) {
@@ -181,14 +182,6 @@ namespace tin {
 		Results* testResults = image.getResultsPointer();
 		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height));
 		testResults->overallSizePass = testResults->overallSizePass && pass;
-#define SHOW_MASK_FIT 1
-#if SHOW_MASK_FIT 
-		cv::Mat show = textMask.clone();
-		Media::highlightBox(minX, minY, maxX, maxY, cv::Scalar(0, 255, 0),show,3);
-		cv::imshow("res", show);
-		cv::waitKey();
-#endif 
-
 
 		return pass;
 	}
