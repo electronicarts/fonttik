@@ -53,4 +53,20 @@ namespace tin {
 
 		return { xOverlap,yOverlap };
 	}
+
+	cv::Mat Textbox::getTextMask() {
+		if (textMask.empty()) {
+			textMask = calculateTextMask();
+		}
+		return textMask;
+	}
+
+	cv::Mat Textbox::calculateTextMask() {
+		//OTSU threshold automatically calculates best fitting threshold values
+		cv::Mat unsignedLuminance,mask;
+		cv::Mat luminanceRegion = getLuminanceMap();
+		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
+		cv::threshold(unsignedLuminance, mask, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
+		return mask;
+	}
 }

@@ -9,6 +9,7 @@
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 #include "Instrumentor.h"
+#include <limits>
 
 namespace tin {
 	std::vector<double>* TinEye::linearizationLUT = nullptr;
@@ -122,20 +123,36 @@ namespace tin {
 		return passes;
 	}
 
-	bool TinEye::textboxSizeCheck(Media& image, const Textbox& textbox) {
+	bool TinEye::textboxSizeCheck(Media& image, Textbox& textbox) {
 		PROFILE_FUNCTION();
 		bool pass = true;
 		cv::Rect boxRect = textbox.getRect();
 
 		ResultType type = ResultType::PASS;
 
+		//Calculate height and width precisely
+		cv::Mat textMask = textbox.getTextMask();
+		std::vector<cv::Point> nonZero;
+		cv::findNonZero(textMask, nonZero);
+		int minY = std::numeric_limits<int>::max(), 
+			maxY = std::numeric_limits<int>::min(),
+			minX = std::numeric_limits<int>::max(), 
+			maxX = std::numeric_limits<int>::min();
+		for (const auto& point : nonZero) {
+			minY = std::min(point.y, minY);
+			minX = std::min(point.x, minX);
+			maxY = std::max(point.y, maxY);
+			maxX = std::max(point.x, maxX);
+		}
+
 		if (config->getAppSettings()->textRecognitionActive()) {
 			//Recognize word in region
 			std::string recognitionResult;
 			recognitionResult = textRecognition.recognize(textbox.getSubmatrix());
 
+			int width = maxX - minX;
 			//Avoids division by zero
-			int averageWidth = (recognitionResult.size() > 0) ? boxRect.width / recognitionResult.size() : -1;
+			int averageWidth = (recognitionResult.size() > 0) ? width / recognitionResult.size() : -1;
 
 			//Check average width
 			if (averageWidth == -1) {
@@ -149,10 +166,13 @@ namespace tin {
 			}
 		}
 
-
 		//Check height
 		int minimumHeight = config->getGuideline()->getHeightRequirement();
-		if (boxRect.height < minimumHeight) {
+		int height = maxY - minY;
+		if (height < boxRect.height) {
+			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at" << boxRect.x << ", " << boxRect.y << std::endl;
+		}
+		if (height < minimumHeight) {
 			pass = false;
 			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height " 
 				<< minimumHeight << ", detected height : " << boxRect.height << std::endl;
@@ -218,18 +238,15 @@ namespace tin {
 		return imagePasses;
 	}
 
-	bool TinEye::textboxContrastCheck(Media& image, const Textbox& box) {
+	bool TinEye::textboxContrastCheck(Media& image, Textbox & box) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = box.getRect();
 
 		//Contrast checking with thresholds
-		cv::Mat luminanceRegion = box.getLuminanceMap();
 		cv::Mat maskA, maskB;
+		cv::Mat luminanceRegion = box.getLuminanceMap();
+		maskA = box.getTextMask();
 
-		//OTSU threshold automatically calculates best fitting threshold values
-		cv::Mat unsignedLuminance;
-		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
-		cv::threshold(unsignedLuminance, maskA, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
 		//Dilate and then substract maskA to get the outline of the mask
 		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
 		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
@@ -240,7 +257,7 @@ namespace tin {
 
 #ifdef _DEBUG
 		if (config->getAppSettings()->saveLuminanceMasks()) {
-			image.saveOutputData(unsignedLuminance, "lum.png");
+			image.saveOutputData(luminanceRegion, "lum.png");
 			image.saveOutputData(maskA, "mask.png");
 			image.saveOutputData(maskB, "outlineMask.png");
 		}

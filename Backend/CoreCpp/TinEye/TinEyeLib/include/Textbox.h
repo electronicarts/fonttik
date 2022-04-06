@@ -10,8 +10,10 @@ namespace tin {
 
 		cv::Mat submatrix;
 		cv::Mat luminanceHistogram;
+		cv::Mat textMask;
 
 		Media* parentImage;
+		cv::Mat calculateTextMask();
 	public:
 		/* Operator method
 		* Returns the percentage of overlap in each axis between two rectangles in relation to the smallest one
@@ -34,5 +36,6 @@ namespace tin {
 		cv::Rect getRect() const { return textboxRect; }
 		cv::Mat getSubmatrix() const { return submatrix; }
 		cv::Mat getLuminanceMap() const { return parentImage->getFrameLuminance()(textboxRect); };
+		cv::Mat getTextMask();
 	};
 }

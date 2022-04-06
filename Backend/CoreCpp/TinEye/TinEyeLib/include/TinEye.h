@@ -15,8 +15,8 @@ namespace tin {
 		TextboxDetection* textboxDetection = nullptr;
 		cv::dnn::TextRecognitionModel textRecognition;
 
-		bool textboxSizeCheck(Media& image, const Textbox& textbox);
-		bool textboxContrastCheck(Media& image, const Textbox& textbox);
+		bool textboxSizeCheck(Media& image, Textbox& textbox);
+		bool textboxContrastCheck(Media& image, Textbox& textbox);
 
 		//Operator method
 		//Calculates the contrast ratio of two given regions of a luminance matrix
