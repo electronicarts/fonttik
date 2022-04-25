@@ -53,6 +53,9 @@ namespace tin {
 		//Highlights box in specified matrix
 		static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness = 1);
 
+		//Puts output value from a resultbox next to itself in image
+		static void putResultBoxValues(cv::Mat& matrix, ResultBox& box, int precision);
+
 		//Calculates the luminance histogram of a region
 		cv::Mat calculateLuminanceHistogram(cv::Rect, cv::Rect ignoreRegion = cv::Rect(0, 0, 0, 0));
 

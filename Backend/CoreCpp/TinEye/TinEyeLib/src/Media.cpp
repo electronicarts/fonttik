@@ -3,6 +3,7 @@
 #include "TinEye.h"
 #include "Video.h"
 #include "Image.h"
+#include <format>
 
 namespace tin {
 	Media* Media::CreateMedia(fs::path path) {
@@ -11,13 +12,13 @@ namespace tin {
 		if (!imgMat.empty()) {
 			media = new Image(path, imgMat);
 		}
-		else{
+		else {
 			cv::VideoCapture capture(path.string());
 			if (capture.isOpened()) {
 				media = new Video(path, capture);
 			}
 		}
-		
+
 		return media;
 	}
 
@@ -53,6 +54,24 @@ namespace tin {
 			cv::line(matrix, cv::Point(x2, y2), cv::Point(x1, y2), color, thickness);
 			cv::line(matrix, cv::Point(x1, y2), cv::Point(x1, y1), color, thickness);
 		}
+	}
+
+	void Media::putResultBoxValues(cv::Mat& matrix, ResultBox& box, int precision) {
+		std::stringstream stream;
+		stream << std::fixed << std::setprecision(precision) << box.value;
+		std::string text = stream.str();
+
+		//Calculate text size
+		int baseline;
+		cv::Size textSize = cv::getTextSize(text, cv::FONT_HERSHEY_PLAIN, 1, 3, &baseline);
+
+		//Check to see if text fits to the right of the textbox, if not, put it to the left
+		cv::Point originPoint = (box.x + box.width + textSize.width < matrix.cols) ?
+			cv::Point(box.x + box.width, box.y + box.height) : cv::Point(box.x - textSize.width, box.y + box.height);
+
+		//Put the text into the image
+		cv::putText(matrix, text, originPoint, cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(), 3);
+		cv::putText(matrix, text, originPoint, cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(255, 255, 255), 1);
 	}
 
 	cv::Mat Media::calculateLuminanceHistogram(cv::Rect rect, cv::Rect ignoreRegion)
