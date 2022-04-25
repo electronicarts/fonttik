@@ -11,7 +11,7 @@ namespace tin {
 		imageMatrix = imgMat;
 	}
 
-	void Image::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName) {
+	void Image::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName, bool saveNumbers) {
 		cv::Mat highlights = imageMatrix.clone();
 
 		for (ResultBox& box : results.back()) {
@@ -20,8 +20,10 @@ namespace tin {
 		}
 
 		//Add measurements after boxes so boxes don't cover the numbers
-		for (ResultBox& box : results.back()) {
-			putResultBoxValues(highlights, box, (fileName == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
+		if (saveNumbers) {
+			for (ResultBox& box : results.back()) {
+				putResultBoxValues(highlights, box, (fileName == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
+			}
 		}
 
 		saveOutputData(highlights, fileName + ".png");

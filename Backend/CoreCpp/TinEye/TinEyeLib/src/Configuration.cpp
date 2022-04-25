@@ -50,7 +50,7 @@ namespace tin {
 
 				appSettings = AppSettings(settings["saveLuminanceMap"], settings["saveTextboxOutline"],
 					settings["saveSeparateTexboxes"], settings["saveHistograms"], settings["saveRawTextboxOutline"],
-					settings["saveLuminanceMasks"], settings["useTextRecognition"],
+					settings["saveLuminanceMasks"], settings["useTextRecognition"], settings["printValuesOnResults"],
 					settings["resultsPath"], settings["debugInfoPath"]);
 				if (!focus.empty()) {
 					appSettings.setFocusMask(focus, ignore);
@@ -119,7 +119,7 @@ namespace tin {
 	void Configuration::setDefaultAppSettings() {
 
 		appSettings = AppSettings(true, true, false, false, false, true, true,
-			"./", "./debugInfo");
+			true, "./", "./debugInfo");
 	}
 
 	void Configuration::setDefaultTextDetectionParams() {

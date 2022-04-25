@@ -9,6 +9,7 @@
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
     "useTextRecognition": true,
+    "printValuesOnResults": true,
     "focusMask": [
       {
         "x": 0,

@@ -3,7 +3,6 @@
 #include "TinEye.h"
 #include "Video.h"
 #include "Image.h"
-#include <format>
 
 namespace tin {
 	Media* Media::CreateMedia(fs::path path) {
