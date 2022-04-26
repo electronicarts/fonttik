@@ -9,7 +9,7 @@
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
     "useTextRecognition": true,
-    "printValuesOnResults": true,
+    "printValuesOnResults": false,
     "focusMask": [
       {
         "x": 0,
@@ -67,8 +67,8 @@
         "height": 28
       },
       "2160": {
-        "width": 14,
-        "height": 92
+        "width": 10,
+        "height": 52
       }
     }
   },

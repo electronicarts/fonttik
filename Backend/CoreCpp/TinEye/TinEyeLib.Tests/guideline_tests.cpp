@@ -27,8 +27,8 @@ namespace tin {
 		Guideline* guideline = cfg.getGuideline();
 		guideline->setActiveResolution(2160);
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
-		ASSERT_EQ(guideline->getWidthRequirement(), 14);
-		ASSERT_EQ(guideline->getHeightRequirement(), 92);
+		ASSERT_EQ(guideline->getWidthRequirement(), 10);
+		ASSERT_EQ(guideline->getHeightRequirement(), 52);
 	}
 
 	TEST(GuidelineTests, missing_resolution) {
