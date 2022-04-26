@@ -27,9 +27,10 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
 
 		//if specified in config, save outlines for both size and contrast
-		if (config.getAppSettings()->saveTexboxOutline()) {
-			media->saveResultsOutlines(results->contrastResults, "contrastChecks");
-			media->saveResultsOutlines(results->sizeResults, "sizeChecks");
+		tin::AppSettings* appSettings = config.getAppSettings();
+		if (appSettings->saveTexboxOutline()) {
+			media->saveResultsOutlines(results->contrastResults, "contrastChecks", appSettings->printValuesOnResults());
+			media->saveResultsOutlines(results->sizeResults, "sizeChecks", appSettings->printValuesOnResults());
 		}
 
 		delete media;

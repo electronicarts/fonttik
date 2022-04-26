@@ -134,9 +134,9 @@ namespace tin {
 		cv::Mat textMask = textbox.getTextMask();
 		std::vector<cv::Point> nonZero;
 		cv::findNonZero(textMask, nonZero);
-		int minY = std::numeric_limits<int>::max(), 
+		int minY = std::numeric_limits<int>::max(),
 			maxY = std::numeric_limits<int>::min(),
-			minX = std::numeric_limits<int>::max(), 
+			minX = std::numeric_limits<int>::max(),
 			maxX = std::numeric_limits<int>::min();
 		for (const auto& point : nonZero) {
 			minY = std::min(point.y, minY);
@@ -174,13 +174,13 @@ namespace tin {
 		}
 		if (height < minimumHeight) {
 			pass = false;
-			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height " 
+			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
 				<< minimumHeight << ", detected height : " << boxRect.height << std::endl;
 		}
 
 		type = (pass) ? type : ResultType::FAIL;
 		Results* testResults = image.getResultsPointer();
-		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height));
+		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, height));
 		testResults->overallSizePass = testResults->overallSizePass && pass;
 
 		return pass;
@@ -238,7 +238,7 @@ namespace tin {
 		return imagePasses;
 	}
 
-	bool TinEye::textboxContrastCheck(Media& image, Textbox & box) {
+	bool TinEye::textboxContrastCheck(Media& image, Textbox& box) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = box.getRect();
 
@@ -274,7 +274,7 @@ namespace tin {
 
 		ResultType type = (boxPasses) ? ResultType::PASS : ResultType::FAIL;
 		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height));
+		testResults->contrastResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
 		testResults->overallContrastPass = testResults->overallContrastPass && boxPasses;
 
 		return boxPasses;

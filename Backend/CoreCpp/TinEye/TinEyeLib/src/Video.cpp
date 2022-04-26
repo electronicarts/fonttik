@@ -33,7 +33,7 @@ namespace tin {
 		}
 	}
 
-	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName) {
+	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName, bool saveNumbers) {
 		//Create output path
 		fs::path outputPath = getOutputPath();
 
@@ -58,6 +58,13 @@ namespace tin {
 			for (ResultBox& box : results[i]) {
 				cv::Scalar color = box.getResultColor();
 				highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
+			}
+
+			//Add measurements after boxes so boxes don't cover the numbers
+			if (saveNumbers) {
+				for (ResultBox& box : results.back()) {
+					putResultBoxValues(frameCopy, box, (fileName == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
+				}
 			}
 
 			//output frame to video

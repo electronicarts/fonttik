@@ -14,9 +14,10 @@ namespace tin {
 	struct ResultBox {
 		ResultType type;
 		int x, y, width, height;
+		double value;
 
-		ResultBox(ResultType type, int x, int y, int w, int h) :
-			type(type), x(x), y(y), width(w), height(h) {}
+		ResultBox(ResultType type, int x, int y, int w, int h, double value) :
+			type(type), x(x), y(y), width(w), height(h), value(value) {}
 
 		cv::Scalar getResultColor() {
 			cv::Scalar color;

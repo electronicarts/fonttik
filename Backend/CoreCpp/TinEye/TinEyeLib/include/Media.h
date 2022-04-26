@@ -30,7 +30,7 @@ namespace tin {
 		virtual bool nextFrame() = 0;
 
 		//Generates outlines for the image's results and saves them
-		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName) = 0;
+		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName, bool saveNumbers = false) = 0;
 
 		//Path of the original image or the video its coming from
 		fs::path getPath() { return path; };
@@ -52,6 +52,9 @@ namespace tin {
 
 		//Highlights box in specified matrix
 		static void highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness = 1);
+
+		//Puts output value from a resultbox next to itself in image
+		static void putResultBoxValues(cv::Mat& matrix, ResultBox& box, int precision);
 
 		//Calculates the luminance histogram of a region
 		cv::Mat calculateLuminanceHistogram(cv::Rect, cv::Rect ignoreRegion = cv::Rect(0, 0, 0, 0));
