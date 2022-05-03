@@ -7,6 +7,7 @@ namespace tin {
 		if (videoCapture.isOpened()) {
 			frameCount = 0;
 			videoCapture >> imageMatrix;
+			previousFrame = imageMatrix;
 		}
 	}
 
@@ -26,6 +27,15 @@ namespace tin {
 		if (videoCapture.isOpened()) {
 			BOOST_LOG_TRIVIAL(trace) << "Processing video frame " << ++frameCount << std::endl;
 			videoCapture >> imageMatrix;
+
+			while (!imageMatrix.empty() && compareFramesSimilarity(imageMatrix)) {
+				//Keep loading new frames until video is over or we find one that is 
+				//sufficiently different from the previously processed one
+				videoCapture >> imageMatrix;
+				++frameCount;
+			}
+
+			previousFrame = imageMatrix;
 			return !imageMatrix.empty();
 		}
 		else {
@@ -72,6 +82,26 @@ namespace tin {
 			i++;
 			videoCapture >> frameMat;
 		}
+	}
+
+	bool Video::compareFramesSimilarity(cv::Mat& mat) {
+		cv::Mat difference, unitaryDifference;
+		cv::absdiff(mat, previousFrame, difference);
+
+		//Convert it to monochannel so we can count zeroes
+		if (difference.type() == CV_8UC3) {
+			cv::cvtColor(difference, difference, cv::COLOR_BGR2GRAY,1);
+		}
+
+		//Get the number of different pixels in the difference
+		int differentCount = cv::countNonZero(difference);
+
+		//If the relative amount of pixels is over a certain threshold, the frames are different
+		if (((double)differentCount)/(difference.rows* difference.cols) > 0.1) {
+			return false;
+		}
+
+		return true;
 	}
 }
 

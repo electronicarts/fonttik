@@ -5,6 +5,8 @@ namespace tin {
 	class Video : public Media {
 		cv::VideoCapture videoCapture;
 
+		cv::Mat previousFrame;
+
 		int frameCount = 0;
 	public:
 		Video(fs::path path, cv::VideoCapture capture);
@@ -13,5 +15,12 @@ namespace tin {
 		virtual bool nextFrame() override;
 
 		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName, bool saveNumbers) override;
+
+		/// <summary>
+		/// Compares the given image matrix to the video's previousFrame.
+		/// </summary>
+		/// <param name="mat">Matrix to be compared two</param>
+		/// <returns>True in case they are similar, false otherwise</returns>
+		bool compareFramesSimilarity(cv::Mat& mat);
 	};
 }
