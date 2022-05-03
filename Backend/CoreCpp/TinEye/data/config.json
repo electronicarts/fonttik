@@ -65,7 +65,7 @@
       },
       "1080": {
         "width": 4,
-        "height": 26
+        "height": 28
       },
       "2160": {
         "width": 10,
@@ -75,7 +75,7 @@
     "resolutionsRecommendations":{
       "1080": {
         "width": 4,
-        "height": 28
+        "height": 30
       }
     }
   },
