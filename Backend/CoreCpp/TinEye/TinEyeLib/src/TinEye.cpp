@@ -175,13 +175,13 @@ namespace tin {
 		int minimumHeight = config->getGuideline()->getHeightRequirement();
 		int height = maxY - minY;
 		if (height < boxRect.height) {
-			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at" << boxRect.x << ", " << boxRect.y << std::endl;
+			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at " << boxRect.x << ", " << boxRect.y << std::endl;
 		}
 		if (height < minimumHeight) {
 			pass = false;
 			type = ResultType::FAIL;
 			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
-				<< minimumHeight << ", detected height : " << boxRect.height << std::endl;
+				<< minimumHeight << ", detected height: " << height << std::endl;
 		}
 		else if (height < config->getGuideline()->getHeightRecommendation() && pass) {
 			//Check for recommended guidelines
