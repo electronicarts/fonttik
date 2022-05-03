@@ -3,14 +3,18 @@
 #include "Media.h"
 #include "Textbox.h"
 #include <gtest/gtest.h>
+#include <boost/log/utility/setup/file.hpp>
 
 namespace fs = std::filesystem;
+namespace logging = boost::log;
+typedef logging::sinks::synchronous_sink<logging::sinks::text_file_backend> sink_t;
 
 namespace tin {
 	class Configuration;
 	class TextboxDetection;
 
 	class TinEye {
+		boost::shared_ptr<sink_t> logSink;
 		Configuration* config = nullptr;
 		TextboxDetection* textboxDetection = nullptr;
 		cv::dnn::TextRecognitionModel textRecognition;

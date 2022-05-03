@@ -14,6 +14,7 @@ namespace tin {
 			dbgSaveRawTextboxOutline = false,
 			dbgSaveLuminanceMasks = false,
 			useTextRecognition = false,
+			dbgSaveLogs = false,
 			printResultValues = false;
 		fs::path resultsPath = "./", debugInfoPath = "./debug/";
 
@@ -25,11 +26,11 @@ namespace tin {
 	public:
 		AppSettings() {};
 		AppSettings(bool saveLum, bool saveTextbox, bool saveSeparateTexbox, bool saveHist, bool saveRawTextbox, bool saveLumMasks,
-			bool textRecognition, bool valuesOnResults, fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
+			bool textRecognition, bool valuesOnResults,bool logs, fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
 			dbgSaveTexboxOutline(saveTextbox), dbgSaveRawTextboxOutline(saveRawTextbox),
 			dbgSaveSeparateTextboxes(saveSeparateTexbox), dbgSaveHistograms(saveHist),
 			dbgSaveLuminanceMasks(saveLumMasks), useTextRecognition(textRecognition),
-			printResultValues(valuesOnResults),
+			printResultValues(valuesOnResults),dbgSaveLogs(logs),
 			resultsPath(resultsPath), debugInfoPath(dbgInfoPath) {}
 
 		//AppSettigs
@@ -40,6 +41,7 @@ namespace tin {
 		bool saveHistograms() const { return dbgSaveHistograms; }
 		bool saveRawTexboxOutline() const { return dbgSaveRawTextboxOutline; }
 		bool textRecognitionActive() const { return useTextRecognition; }
+		bool saveLogs() const { return dbgSaveLogs; }
 		bool printValuesOnResults() const { return printResultValues; }
 		fs::path getResultsPath() const { return resultsPath; }
 		fs::path getDebugInfoPath() const { return debugInfoPath; }
