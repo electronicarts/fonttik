@@ -23,7 +23,6 @@ namespace tin {
 
 		Textbox(const std::vector<cv::Point >& points, int padding = 0);
 		Textbox(cv::Rect rect);
-
 		//Sets textbox's parent image and calculates its submatrix
 		void setParentMedia(Media* media);
 

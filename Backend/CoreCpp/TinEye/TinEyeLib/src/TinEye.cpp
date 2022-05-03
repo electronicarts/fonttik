@@ -11,10 +11,32 @@
 #include "Instrumentor.h"
 #include <limits>
 
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/utility/setup/file.hpp>
+
 namespace tin {
 	std::vector<double>* TinEye::linearizationLUT = nullptr;
 
 	Results* TinEye::processMedia(Media& media) {
+		//Save the logs or output through console
+		if (config->getAppSettings()->saveLogs()) {
+			if (logSink) {
+				logging::core::get()->remove_sink(logSink);
+			}
+			logSink = boost::log::add_file_log(media.getPath().stem().string() + ".txt");
+
+			boost::log::core::get()->set_filter
+			(
+				boost::log::trivial::severity >= boost::log::trivial::info
+			);
+		}
+		else {
+			if (logSink) {
+				logging::core::get()->remove_sink(logSink);
+			}
+		}
 		do {
 			//Check if image has text recognized by OCR
 			applyFocusMask(media);
