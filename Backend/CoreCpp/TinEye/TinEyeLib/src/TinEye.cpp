@@ -184,8 +184,12 @@ namespace tin {
 			}
 			else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
 				pass = false;
+				type = ResultType::FAIL;
 				BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
 					" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
+			}
+			else if (averageWidth < config->getGuideline()->getWidthRecommendation()) {
+				type = ResultType::WARNING;
 			}
 		}
 
@@ -197,11 +201,15 @@ namespace tin {
 		}
 		if (height < minimumHeight) {
 			pass = false;
+			type = ResultType::FAIL;
 			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
 				<< minimumHeight << ", detected height: " << height << std::endl;
 		}
+		else if (height < config->getGuideline()->getHeightRecommendation() && pass) {
+			//Check for recommended guidelines
+			type = ResultType::WARNING;
+		}
 
-		type = (pass) ? type : ResultType::FAIL;
 		Results* testResults = image.getResultsPointer();
 		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, height));
 		testResults->overallSizePass = testResults->overallSizePass && pass;
@@ -288,14 +296,18 @@ namespace tin {
 
 		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
 
+		ResultType type = ResultType::PASS;
 		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
 
 		if (!boxPasses) {
+			type = ResultType::FAIL;
 			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
 				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
 		}
+		else if(ratio < config->getGuideline()->getContrastRecommendation()) {
+			type = ResultType::WARNING;
+		}
 
-		ResultType type = (boxPasses) ? ResultType::PASS : ResultType::FAIL;
 		Results* testResults = image.getResultsPointer();
 		testResults->contrastResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
 		testResults->overallContrastPass = testResults->overallContrastPass && boxPasses;

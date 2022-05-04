@@ -57,6 +57,7 @@
   },
   "guideline": {
     "contrast": 4.5,
+    "recommendedContrast": 4.5,
     "textBackgroundRadius": 5,
     "resolutions": {
       "720": {
@@ -70,6 +71,12 @@
       "2160": {
         "width": 10,
         "height": 52
+      }
+    },
+    "resolutionsRecommendations":{
+      "1080": {
+        "width": 4,
+        "height": 30
       }
     }
   },

@@ -25,7 +25,15 @@ namespace tin {
 					resolutionGuidelines[atoi(it.key().c_str())] = a;
 				}
 
-				guideline = Guideline(guidelineJson["contrast"], guidelineJson["textBackgroundRadius"], resolutionGuidelines);
+				std::unordered_map<int, ResolutionGuidelines> resolutionRecs;
+				for (auto it = guidelineJson["resolutionsRecommendations"].begin(); it != guidelineJson["resolutionsRecommendations"].end(); ++it)
+				{
+					ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
+					resolutionRecs[atoi(it.key().c_str())] = a;
+				}
+
+				guideline = Guideline(guidelineJson["contrast"], guidelineJson["recommendedContrast"],
+					guidelineJson["textBackgroundRadius"], resolutionGuidelines, resolutionRecs);
 
 			}
 			catch (...) {
@@ -114,7 +122,7 @@ namespace tin {
 		BOOST_LOG_TRIVIAL(error) << "Configuration file not found, falling back to default configuration\n";
 		BOOST_LOG_TRIVIAL(error) << "Contrast ratio: 4.5" << std::endl;
 
-		guideline = Guideline(4.5, 100, { {1080,{4,28}} });
+		guideline = Guideline(4.5, 4.5, 100, { {1080,{4,28}} });
 	}
 
 	void Configuration::setDefaultAppSettings() {

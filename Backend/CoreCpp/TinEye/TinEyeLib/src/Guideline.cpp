@@ -1,9 +1,15 @@
 #include "Guideline.h"
 
 namespace tin {
-	Guideline::Guideline(float contrast, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines) :
+	Guideline::Guideline(float contrast, float contrastRec, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines) :
 		contrastRatio(contrast), textBackgroundRadius(textRadius),
-		resolutionGuidelines(resolutionGuidelines) {}
+		resolutionGuidelines(resolutionGuidelines),
+		contrastRatioRecommendation(contrastRec) {}
+
+	Guideline::Guideline(float contrast, float contrastRec, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines, std::unordered_map<int, ResolutionGuidelines> resolutionRecs) :
+		contrastRatio(contrast), textBackgroundRadius(textRadius),
+		resolutionGuidelines(resolutionGuidelines),
+		contrastRatioRecommendation(contrastRec), resolutionRecommendations(resolutionRecs) {}
 
 	void Guideline::setActiveResolution(int resolution) {
 		auto foundRes = resolutionGuidelines.find(resolution);
@@ -16,6 +22,15 @@ namespace tin {
 		}
 		else {
 			activeResolution = &foundRes->second;
+		}
+
+		//See if there are recommended measurements for this resolution, if not then default to required measurements
+		auto foundRec = resolutionRecommendations.find(resolution);
+		if (foundRec == resolutionRecommendations.end()) {
+			activeRecommendation = activeResolution;
+		}
+		else {
+			activeRecommendation = &foundRec->second;
 		}
 	};
 }
