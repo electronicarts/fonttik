@@ -9,6 +9,7 @@
 
     "nlohmann-json",
     "gtest",
-    "boost-log"
+    "boost-log",
+    "benchmark"
   ]
 }
