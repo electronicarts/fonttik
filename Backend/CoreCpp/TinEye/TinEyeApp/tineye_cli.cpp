@@ -1,12 +1,13 @@
 #include "TinEye.h"
 #include "Configuration.h"
+#include "Media.h"
+
 #include <iostream>
 #include <algorithm>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <filesystem>
 #include <regex>
-#include "Media.h"
 
 namespace fs = std::filesystem;
 
