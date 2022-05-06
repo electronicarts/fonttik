@@ -24,7 +24,7 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 		tin::Results* results = tineye.processMedia(*media);
 
 		std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
+			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;
 
 		//if specified in config, save outlines for both size and contrast
 		tin::AppSettings* appSettings = config.getAppSettings();

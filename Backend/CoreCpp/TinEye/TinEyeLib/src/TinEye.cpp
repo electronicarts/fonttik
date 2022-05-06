@@ -54,6 +54,9 @@ namespace tin {
 			}
 		} while (media.nextFrame());
 
+		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->overallSizePass) ? "PASS" : "FAIL") <<
+			"\tCONTRAST: " << ((media.getResultsPointer()->overallContrastPass) ? "PASS" : "FAIL") << std::endl;
+
 		return media.getResultsPointer();
 	}
 
