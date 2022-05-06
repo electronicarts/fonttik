@@ -25,7 +25,9 @@ namespace tin {
 			if (logSink) {
 				logging::core::get()->remove_sink(logSink);
 			}
-			logSink = boost::log::add_file_log(media.getPath().stem().string() + ".txt");
+			std::string logFile = media.getOutputPath().string();
+			logFile = logFile.substr(0, logFile.length() - 4);
+			logSink = boost::log::add_file_log(media.getOutputPath().string() + "/" + media.getPath().stem().string() + ".txt");
 
 			boost::log::core::get()->set_filter
 			(

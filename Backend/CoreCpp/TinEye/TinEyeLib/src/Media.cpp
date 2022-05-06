@@ -162,16 +162,15 @@ namespace tin {
 		return cv::mean(mat, mask)[0];
 	}
 
-	void Media::saveOutputData(cv::Mat data, std::string name) {
+	void Media::saveOutputData(cv::Mat data, fs::path path) {
 		PROFILE_FUNCTION();
-		fs::path outputPath = getOutputPath();
 
-
-		cv::imwrite((outputPath / name).string(), data);
+		cv::imwrite(path.string(), data);
 	}
 
 	fs::path Media::getOutputPath() {
-		fs::path outputPath = path.parent_path() / (path.filename().string() + "_output");
+		std::string out= path.parent_path().string() +"/" + (path.stem().string() + "_out");
+		fs::path outputPath(out);
 
 		if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {
 			fs::create_directory(outputPath);
