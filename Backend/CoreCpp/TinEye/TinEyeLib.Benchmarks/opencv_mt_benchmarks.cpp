@@ -1,4 +1,4 @@
-#include <benchmark/benchmark.h>
+#include "benchmark/benchmark.h"
 #include "TinEye.h"
 #include "Configuration.h"
 #include "Media.h"
@@ -74,12 +74,8 @@ static void BM_TextRecognition(benchmark::State& state) {
 
 	img = cv::imread("resources/knockout/Knockout1080.bmp", cv::IMREAD_COLOR);
 	for (auto _ : state) {
-		//Calculate needed conversion for new width and height to be multiples of 32
-		////This needs to be multiple of 32
 		textRecognition.recognize(img);
-
 	}
-
 }
 
 BENCHMARK(BM_TextRecognition)->Iterations(5)->Unit(benchmark::kSecond)->ThreadRange(1, 8);

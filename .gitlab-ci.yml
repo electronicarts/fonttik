@@ -69,6 +69,8 @@ build-corecpp:
             - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/AddressSanitizer.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-release/CTestTestfile.cmake
+            - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Benchmarks
+            - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Benchmarks
 #test corecpp project
 test-corecpp:
     stage: test-corecpp
