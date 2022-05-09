@@ -1,3 +1,0 @@
-Naming convention for size texts is: resolution_characterwidthXcharacterheight_...
-
-720p_10x19.png contains a 720p resolution file with a single character, 10px wide and 19px hight.
