@@ -24,13 +24,17 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 		tin::Results* results = tineye.processMedia(*media);
 
 		std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;;
+			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;
 
 		//if specified in config, save outlines for both size and contrast
 		tin::AppSettings* appSettings = config.getAppSettings();
 		if (appSettings->saveTexboxOutline()) {
-			media->saveResultsOutlines(results->contrastResults, "contrastChecks", appSettings->printValuesOnResults());
-			media->saveResultsOutlines(results->sizeResults, "sizeChecks", appSettings->printValuesOnResults());
+			media->saveResultsOutlines(results->contrastResults, 
+				media->getOutputPath() / "contrastChecks",
+				appSettings->printValuesOnResults());
+			media->saveResultsOutlines(results->contrastResults,
+				media->getOutputPath() / "sizeChecks",
+				appSettings->printValuesOnResults());
 		}
 
 		delete media;
@@ -60,9 +64,7 @@ void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& confi
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
-		std::cout << "Usage: \"./tineye_cli media_path/ [options] \n"
-			<< "options:\n"
-			<< "--east: running OCR on regions where EAST finds text";
+		std::cout << "Usage: \"./tineye_cli media_path/ \n";
 		std::cin.get();
 		return 1;
 	}

@@ -30,7 +30,7 @@ namespace tin {
 		virtual bool nextFrame() = 0;
 
 		//Generates outlines for the image's results and saves them
-		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName, bool saveNumbers = false) = 0;
+		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, fs::path path, bool saveNumbers = false) = 0;
 
 		//Path of the original image or the video its coming from
 		fs::path getPath() { return path; };
@@ -70,7 +70,7 @@ namespace tin {
 		static void saveHistogramCSV(cv::Mat histogram, std::string filename);
 
 		//Saves the data in the image sub folder
-		void saveOutputData(cv::Mat data, std::string name);
+		void saveOutputData(cv::Mat data, fs::path path);
 
 		//Returns output path and if it doesn't exist creates it
 		fs::path getOutputPath();

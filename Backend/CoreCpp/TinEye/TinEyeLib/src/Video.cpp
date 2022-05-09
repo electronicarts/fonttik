@@ -43,7 +43,7 @@ namespace tin {
 		}
 	}
 
-	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, std::string fileName, bool saveNumbers) {
+	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, fs::path path, bool saveNumbers) {
 		//Create output path
 		fs::path outputPath = getOutputPath();
 
@@ -54,7 +54,7 @@ namespace tin {
 		cv::Size size = cv::Size((int)videoCapture.get(cv::CAP_PROP_FRAME_WIDTH), (int)videoCapture.get(cv::CAP_PROP_FRAME_HEIGHT));
 
 		//Create output video
-		cv::VideoWriter outputVideo((outputPath / (fileName + ".mp4")).string(), videoCapture.get(cv::CAP_PROP_FOURCC),
+		cv::VideoWriter outputVideo(path.string() + ".mp4", videoCapture.get(cv::CAP_PROP_FOURCC),
 			videoCapture.get(cv::CAP_PROP_FRAME_COUNT), size, true);
 
 		//Iterate through every video frame and result, if either is empty exit
@@ -73,7 +73,7 @@ namespace tin {
 			//Add measurements after boxes so boxes don't cover the numbers
 			if (saveNumbers) {
 				for (ResultBox& box : results.back()) {
-					putResultBoxValues(frameCopy, box, (fileName == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
+					putResultBoxValues(frameCopy, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
 				}
 			}
 
