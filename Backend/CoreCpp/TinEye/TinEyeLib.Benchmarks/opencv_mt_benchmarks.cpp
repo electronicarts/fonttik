@@ -108,7 +108,116 @@ static void BM_TextRecognition_Iter(benchmark::State& state) {
 	}
 }
 
-BENCHMARK(BM_TextRecognition_Iter)->UseRealTime()->Range(8, 8*8*8)->Unit(benchmark::kSecond)->ThreadRange(1, 8);
+//BENCHMARK(BM_TextRecognition_Iter)->UseRealTime()->Range(8, 8*8*8)->Unit(benchmark::kSecond)->ThreadRange(1, 8);
 
+static int divideImage(const cv::Mat& img, const int blockWidth, const int blockHeight, std::vector<cv::Mat>& blocks)
+
+{
+
+	// Checking if the image was passed correctly
+
+	if (!img.data || img.empty())
+
+	{
+
+		std::wcout << "Image Error: Cannot load image to divide." << std::endl;
+
+		return EXIT_FAILURE;
+
+	}
+
+
+	// init image dimensions
+
+	int imgWidth = img.cols;
+
+	int imgHeight = img.rows;
+
+
+
+	// init block dimensions
+
+	int bwSize;
+
+	int bhSize;
+
+
+	int y0 = 0;
+
+	while (y0 < imgHeight)
+
+	{
+
+		// compute the block height
+
+		bhSize = ((y0 + blockHeight) > imgHeight) * (blockHeight - (y0 + blockHeight - imgHeight)) + ((y0 + blockHeight) <= imgHeight) * blockHeight;
+
+
+		int x0 = 0;
+
+		while (x0 < imgWidth)
+
+		{
+
+			// compute the block height
+
+			bwSize = ((x0 + blockWidth) > imgWidth) * (blockWidth - (x0 + blockWidth - imgWidth)) + ((x0 + blockWidth) <= imgWidth) * blockWidth;
+
+
+			// crop block
+
+			blocks.push_back(img(cv::Rect(x0, y0, bwSize, bhSize)).clone());
+
+
+			// update x-coordinate
+
+			x0 = x0 + blockWidth;
+
+		}
+
+
+		// update y-coordinate
+
+		y0 = y0 + blockHeight;
+
+	}
+
+	return EXIT_SUCCESS;
+
+}
+
+static void BM_TextRecognition_Split(benchmark::State& state) {
+	cv::Mat img;
+	cv::dnn::TextRecognitionModel textRecognition = cv::dnn::TextRecognitionModel("crnn_cs.onnx");
+	textRecognition.setDecodeType("CTC-greedy");
+	std::ifstream vocFile;
+	vocFile.open("alphabet_94.txt");
+	CV_Assert(vocFile.is_open());
+	std::string vocLine;
+	std::vector<std::string> vocabulary;
+	while (std::getline(vocFile, vocLine)) {
+		vocabulary.push_back(vocLine);
+	}
+	textRecognition.setVocabulary(vocabulary);
+
+	// Normalization parameters
+	auto mean = cv::Scalar(127.5, 127.5, 127.5);
+	// The input shape
+	std::pair<int, int> size = { 100,32 };
+	textRecognition.setInputParams(1.0 / 127.5, cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
+
+	img = cv::imread("resources/knockout/Knockout1080.bmp", cv::IMREAD_COLOR);
+	std::vector<cv::Mat> blocks;
+	int w = img.cols / state.range(0);
+	int h = img.rows/ state.range(0);
+	divideImage(img, w, h, blocks);
+	for (auto _ : state) {
+		for (auto& block : blocks) {
+			textRecognition.recognize(block);
+		}
+	}
+}
+
+BENCHMARK(BM_TextRecognition_Split)->UseRealTime()->Range(2,16)->Unit(benchmark::kSecond)->ThreadRange(1, 8);
 
 BENCHMARK_MAIN();
