@@ -136,8 +136,23 @@ profile-tool:
         - echo "Profiling run for TinEye"
         - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
         - ./TinEyeApp resources/knockout/Knockout1080.bmp
-        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Benchmarks
-        - ./TinEyeLibs.Benchmarks
+        - cd ../TinEyeLib.Benchmarks
+        - ./TinEyeLib.Benchmarks
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
+benchmark-tool:
+    stage: test-corecpp
+    image: docker.artifactory.ea.com/gcc:latest
+    only:
+        changes:
+            - "Backend/CoreCpp/TinEye/TinEyeLib.Benchmarks/*" 
+    tags:
+        - docker
+    dependencies:
+        - build-corecpp
+    script:
+        # run the tool
+        - echo "Running TinEye benchmarks"
+        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Benchmarks
+        - ./TinEyeLib.Benchmarks
