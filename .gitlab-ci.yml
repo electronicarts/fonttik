@@ -144,9 +144,12 @@ profile-tool:
 benchmark-tool:
     stage: test-corecpp
     image: docker.artifactory.ea.com/gcc:latest
-    # only:
-    #     changes:
-    #         - "Backend/CoreCpp/TinEye/TinEyeLib.Benchmarks/*" 
+    #Right now, the benchmarks are snippets that dont rely on TinEyes real functionality
+    #Once the benchmarks start targetting TinEye code, change this job to run
+    #Every time the library is changed
+    only:
+        changes:
+            - "Backend/CoreCpp/TinEye/TinEyeLib.Benchmarks/*" 
     tags:
         - docker
     dependencies:
