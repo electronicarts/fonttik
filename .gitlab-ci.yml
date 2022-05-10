@@ -127,13 +127,13 @@ test-saddress-corecpp:
 profile-tool:
     stage: test-corecpp
     image: docker.artifactory.ea.com/gcc:latest
-        only:
-        changes:
-            - "Backend/CoreCpp/**/*" 
     tags:
         - docker
     dependencies:
         - build-corecpp
+    only:
+        changes:
+            - "Backend/CoreCpp/**/*" 
     script:
         # run the tool
         - echo "Profiling run for TinEye"
