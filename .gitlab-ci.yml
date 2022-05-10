@@ -127,6 +127,9 @@ test-saddress-corecpp:
 profile-tool:
     stage: test-corecpp
     image: docker.artifactory.ea.com/gcc:latest
+        only:
+        changes:
+            - "Backend/CoreCpp/**/*" 
     tags:
         - docker
     dependencies:
@@ -136,8 +139,6 @@ profile-tool:
         - echo "Profiling run for TinEye"
         - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
         - ./TinEyeApp resources/knockout/Knockout1080.bmp
-        - cd ../TinEyeLib.Benchmarks
-        - ./TinEyeLib.Benchmarks
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
