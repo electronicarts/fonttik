@@ -136,6 +136,8 @@ profile-tool:
         - echo "Profiling run for TinEye"
         - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
         - ./TinEyeApp resources/knockout/Knockout1080.bmp
+        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLibs.Benchmarks
+        - ./TinEyeLibs.Benchmarks
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
