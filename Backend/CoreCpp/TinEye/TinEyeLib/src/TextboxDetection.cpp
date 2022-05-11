@@ -29,6 +29,9 @@ namespace tin {
 		east->setInputMean(detMean);
 
 		east->setInputSwapRB(true);
+
+		east->setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
+		east->setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 	}
 
 	TextboxDetection::~TextboxDetection() {

@@ -15,6 +15,11 @@ cmake_minimum_required (VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+set(CUDA_ARCH_BIN 5.2)
+set(ENABLE_FAST_MATH ON)
+set(CUDA_FAST_MATH ON)
+set(WITH_CUBLAS ON)
+
 #Enable profiling
 option(PROFILING "Enable profiling" ON)
 

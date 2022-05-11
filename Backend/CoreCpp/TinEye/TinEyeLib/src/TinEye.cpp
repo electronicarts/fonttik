@@ -97,6 +97,9 @@ namespace tin {
 			// The input shape
 			std::pair<int, int> size = recognitionParams->getSize();
 			textRecognition.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
+
+			textRecognition.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
+			textRecognition.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 		}
 	}
 
