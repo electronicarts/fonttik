@@ -19,10 +19,10 @@ namespace tin {
 			configFile >> config;
 			//Guidelines
 			try {
-				guideline.init(config["appSettings"]);
+				guideline.init(config["guideline"]);
 			}
 			catch (...) {
-				BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration guidelines" << std::endl;
 				guideline = Guideline();
 			}
 			//AppSettigns
