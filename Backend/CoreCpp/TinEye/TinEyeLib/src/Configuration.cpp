@@ -18,15 +18,20 @@ namespace tin {
 			json config;
 			configFile >> config;
 			//Guidelines
-			guideline.init(config["guideline"]);
+			try {
+				guideline.init(config["appSettings"]);
+			}
+			catch (...) {
+				BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
+				guideline = Guideline();
+			}
 			//AppSettigns
 			try {
-				json settings = config["appSettings"];
-
 				appSettings.init(config["appSettings"]);
 			}
 			catch (...) {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration appSettings" << std::endl;
+				appSettings = AppSettings();
 			}
 			//Text Detection
 			try {
@@ -34,6 +39,7 @@ namespace tin {
 			}
 			catch (...) {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration text detection params" << std::endl;
+				textDetectionParams = TextDetectionParams();
 			}
 			//text recognition
 			try {
@@ -41,6 +47,7 @@ namespace tin {
 			}
 			catch (...) {
 				BOOST_LOG_TRIVIAL(error) << "Malformed configuration: Text recognition params" << std::endl;
+				textRecognitionParams = TextRecognitionParams();
 			}
 			//RGB lookup tables
 			try {
