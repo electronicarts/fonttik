@@ -3,6 +3,35 @@
 #include <opencv2/imgcodecs.hpp>
 
 namespace tin {
+	void AppSettings::init(nlohmann::json settings) {
+		std::vector<cv::Rect2f> focus;
+		for (auto it = settings["focusMask"].begin(); it != settings["focusMask"].end(); ++it)
+		{
+			focus.push_back(RectFromJson<float>(*it));
+		}
+
+		std::vector<cv::Rect2f> ignore;
+		for (auto it = settings["ignoreMask"].begin(); it != settings["ignoreMask"].end(); ++it)
+		{
+			ignore.push_back(RectFromJson<float>(*it));
+		}
+		if (!focus.empty()) {
+			setFocusMask(focus, ignore);
+		}
+
+		dbgSaveLuminanceMap = settings["saveLuminanceMap"];
+		dbgSaveTexboxOutline = settings["saveTextboxOutline"];
+		dbgSaveRawTextboxOutline = settings["saveSeparateTexboxes"];
+		dbgSaveSeparateTextboxes = settings["saveHistograms"];
+		dbgSaveHistograms = settings["saveRawTextboxOutline"];
+		dbgSaveLuminanceMasks = settings["saveLuminanceMasks"];
+		useTextRecognition = settings["useTextRecognition"];
+		printResultValues = settings["printValuesOnResults"];
+		dbgSaveLogs = settings["saveLogs"];
+		resultsPath = std::string(settings["resultsPath"]);
+		debugInfoPath = std::string(settings["debugInfoPath"]);
+	}
+
 	void AppSettings::setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore) {
 		if (!focus.empty()) {
 			focusMasks = focus;
@@ -34,5 +63,10 @@ namespace tin {
 			subMatrix.setTo(cv::Scalar(0, 0, 0));
 		}
 		return mat;
+	}
+
+	template<typename T>
+	cv::Rect_<T> AppSettings::RectFromJson(nlohmann::json data) {
+		return { data["x"], data["y"], data["w"], data["h"] };
 	}
 }

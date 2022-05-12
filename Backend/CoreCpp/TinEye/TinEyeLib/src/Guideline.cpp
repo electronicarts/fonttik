@@ -1,15 +1,25 @@
 #include "Guideline.h"
 
 namespace tin {
-	Guideline::Guideline(float contrast, float contrastRec, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines) :
-		contrastRatio(contrast), textBackgroundRadius(textRadius),
-		resolutionGuidelines(resolutionGuidelines),
-		contrastRatioRecommendation(contrastRec) {}
+	void Guideline::init(nlohmann::json guidelineJson) {
+		resolutionGuidelines = std::unordered_map<int, ResolutionGuidelines>();
+		for (auto it = guidelineJson["resolutions"].begin(); it != guidelineJson["resolutions"].end(); ++it)
+		{
+			ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
+			resolutionGuidelines[atoi(it.key().c_str())] = a;
+		}
 
-	Guideline::Guideline(float contrast, float contrastRec, int textRadius, std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines, std::unordered_map<int, ResolutionGuidelines> resolutionRecs) :
-		contrastRatio(contrast), textBackgroundRadius(textRadius),
-		resolutionGuidelines(resolutionGuidelines),
-		contrastRatioRecommendation(contrastRec), resolutionRecommendations(resolutionRecs) {}
+		resolutionRecommendations = std::unordered_map<int, ResolutionGuidelines>();
+		for (auto it = guidelineJson["resolutionsRecommendations"].begin(); it != guidelineJson["resolutionsRecommendations"].end(); ++it)
+		{
+			ResolutionGuidelines a(it.value()["width"], it.value()["height"]);
+			resolutionRecommendations[atoi(it.key().c_str())] = a;
+		}
+
+		contrastRatio = guidelineJson["contrast"];
+		contrastRatioRecommendation = guidelineJson["recommendedContrast"];
+		textBackgroundRadius = guidelineJson["textBackgroundRadius"];
+	}
 
 	void Guideline::setActiveResolution(int resolution) {
 		auto foundRes = resolutionGuidelines.find(resolution);

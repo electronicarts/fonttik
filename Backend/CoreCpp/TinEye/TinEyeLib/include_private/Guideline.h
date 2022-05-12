@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <iostream>
 #include <boost/log/trivial.hpp>
+#include <nlohmann/json.hpp>
 
 
 namespace fs = std::filesystem;
@@ -28,12 +29,10 @@ namespace tin {
 		ResolutionGuidelines* activeResolution = nullptr;
 		ResolutionGuidelines* activeRecommendation = nullptr;
 	public:
-		Guideline() {}
-		Guideline(float contrast, float contrastRec, int textRadius,
-			std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines);
-		Guideline(float contrast, float contrastRec, int textRadius, 
-			std::unordered_map<int, ResolutionGuidelines> resolutionGuidelines, 
-			std::unordered_map<int, ResolutionGuidelines> resolutionRecs);
+		Guideline() : contrastRatio(4.5), contrastRatioRecommendation(4.5),
+		textBackgroundRadius(10), resolutionGuidelines({ {1080,{4,28}} }) {}
+
+		void init(nlohmann::json guidelineJson);
 
 		void setActiveResolution(int resolution);
 
