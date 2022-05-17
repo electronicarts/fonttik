@@ -3,7 +3,8 @@
 #include <string>
 #include "Configuration.h"
 #include "Image.h"
-#include "TextboxDetection.h"
+#include "TextboxDetectionEAST.h"
+#include "TextboxRecognitionOpenCV.h"
 #include "boost/log/trivial.hpp"
 #include "Guideline.h"
 #include "AppSettings.h"
@@ -71,7 +72,8 @@ namespace tin {
 		linearizationLUT = config->getRGBLookupTable();
 
 		//Initialize EAST detection
-		textboxDetection = new TextboxDetection(config->getTextDetectionParams());
+		textboxDetection = new TextboxDetectionEAST();
+		textboxDetection->init(config->getTextDetectionParams());
 
 
 		//Initialize text recognition only if text recognition is enabled in config
@@ -80,23 +82,8 @@ namespace tin {
 		if (config->getAppSettings()->textRecognitionActive()) {
 			// Load models weights
 			TextRecognitionParams* recognitionParams = config->getTextRecognitionParams();
-			textRecognition = cv::dnn::TextRecognitionModel(recognitionParams->getRecognitionModel());
-			textRecognition.setDecodeType(recognitionParams->getDecodeType());
-			std::ifstream vocFile;
-			vocFile.open(recognitionParams->getVocabularyFilepath());
-			CV_Assert(vocFile.is_open());
-			std::string vocLine;
-			std::vector<std::string> vocabulary;
-			while (std::getline(vocFile, vocLine)) {
-				vocabulary.push_back(vocLine);
-			}
-			textRecognition.setVocabulary(vocabulary);
-
-			// Normalization parameters
-			auto mean = recognitionParams->getMean();
-			// The input shape
-			std::pair<int, int> size = recognitionParams->getSize();
-			textRecognition.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
+			textboxRecognition = new TextboxRecognitionOpenCV();
+			textboxRecognition->init(recognitionParams);
 		}
 	}
 
@@ -176,7 +163,7 @@ namespace tin {
 		if (config->getAppSettings()->textRecognitionActive()) {
 			//Recognize word in region
 			std::string recognitionResult;
-			recognitionResult = textRecognition.recognize(textbox.getSubmatrix());
+			recognitionResult = textboxRecognition->recognizeBox(textbox);
 
 			int width = maxX - minX;
 			//Avoids division by zero
@@ -339,7 +326,7 @@ namespace tin {
 		PROFILE_FUNCTION();
 		std::pair<float, float> threshold = config->getTextDetectionParams()->getMergeThreshold();
 		if (threshold.first < 1.0 || threshold.second < 1.0) {
-			TextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
+			ITextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
 		}
 	}
 
@@ -409,6 +396,11 @@ namespace tin {
 			delete textboxDetection;
 		}
 		textboxDetection = nullptr;
+
+		if (textboxRecognition != nullptr) {
+			delete textboxRecognition;
+		}
+		textboxRecognition = nullptr;
 
 
 		config = nullptr;
