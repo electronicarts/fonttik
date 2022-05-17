@@ -397,6 +397,11 @@ namespace tin {
 		}
 		textboxDetection = nullptr;
 
+		if (textboxRecognition != nullptr) {
+			delete textboxRecognition;
+		}
+		textboxRecognition = nullptr;
+
 
 		config = nullptr;
 		Instrumentor::Get().EndSession();
