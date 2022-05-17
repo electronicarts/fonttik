@@ -3,7 +3,7 @@
 #include <string>
 #include "Configuration.h"
 #include "Image.h"
-#include "TextboxDetection.h"
+#include "TextboxDetectionEAST.h"
 #include "boost/log/trivial.hpp"
 #include "Guideline.h"
 #include "AppSettings.h"
@@ -71,7 +71,8 @@ namespace tin {
 		linearizationLUT = config->getRGBLookupTable();
 
 		//Initialize EAST detection
-		textboxDetection = new TextboxDetection(config->getTextDetectionParams());
+		textboxDetection = new TextboxDetectionEAST();
+		textboxDetection->init(config->getTextDetectionParams());
 
 
 		//Initialize text recognition only if text recognition is enabled in config
@@ -339,7 +340,7 @@ namespace tin {
 		PROFILE_FUNCTION();
 		std::pair<float, float> threshold = config->getTextDetectionParams()->getMergeThreshold();
 		if (threshold.first < 1.0 || threshold.second < 1.0) {
-			TextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
+			ITextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
 		}
 	}
 
