@@ -12,12 +12,13 @@ typedef logging::sinks::synchronous_sink<logging::sinks::text_file_backend> sink
 namespace tin {
 	class Configuration;
 	class ITextboxDetection;
+	class ITextboxRecognition;
 
 	class TinEye {
 		boost::shared_ptr<sink_t> logSink;
 		Configuration* config = nullptr;
 		ITextboxDetection* textboxDetection = nullptr;
-		cv::dnn::TextRecognitionModel textRecognition;
+		ITextboxRecognition* textboxRecognition = nullptr;
 
 		bool textboxSizeCheck(Media& image, Textbox& textbox);
 		bool textboxContrastCheck(Media& image, Textbox& textbox);
