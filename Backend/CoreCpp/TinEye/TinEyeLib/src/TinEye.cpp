@@ -100,11 +100,11 @@ namespace tin {
 	}
 
 	bool TinEye::fontSizeCheck(Media& image, std::vector<Textbox>& boxes) {
-		sizeChecker->check(image, boxes);
+		return sizeChecker->check(image, boxes);
 	}
 
 	bool TinEye::textContrastCheck(Media& image, std::vector<Textbox>& boxes) {
-		contrastChecker->check(image, boxes);
+		return contrastChecker->check(image, boxes);
 	}
 
 	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {

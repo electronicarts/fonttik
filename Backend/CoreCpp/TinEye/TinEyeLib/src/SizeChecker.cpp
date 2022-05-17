@@ -5,7 +5,7 @@ namespace tin {
 	bool tin::SizeChecker::check(Media& image, std::vector<Textbox>& boxes)
 	{
 		PROFILE_FUNCTION();
-		cv::Mat openCVMat = imgage.getImageMatrix();
+		cv::Mat openCVMat = image.getImageMatrix();
 
 		AppSettings* appSettings = config->getAppSettings();
 		Guideline* guideline = config->getGuideline();
@@ -24,20 +24,20 @@ namespace tin {
 #endif
 
 		//add entry for this image in result struct
-		Results* testResults = img.getResultsPointer();
+		Results* testResults = image.getResultsPointer();
 		testResults->sizeResults.push_back(std::vector<ResultBox>());
 
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
-			box.setParentMedia(&img);
+			box.setParentMedia(&image);
 
-			bool individualPass = textboxSizeCheck(img, box);
+			bool individualPass = textboxSizeCheck(image, box);
 
 			passes = passes && individualPass;
 
 #ifdef _DEBUG
 			if (appSettings->saveSeparateTextboxes()) {
-				img.saveOutputData(box.getSubmatrix(), "textbox_" + std::to_string(counter) + ".png");
+				image.saveOutputData(box.getSubmatrix(), "textbox_" + std::to_string(counter) + ".png");
 			}
 			counter++;
 
@@ -73,7 +73,7 @@ namespace tin {
 		if (config->getAppSettings()->textRecognitionActive()) {
 			//Recognize word in region
 			std::string recognitionResult;
-			recognitionResult = textRecognition.recognize(textbox.getSubmatrix());
+			recognitionResult = textboxRecognition->recognizeBox(textbox);
 
 			int width = maxX - minX;
 			//Avoids division by zero

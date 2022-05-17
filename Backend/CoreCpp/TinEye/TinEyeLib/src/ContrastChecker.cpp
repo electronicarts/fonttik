@@ -59,12 +59,12 @@ namespace tin {
 
 	bool ContrastChecker::textboxContrastCheck(Media& image, Textbox& textbox) {
 		PROFILE_FUNCTION();
-		cv::Rect boxRect = box.getRect();
+		cv::Rect boxRect = textbox.getRect();
 
 		//Contrast checking with thresholds
 		cv::Mat maskA, maskB;
-		cv::Mat luminanceRegion = box.getLuminanceMap();
-		maskA = box.getTextMask();
+		cv::Mat luminanceRegion = textbox.getLuminanceMap();
+		maskA = textbox.getTextMask();
 
 		//Dilate and then substract maskA to get the outline of the mask
 		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
