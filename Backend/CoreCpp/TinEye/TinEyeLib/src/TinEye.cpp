@@ -197,7 +197,6 @@ namespace tin {
 		}
 		textboxDetection = nullptr;
 
-		sizeChecker = nullptr;
 		if (textboxRecognition != nullptr) {
 			delete textboxRecognition;
 		}
@@ -211,6 +210,7 @@ namespace tin {
 		if (sizeChecker != nullptr) {
 			delete sizeChecker;
 		}
+		sizeChecker = nullptr;
 
 		config = nullptr;
 		Instrumentor::Get().EndSession();

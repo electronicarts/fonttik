@@ -21,11 +21,8 @@ namespace tin {
 		ITextboxDetection* textboxDetection = nullptr;
 		ITextboxRecognition* textboxRecognition = nullptr;
 
-		bool textboxSizeCheck(Media& image, Textbox& textbox);
-		bool textboxContrastCheck(Media& image, Textbox& textbox);
-
-		IChecker* contrastChecker;
-		IChecker* sizeChecker;
+		IChecker* contrastChecker = nullptr;
+		IChecker* sizeChecker = nullptr;
 
 		static std::vector<double>* linearizationLUT;
 		static double linearize8bitRGB(const uchar& colorBits);
