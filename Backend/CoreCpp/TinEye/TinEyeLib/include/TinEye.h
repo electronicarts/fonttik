@@ -13,6 +13,7 @@ namespace tin {
 	class Configuration;
 	class ITextboxDetection;
 	class ITextboxRecognition;
+	class IChecker;
 
 	class TinEye {
 		boost::shared_ptr<sink_t> logSink;
@@ -20,12 +21,8 @@ namespace tin {
 		ITextboxDetection* textboxDetection = nullptr;
 		ITextboxRecognition* textboxRecognition = nullptr;
 
-		bool textboxSizeCheck(Media& image, Textbox& textbox);
-		bool textboxContrastCheck(Media& image, Textbox& textbox);
-
-		//Operator method
-		//Calculates the contrast ratio of two given regions of a luminance matrix
-		static double ContrastBetweenRegions(const cv::Mat& luminance, const cv::Mat& maskA, const cv::Mat& maskB);
+		IChecker* contrastChecker = nullptr;
+		IChecker* sizeChecker = nullptr;
 
 		static std::vector<double>* linearizationLUT;
 		static double linearize8bitRGB(const uchar& colorBits);
@@ -51,5 +48,9 @@ namespace tin {
 		//Operator
 		//Calculates the luminance of a given image matrix
 		static cv::Mat calculateLuminance(cv::Mat imageMatrix);
+
+		//Operator method
+		//Calculates the contrast ratio of two given regions of a luminance matrix
+		static double ContrastBetweenRegions(const cv::Mat& luminance, const cv::Mat& maskA, const cv::Mat& maskB);
 	};
 }
