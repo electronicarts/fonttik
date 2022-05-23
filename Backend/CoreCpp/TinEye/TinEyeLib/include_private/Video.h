@@ -8,6 +8,8 @@ namespace tin {
 		cv::Mat previousFrame;
 
 		int frameCount = 0;
+
+		friend class VideoTests;
 	public:
 		Video(fs::path path, cv::VideoCapture capture);
 		virtual ~Video();
@@ -21,6 +23,6 @@ namespace tin {
 		/// </summary>
 		/// <param name="mat">Matrix to be compared two</param>
 		/// <returns>True in case they are similar, false otherwise</returns>
-		bool compareFramesSimilarity(cv::Mat& mat);
+		bool compareFramesSimilarity(cv::Mat& mat1, cv::Mat& mat2);
 	};
 }
