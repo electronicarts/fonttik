@@ -12,7 +12,7 @@ namespace tin {
 		cv::Mat luminanceHistogram;
 		cv::Mat textMask;
 
-		Media* parentImage;
+		Media* parentImage = nullptr;
 		cv::Mat calculateTextMask();
 	public:
 		/* Operator method
@@ -20,11 +20,16 @@ namespace tin {
 		* @return (x axis overlap, y axis overlap)
 		* */
 		static std::pair<float, float> OverlapAxisPercentage(const Textbox& a, const Textbox& b);
+		bool operator==(const Textbox& b) const{
+			return textboxRect == b.textboxRect && parentImage == b.parentImage;
+		}
 
 		Textbox(const std::vector<cv::Point >& points, int padding = 0);
 		Textbox(cv::Rect rect);
 		//Sets textbox's parent image and calculates its submatrix
 		void setParentMedia(Media* media);
+
+		void mergwWith(Textbox& other) { textboxRect = textboxRect | other.getRect(); };
 
 		//Returns and saves the luminance histogram of the specified textbox rect
 		cv::Mat getLuminanceHistogram();

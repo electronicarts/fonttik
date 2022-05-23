@@ -41,5 +41,6 @@ namespace tin {
 		double getDetectionScale() const { return detScale; }
 		std::array<double, 3> getDetectionMean() const { return detMean; }
 		std::pair<float, float> getMergeThreshold() const { return mergeThreshold; }
+		void setMergeThreshold(std::pair<float, float> threshold) { mergeThreshold = threshold; }
 	};
 }
