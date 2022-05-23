@@ -25,7 +25,7 @@ namespace tin {
 					auto overlap = Textbox::OverlapAxisPercentage(*boxIt, *targetIt);
 					if (overlap.first >= mergeThreshold.first && overlap.second >= mergeThreshold.second) {
 						BOOST_LOG_TRIVIAL(info) << boxIt->getRect() << "merges with " << targetIt->getRect() << std::endl;
-						boxIt->mergwWith(*targetIt);
+						boxIt->mergeWith(*targetIt);
 						targetIt = boxes.erase(targetIt);
 					}
 					else {

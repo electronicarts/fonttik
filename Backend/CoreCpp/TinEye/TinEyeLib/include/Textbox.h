@@ -29,7 +29,7 @@ namespace tin {
 		//Sets textbox's parent image and calculates its submatrix
 		void setParentMedia(Media* media);
 
-		void mergwWith(Textbox& other) { textboxRect = textboxRect | other.getRect(); };
+		void mergeWith(Textbox& other) { textboxRect = textboxRect | other.getRect(); };
 
 		//Returns and saves the luminance histogram of the specified textbox rect
 		cv::Mat getLuminanceHistogram();

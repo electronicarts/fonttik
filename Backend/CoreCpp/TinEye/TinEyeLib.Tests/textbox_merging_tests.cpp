@@ -53,7 +53,7 @@ namespace tin {
 	TEST(MergeTests, Separate_Merge) {
 		Textbox a({ 0, 0, 2, 2 }),
 			b({ 2, 2, 2, 2 });
-		a.mergwWith(b);
+		a.mergeWith(b);
 		ASSERT_EQ(a.getRect(), cv::Rect(0, 0, 4, 4));
 	}
 
@@ -62,7 +62,7 @@ namespace tin {
 		Textbox a1({ 0, 0, 2, 2 }),
 			a2({ 0, 0, 2, 2 }),
 			b({ 0, 0, 1, 1 });
-		a1.mergwWith(b);
+		a1.mergeWith(b);
 		ASSERT_EQ(a2.getRect(), a1.getRect());
 	}
 
@@ -71,8 +71,8 @@ namespace tin {
 			b1({ 4, 4, 2, 2 });
 		Textbox a2({ 0, 0, 2, 2 }),
 			b2({ 4, 4, 2, 2 });
-		a1.mergwWith(b1);
-		b2.mergwWith(a2);
+		a1.mergeWith(b1);
+		b2.mergeWith(a2);
 		ASSERT_EQ(a1.getRect(), b2.getRect());
 	}
 
