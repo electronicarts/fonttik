@@ -11,7 +11,7 @@ namespace tin {
 			config = Configuration("config.json");
 			tineye.init(&config);
 
-			image = Media::CreateMedia("resources/bf2042/chat_window_closed.png");
+			image = Media::CreateMedia("unit_test/luminance/chat_window_closed.png");
 
 		}
 
