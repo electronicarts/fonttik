@@ -1,6 +1,7 @@
 #include "AppSettings.h"
 #include <tuple>
 #include <opencv2/imgcodecs.hpp>
+#include "Video.h"
 
 namespace tin {
 	void AppSettings::init(nlohmann::json settings) {
@@ -30,6 +31,9 @@ namespace tin {
 		dbgSaveLogs = settings["saveLogs"];
 		resultsPath = std::string(settings["resultsPath"]);
 		debugInfoPath = std::string(settings["debugInfoPath"]);
+
+		int framesToSkip = settings["videoFramesToSkip"];
+		Video::setFramesToSkip(framesToSkip);
 	}
 
 	void AppSettings::setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore) {

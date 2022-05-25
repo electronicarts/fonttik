@@ -11,6 +11,7 @@
     "useTextRecognition": true,
     "saveLogs":true,
     "printValuesOnResults": false,
+    "videoFramesToSkip": 5,
     "focusMask": [
       {
         "x": 0,

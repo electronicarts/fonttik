@@ -2,6 +2,8 @@
 #include "boost/log/trivial.hpp"
 
 namespace tin {
+	int Video::framesToSkip = 0;
+
 	Video::Video(fs::path filePath, cv::VideoCapture capture) : Media(filePath), videoCapture(capture)
 	{
 		if (videoCapture.isOpened()) {
@@ -25,15 +27,22 @@ namespace tin {
 		luminanceMap.release();
 
 		if (videoCapture.isOpened()) {
-			BOOST_LOG_TRIVIAL(trace) << "Processing video frame " << ++frameCount << std::endl;
 			videoCapture >> imageMatrix;
+
+			for (int i = 0; i < framesToSkip && !imageMatrix.empty(); i++) {
+				//Skip the amount of frames specified by configuration
+				videoCapture >> imageMatrix;
+				frameCount++;
+			}
 
 			while (!imageMatrix.empty() && compareFramesSimilarity(previousFrame, imageMatrix)) {
 				//Keep loading new frames until video is over or we find one that is 
 				//sufficiently different from the previously processed one
 				videoCapture >> imageMatrix;
-				++frameCount;
+				frameCount++;
 			}
+
+			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
 			return !imageMatrix.empty();
@@ -102,6 +111,11 @@ namespace tin {
 		}
 
 		return true;
+	}
+
+	void Video::setFramesToSkip(int numberOfFrames)
+	{
+		framesToSkip = numberOfFrames;
 	}
 }
 

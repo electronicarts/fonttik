@@ -8,6 +8,7 @@ namespace tin {
 		cv::Mat previousFrame;
 
 		int frameCount = 0;
+		static int framesToSkip;
 
 		friend class VideoTests;
 	public:
@@ -24,5 +25,8 @@ namespace tin {
 		/// <param name="mat">Matrix to be compared two</param>
 		/// <returns>True in case they are similar, false otherwise</returns>
 		bool compareFramesSimilarity(cv::Mat& mat1, cv::Mat& mat2);
+
+		//Sets how many frames should video processing skip between each frame analyzed
+		static void setFramesToSkip(int numberOfFrames);
 	};
 }
