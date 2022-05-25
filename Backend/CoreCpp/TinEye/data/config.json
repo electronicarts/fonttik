@@ -9,9 +9,9 @@
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
     "useTextRecognition": true,
-    "useDPI":true,
-    "targetResolution":1080,
-    "targetDPI":200,
+    "useDPI":false,
+    "targetResolution":0,
+    "targetDPI":0,
     "saveLogs":true,
     "printValuesOnResults": false,
     "focusMask": [
