@@ -34,7 +34,7 @@ namespace tin {
 
 	TEST_F(CorrectConfiguration, 720_legal_guidelines) {
 		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveResolution(720);
+		guideline->setActiveGuideline(720);
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 19);
@@ -42,7 +42,7 @@ namespace tin {
 
 	TEST_F(CorrectConfiguration, 1080_legal_guidelines) {
 		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveResolution(1080);
+		guideline->setActiveGuideline(1080);
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 28);
@@ -50,7 +50,7 @@ namespace tin {
 
 	TEST_F(CorrectConfiguration, 2160_legal_guidelines) {
 		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveResolution(2160);
+		guideline->setActiveGuideline(2160);
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 10);
 		ASSERT_EQ(guideline->getHeightRequirement(), 52);
@@ -58,7 +58,7 @@ namespace tin {
 
 	TEST_F(CorrectConfiguration, missing_resolution) {
 		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveResolution(1);
+		guideline->setActiveGuideline(1);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 28);
 	}
@@ -66,7 +66,7 @@ namespace tin {
 	//Builds with hard-coded values and doesnt throw exceptions
 	TEST_F(MissingConfiguration, default_guideline) {
 		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveResolution(1080);
+		guideline->setActiveGuideline(1080);
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 28);
@@ -98,7 +98,7 @@ namespace tin {
 
 	TEST_F(MalformedConfiguration, default_guideline) {
 		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveResolution(1080);
+		guideline->setActiveGuideline(1080);
 		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 28);

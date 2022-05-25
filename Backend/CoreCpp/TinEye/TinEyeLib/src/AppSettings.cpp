@@ -30,6 +30,9 @@ namespace tin {
 		dbgSaveLogs = settings["saveLogs"];
 		resultsPath = std::string(settings["resultsPath"]);
 		debugInfoPath = std::string(settings["debugInfoPath"]);
+		useDPI = settings["useDPI"];
+		targetDPI = settings["targetDPI"];
+		targetResolution = settings["targetResolution"];
 	}
 
 	void AppSettings::setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore) {
@@ -63,6 +66,10 @@ namespace tin {
 			subMatrix.setTo(cv::Scalar(0, 0, 0));
 		}
 		return mat;
+	}
+
+	int AppSettings::getSpecifiedSize() const {
+		return (useDPI) ? targetDPI : targetResolution;
 	}
 
 	template<typename T>

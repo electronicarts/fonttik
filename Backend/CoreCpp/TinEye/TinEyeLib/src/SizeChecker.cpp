@@ -15,7 +15,9 @@ namespace tin {
 			return false;
 		}
 
-		guideline->setActiveResolution(openCVMat.rows);
+		int activeSize = appSettings->getSpecifiedSize();
+		guideline->setDPI(appSettings->usingDPI());
+		guideline->setActiveGuideline((activeSize != 0) ? activeSize : openCVMat.rows);
 
 		bool passes = true;
 
