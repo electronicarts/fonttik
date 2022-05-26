@@ -74,6 +74,7 @@ namespace tin {
 
 	TEST_F(DPIConfiguration, correct_dpi_calc) {
 		Guideline* guideline = cfg.getGuideline();
+		guideline->setDPI(cfg.getAppSettings()->usingDPI());
 		int dpis[5] = { 100,200,400,636,570 };
 		for (const auto& dpi : dpis) {
 			guideline->setActiveGuideline(dpi);
