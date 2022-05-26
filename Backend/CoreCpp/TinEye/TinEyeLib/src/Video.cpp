@@ -2,12 +2,16 @@
 #include "boost/log/trivial.hpp"
 
 namespace tin {
+	int Video::framesToSkip = 0;
+
 	Video::Video(fs::path filePath, cv::VideoCapture capture) : Media(filePath), videoCapture(capture)
 	{
 		if (videoCapture.isOpened()) {
 			frameCount = 0;
 			videoCapture >> imageMatrix;
 			previousFrame = imageMatrix;
+
+			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << 0 << std::endl;
 		}
 	}
 
@@ -25,15 +29,22 @@ namespace tin {
 		luminanceMap.release();
 
 		if (videoCapture.isOpened()) {
-			BOOST_LOG_TRIVIAL(trace) << "Processing video frame " << ++frameCount << std::endl;
 			videoCapture >> imageMatrix;
+
+			for (int i = 0; i < framesToSkip && !imageMatrix.empty(); i++) {
+				//Skip the amount of frames specified by configuration
+				videoCapture >> imageMatrix;
+				frameCount++;
+			}
 
 			while (!imageMatrix.empty() && compareFramesSimilarity(previousFrame, imageMatrix)) {
 				//Keep loading new frames until video is over or we find one that is 
 				//sufficiently different from the previously processed one
 				videoCapture >> imageMatrix;
-				++frameCount;
+				frameCount++;
 			}
+
+			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
 			return !imageMatrix.empty();
@@ -43,7 +54,7 @@ namespace tin {
 		}
 	}
 
-	void Video::saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, fs::path path, bool saveNumbers) {
+	void Video::saveResultsOutlines(std::vector<std::pair<int, std::vector<ResultBox>>>& results, fs::path path, bool saveNumbers) {
 		//Create output path
 		fs::path outputPath = getOutputPath();
 
@@ -55,32 +66,40 @@ namespace tin {
 
 		//Create output video
 		cv::VideoWriter outputVideo(path.string() + ".mp4", videoCapture.get(cv::CAP_PROP_FOURCC),
-			videoCapture.get(cv::CAP_PROP_FRAME_COUNT), size, true);
+			videoCapture.get(cv::CAP_PROP_FPS), size, true);
 
-		//Iterate through every video frame and result, if either is empty exit
-		int i = 0;
+		//Iterate through every video frame
+		//If specific result is not available for that frame, reuse previous result
+		int resultIndex = 0, frameIndex = 0;
 		cv::Mat frameMat, frameCopy;
 		videoCapture >> frameMat;
-		while (!frameMat.empty() && i < results.size()) {
+		while (!frameMat.empty()) {
 			//clone frame for editing
 			frameCopy = frameMat.clone();
 
-			for (ResultBox& box : results[i]) {
+			for (ResultBox& box : results[resultIndex].second) {
 				cv::Scalar color = box.getResultColor();
 				highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
 			}
 
 			//Add measurements after boxes so boxes don't cover the numbers
 			if (saveNumbers) {
-				for (ResultBox& box : results.back()) {
+				for (ResultBox& box : results[resultIndex].second) {
 					putResultBoxValues(frameCopy, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
 				}
 			}
 
-			//output frame to video
+			//output frame to result video
 			outputVideo << frameCopy;
-			i++;
+
+			//get next frame
+			frameIndex++;
 			videoCapture >> frameMat;
+
+			// if new frame loaded corresponds to next available result then get next result index
+			if (resultIndex + 1 < results.size() && frameIndex == results[resultIndex + 1].first ) {
+				resultIndex++;
+			}
 		}
 	}
 
@@ -102,6 +121,11 @@ namespace tin {
 		}
 
 		return true;
+	}
+
+	void Video::setFramesToSkip(int numberOfFrames)
+	{
+		framesToSkip = numberOfFrames;
 	}
 }
 

@@ -1,6 +1,7 @@
 #include "AppSettings.h"
 #include <tuple>
 #include <opencv2/imgcodecs.hpp>
+#include "Video.h"
 
 namespace tin {
 	void AppSettings::init(nlohmann::json settings) {
@@ -33,6 +34,9 @@ namespace tin {
 		useDPI = settings["useDPI"];
 		targetDPI = settings["targetDPI"];
 		targetResolution = settings["targetResolution"];
+
+		int framesToSkip = settings["videoFramesToSkip"];
+		Video::setFramesToSkip(framesToSkip);
 	}
 
 	void AppSettings::setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore) {

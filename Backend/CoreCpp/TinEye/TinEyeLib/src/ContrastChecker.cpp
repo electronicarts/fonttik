@@ -28,7 +28,7 @@ namespace tin {
 
 		//add entry for this image in result struct
 		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.push_back(std::vector<ResultBox>());
+		testResults->contrastResults.push_back({ image.getFrameCount(), std::vector<ResultBox>()});
 
 		for (Textbox box : boxes) {
 
@@ -97,7 +97,7 @@ namespace tin {
 		}
 
 		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
+		testResults->contrastResults.back().second.push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
 		testResults->overallContrastPass = testResults->overallContrastPass && boxPasses;
 
 		return boxPasses;

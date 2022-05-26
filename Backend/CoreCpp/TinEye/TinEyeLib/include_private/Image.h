@@ -17,6 +17,6 @@ namespace tin {
 
 		virtual bool nextFrame() override { return false; }
 
-		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, fs::path path, bool saveNumbers) override;
+		virtual void saveResultsOutlines(std::vector<std::pair<int, std::vector<ResultBox>>>& results, fs::path path, bool saveNumbers) override;
 	};
 }
