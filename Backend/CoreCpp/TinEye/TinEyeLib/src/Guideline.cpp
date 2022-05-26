@@ -15,14 +15,8 @@ namespace tin {
 			SizeGuidelines a(it.value()["width"], it.value()["height"]);
 			resolutionRecommendations[atoi(it.key().c_str())] = a;
 		}
-
-		dpiGuidelines = std::unordered_map<int, SizeGuidelines>();
-		for (auto it = guidelineJson["dpi"].begin(); it != guidelineJson["dpi"].end(); ++it)
-		{
-			SizeGuidelines a(it.value()["width"], it.value()["height"]);
-			dpiGuidelines[atoi(it.key().c_str())] = a;
-		}
-
+		dpiGuidelines = {};
+		heightPer100DPI = guidelineJson["heightPer100DPI"];
 		contrastRatio = guidelineJson["contrast"];
 		contrastRatioRecommendation = guidelineJson["recommendedContrast"];
 		textBackgroundRadius = guidelineJson["textBackgroundRadius"];
@@ -42,8 +36,9 @@ namespace tin {
 				activeGuideline = &resolutionGuidelines.find(1080)->second;
 			}
 			else {
-				dpiGuidelines[100] = SizeGuidelines(0, 18);
-				activeGuideline = &dpiGuidelines.find(100)->second;
+				dpiGuidelines[resolution] = SizeGuidelines(0, 
+					static_cast<int>(heightPer100DPI*(resolution/100.0f)));
+				activeGuideline = &dpiGuidelines.find(resolution)->second;
 			}
 			
 		}

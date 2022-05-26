@@ -30,6 +30,7 @@ namespace tin {
 		SizeGuidelines* activeGuideline = nullptr;
 		SizeGuidelines* activeRecommendation = nullptr;
 		bool usingDPI = false;
+		int heightPer100DPI;
 	public:
 		Guideline() : contrastRatio(4.5), contrastRatioRecommendation(4.5),
 		textBackgroundRadius(10), resolutionGuidelines({ {1080,{4,28}} }) {}
