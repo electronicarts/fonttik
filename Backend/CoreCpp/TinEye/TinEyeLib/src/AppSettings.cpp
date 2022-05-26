@@ -31,6 +31,9 @@ namespace tin {
 		dbgSaveLogs = settings["saveLogs"];
 		resultsPath = std::string(settings["resultsPath"]);
 		debugInfoPath = std::string(settings["debugInfoPath"]);
+		useDPI = settings["useDPI"];
+		targetDPI = settings["targetDPI"];
+		targetResolution = settings["targetResolution"];
 
 		int framesToSkip = settings["videoFramesToSkip"];
 		Video::setFramesToSkip(framesToSkip);
@@ -67,6 +70,10 @@ namespace tin {
 			subMatrix.setTo(cv::Scalar(0, 0, 0));
 		}
 		return mat;
+	}
+
+	int AppSettings::getSpecifiedSize() const {
+		return (useDPI) ? targetDPI : targetResolution;
 	}
 
 	template<typename T>

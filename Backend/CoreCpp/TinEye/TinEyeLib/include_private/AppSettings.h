@@ -16,7 +16,10 @@ namespace tin {
 			dbgSaveLuminanceMasks = false,
 			useTextRecognition = false,
 			dbgSaveLogs = false,
-			printResultValues = false;
+			printResultValues = false,
+			useDPI = false;
+		int targetDPI = 0,
+			targetResolution = 0;
 		fs::path resultsPath = "./", debugInfoPath = "./debug/";
 
 
@@ -33,6 +36,7 @@ namespace tin {
 			dbgSaveHistograms(false), dbgSaveRawTextboxOutline(false),
 			dbgSaveLuminanceMasks(true), useTextRecognition(true),
 			printResultValues(true), dbgSaveLogs(false),
+			useDPI(false),targetDPI(0),targetResolution(0),
 			resultsPath("./"), debugInfoPath("./debugInfo") {}
 
 		void init(nlohmann::json settings);
@@ -49,6 +53,8 @@ namespace tin {
 		bool printValuesOnResults() const { return printResultValues; }
 		fs::path getResultsPath() const { return resultsPath; }
 		fs::path getDebugInfoPath() const { return debugInfoPath; }
+		int getSpecifiedSize() const;
+		bool usingDPI() const { return useDPI; }
 
 		void setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore = {});
 
