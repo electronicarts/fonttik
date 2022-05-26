@@ -44,8 +44,9 @@ namespace tin {
 		bool overallSizePass = true;
 		bool warningsRaised = false;
 
-		std::vector<std::vector<ResultBox>> contrastResults;
-		std::vector < std::vector<ResultBox>> sizeResults;
+		//Pairs' int value identifies the frame number of the result
+		std::vector<std::pair<int,std::vector<ResultBox>>> contrastResults;
+		std::vector<std::pair<int, std::vector<ResultBox>>> sizeResults;
 
 		void clear() {
 			overallContrastPass = true;

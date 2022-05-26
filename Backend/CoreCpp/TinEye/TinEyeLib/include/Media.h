@@ -30,7 +30,7 @@ namespace tin {
 		virtual bool nextFrame() = 0;
 
 		//Generates outlines for the image's results and saves them
-		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, fs::path path, bool saveNumbers = false) = 0;
+		virtual void saveResultsOutlines(std::vector<std::pair<int, std::vector<ResultBox>>>& results, fs::path path, bool saveNumbers = false) = 0;
 
 		//Path of the original image or the video its coming from
 		fs::path getPath() { return path; };
@@ -88,5 +88,8 @@ namespace tin {
 		void flipLuminance();
 
 		static double LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask);
+
+		//Returns current frame number identifier, by default is 0
+		virtual int getFrameCount() { return 0; }
 	};
 }

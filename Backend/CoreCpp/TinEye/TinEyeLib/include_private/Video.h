@@ -17,7 +17,7 @@ namespace tin {
 
 		virtual bool nextFrame() override;
 
-		virtual void saveResultsOutlines(std::vector<std::vector<ResultBox>>& results, fs::path path, bool saveNumbers) override;
+		virtual void saveResultsOutlines(std::vector<std::pair<int, std::vector<ResultBox>>>& results, fs::path path, bool saveNumbers) override;
 
 		/// <summary>
 		/// Compares the given image matrix to the video's previousFrame.
@@ -28,5 +28,8 @@ namespace tin {
 
 		//Sets how many frames should video processing skip between each frame analyzed
 		static void setFramesToSkip(int numberOfFrames);
+
+		//Returns current frame number identifier
+		virtual int getFrameCount() override { return frameCount; }
 	};
 }

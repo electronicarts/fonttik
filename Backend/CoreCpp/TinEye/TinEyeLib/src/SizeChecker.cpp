@@ -25,7 +25,7 @@ namespace tin {
 
 		//add entry for this image in result struct
 		Results* testResults = image.getResultsPointer();
-		testResults->sizeResults.push_back(std::vector<ResultBox>());
+		testResults->sizeResults.push_back({ image.getFrameCount(), std::vector<ResultBox>() });
 
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
@@ -113,7 +113,7 @@ namespace tin {
 		}
 
 		Results* testResults = image.getResultsPointer();
-		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, height));
+		testResults->sizeResults.back().second.push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, height));
 		testResults->overallSizePass = testResults->overallSizePass && pass;
 
 		return pass;
