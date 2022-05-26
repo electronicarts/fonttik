@@ -9,6 +9,9 @@
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
     "useTextRecognition": true,
+    "useDPI":false,
+    "targetResolution":0,
+    "targetDPI":0,
     "saveLogs":true,
     "printValuesOnResults": false,
     "focusMask": [
@@ -73,6 +76,7 @@
         "height": 52
       }
     },
+    "heightPer100DPI":18,
     "resolutionsRecommendations":{
       "1080": {
         "width": 4,
