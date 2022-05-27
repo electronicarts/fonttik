@@ -8,7 +8,7 @@ namespace tin {
 	protected:
 		void SetUp() override {
 			tineye = TinEye();
-			config = Configuration("config.json");
+			config = Configuration("unit_test/config_resolution.json");
 			tineye.init(&config);
 
 			whiteImg = Media::CreateMedia("unit_test/luminance/white.png");

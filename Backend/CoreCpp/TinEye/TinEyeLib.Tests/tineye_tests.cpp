@@ -7,7 +7,7 @@ namespace tin {
 	protected:
 		void SetUp() override {
 			tineye = tin::TinEye();
-			config = tin::Configuration("config.json");
+			config = tin::Configuration("unit_test/config_resolution.json");
 			tineye.init(&config);
 		}
 
