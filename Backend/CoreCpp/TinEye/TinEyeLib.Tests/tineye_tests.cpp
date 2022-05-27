@@ -16,7 +16,7 @@ namespace tin {
 	};
 
 	TEST_F(TinEyeTests, PassingContrast) {
-		tin::Media* media = tin::Media::CreateMedia("resources/Contrasts/highContrast.png");
+		tin::Media* media = tin::Media::CreateMedia("unit_test/Contrasts/highContrast.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
@@ -26,7 +26,7 @@ namespace tin {
 	}
 
 	TEST_F(TinEyeTests, FailingContrast) {
-		tin::Media* media = tin::Media::CreateMedia("resources/Contrasts/lowContrast.png");
+		tin::Media* media = tin::Media::CreateMedia("unit_test/Contrasts/lowContrast.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
@@ -36,7 +36,7 @@ namespace tin {
 	}
 
 	TEST_F(TinEyeTests, PassingSize) {
-		tin::Media* media = tin::Media::CreateMedia("resources/sizes/720SerifPass.png");
+		tin::Media* media = tin::Media::CreateMedia("unit_test/sizes/720SerifPass.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 
@@ -46,7 +46,7 @@ namespace tin {
 	}
 
 	TEST_F(TinEyeTests, FailingSize) {
-		tin::Media* media = tin::Media::CreateMedia("resources/sizes/720SerifFail.png");
+		tin::Media* media = tin::Media::CreateMedia("unit_test/sizes/720SerifFail.png");
 
 		tin::Results* results = tineye.processMedia(*media);
 

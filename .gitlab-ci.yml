@@ -69,6 +69,8 @@ build-corecpp:
             - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/AddressSanitizer.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-release/CTestTestfile.cmake
+            - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Benchmarks
+            - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Benchmarks
 #test corecpp project
 test-corecpp:
     stage: test-corecpp
@@ -129,6 +131,9 @@ profile-tool:
         - docker
     dependencies:
         - build-corecpp
+    only:
+        changes:
+            - "Backend/CoreCpp/**/*" 
     script:
         # run the tool
         - echo "Profiling run for TinEye"
@@ -137,3 +142,21 @@ profile-tool:
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
+benchmark-tool:
+    stage: test-corecpp
+    image: docker.artifactory.ea.com/gcc:latest
+    #Right now, the benchmarks are snippets that dont rely on TinEyes real functionality
+    #Once the benchmarks start targetting TinEye code, change this job to run
+    #Every time the library is changed
+    only:
+        changes:
+            - "Backend/CoreCpp/TinEye/TinEyeLib.Benchmarks/*" 
+    tags:
+        - docker
+    dependencies:
+        - build-corecpp
+    script:
+        # run the tool
+        - echo "Running TinEye benchmarks"
+        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Benchmarks
+        - ./TinEyeLib.Benchmarks

@@ -169,7 +169,7 @@ namespace tin {
 	}
 
 	fs::path Media::getOutputPath() {
-		std::string out= path.parent_path().string() +"/" + (path.stem().string() + "_out");
+		std::string out= path.parent_path().string() +"/" + (path.stem().string() + "_output");
 		fs::path outputPath(out);
 
 		if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {

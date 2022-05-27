@@ -1,12 +1,13 @@
 #include "TinEye.h"
 #include "Configuration.h"
+#include "Media.h"
+
 #include <iostream>
 #include <algorithm>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <filesystem>
 #include <regex>
-#include "Media.h"
 
 namespace fs = std::filesystem;
 
@@ -64,7 +65,7 @@ void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& confi
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
-		std::cout << "Usage: \"./tineye_cli media_path/ \n";
+		std::cout << "Usage: \"TinEyeApp.exe media_path/ \n";
 		std::cin.get();
 		return 1;
 	}

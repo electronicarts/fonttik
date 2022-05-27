@@ -1,16 +1,15 @@
-#include "TextboxDetection.h"
+#include "TextboxDetectionEAST.h"
 #include <opencv2/dnn.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
 #include <boost/log/trivial.hpp>
-
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 #include "Instrumentor.h"
 
 namespace tin {
-	TextboxDetection::TextboxDetection(const TextDetectionParams* params)
+	void TextboxDetectionEAST::init(const TextDetectionParams* params)
 	{
 		east = new cv::dnn::TextDetectionModel_EAST(params->getDetectionModel());
 
@@ -34,13 +33,13 @@ namespace tin {
 		east->setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
 	}
 
-	TextboxDetection::~TextboxDetection() {
+	TextboxDetectionEAST::~TextboxDetectionEAST() {
 		if (east != nullptr) {
 			delete east;
 		}
 	}
 
-	void TextboxDetection::fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result)
+	void TextboxDetectionEAST::fourPointsTransform(const cv::Mat& frame, const cv::Point2f vertices[], cv::Mat& result)
 	{
 		const cv::Size outputSize = cv::Size(100, 32);
 
@@ -54,7 +53,7 @@ namespace tin {
 		warpPerspective(frame, result, rotationMatrix, outputSize);
 	}
 
-	std::vector<Textbox> TextboxDetection::detectBoxes(cv::Mat img, const AppSettings* appSettings, const TextDetectionParams* params)
+	std::vector<Textbox> TextboxDetectionEAST::detectBoxes(const cv::Mat& img, const AppSettings* appSettings, const TextDetectionParams* params)
 	{
 		//Calculate needed conversion for new width and height to be multiples of 32
 		////This needs to be multiple of 32
@@ -72,7 +71,7 @@ namespace tin {
 		cv::resize(img, resizedImg, detInputSize);
 
 		std::vector< std::vector<cv::Point> > detResults;
-		{	
+		{
 			PROFILE_SCOPE("EAST DNN");
 			east->detect(resizedImg, detResults);
 		}
@@ -144,36 +143,5 @@ namespace tin {
 #endif // _DEBUG
 
 		return boxes;
-	}
-
-	void TextboxDetection::mergeTextBoxes(std::vector<Textbox>& boxes, const TextDetectionParams* params) {
-		PROFILE_FUNCTION();
-		std::pair<float, float> mergeThreshold = params->getMergeThreshold();
-
-		for (auto boxIt = boxes.begin(); boxIt != boxes.end(); boxIt++) {
-			for (auto targetIt = boxIt; targetIt != boxes.end(); ) {
-				if (boxIt != targetIt) {
-					auto overlap = Textbox::OverlapAxisPercentage(*boxIt, *targetIt);
-					if (overlap.first >= mergeThreshold.first && overlap.second >= mergeThreshold.second) {
-						BOOST_LOG_TRIVIAL(info) << boxIt->getRect() << "merges with " << targetIt->getRect() << std::endl;
-						*boxIt = Textbox(boxIt->getRect() | targetIt->getRect());
-						targetIt = boxes.erase(targetIt);
-					}
-					else {
-						targetIt++;
-					}
-				}
-				else {
-					targetIt++;
-				}
-			}
-		}
-
-	}
-
-	float TextboxDetection::HorizontalTiltAngle(const cv::Point& a, const cv::Point& b) {
-		double hip = cv::norm(b - a);
-		double h = std::abs(a.y - b.y);
-		return asin(h / hip);
 	}
 }

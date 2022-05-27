@@ -34,45 +34,45 @@ namespace tin {
 
 	TEST_F(ContrastRatioChecks, PassingContrastFlat) {
 
-		std::string path = "resources/Contrasts/flatPass.png";
+		std::string path = "unit_test/Contrasts/flatPass.png";
 		ASSERT_TRUE(checkContrast(path));
 	}
 
 	TEST_F(ContrastRatioChecks, PassingContrastGradient) {
-		std::string path = "resources/Contrasts/gradientPass.png";
+		std::string path = "unit_test/Contrasts/gradientPass.png";
 		ASSERT_TRUE(checkContrast(path));
 	}
 
 	TEST_F(ContrastRatioChecks, PassingContrastStripes) {
-		std::string path = "resources/Contrasts/stripesPass.png";
+		std::string path = "unit_test/Contrasts/stripesPass.png";
 		ASSERT_TRUE(checkContrast(path));
 	}
 
 	TEST_F(ContrastRatioChecks, FailingContrastFlat) {
-		std::string path = "resources/Contrasts/flatFail.png";
+		std::string path = "unit_test/Contrasts/flatFail.png";
 		ASSERT_FALSE(checkContrast(path));
 
 	}
 
 	TEST_F(ContrastRatioChecks, FailingContrastGradient) {
-		std::string path = "resources/Contrasts/gradientFail.png";
+		std::string path = "unit_test/Contrasts/gradientFail.png";
 		ASSERT_FALSE(checkContrast(path));
 
 	}
 
 	TEST_F(ContrastRatioChecks, FailingContrastStripes) {
-		std::string path = "resources/Contrasts/stripesFail.png";
+		std::string path = "unit_test/Contrasts/stripesFail.png";
 		ASSERT_FALSE(checkContrast(path));
 
 	}
 
 	TEST_F(ContrastRatioChecks, HighContrast) {
-		std::string path = "resources/Contrasts/highContrast.png";
+		std::string path = "unit_test/Contrasts/highContrast.png";
 		ASSERT_TRUE(checkContrast(path));
 	}
 
 	TEST_F(ContrastRatioChecks, lowContrast) {
-		std::string path = "resources/Contrasts/lowContrast.png";
+		std::string path = "unit_test/Contrasts/lowContrast.png";
 		ASSERT_FALSE(checkContrast(path));
 	}
 }

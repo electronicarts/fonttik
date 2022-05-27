@@ -19,15 +19,6 @@ namespace tin {
 		TextDetectionParams textDetectionParams;
 		TextRecognitionParams textRecognitionParams;
 		std::vector<double> rgbLookUp;
-		
-		
-		void setDefaultGuideline();
-		void setDefaultAppSettings();
-		void setDefaultTextDetectionParams();
-		void setDefaultTextRecognitionParams();
-
-		template<typename T>
-		static cv::Rect_<T> RectFromJson(json data);
 	public:
 		Configuration();
 		Configuration(fs::path configPath);

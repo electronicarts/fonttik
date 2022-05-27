@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <opencv2/core/mat.hpp>
 #include <unordered_map>
+#include <nlohmann/json.hpp>
 
 namespace fs = std::filesystem;
 
@@ -15,7 +16,10 @@ namespace tin {
 			dbgSaveLuminanceMasks = false,
 			useTextRecognition = false,
 			dbgSaveLogs = false,
-			printResultValues = false;
+			printResultValues = false,
+			useDPI = false;
+		int targetDPI = 0,
+			targetResolution = 0;
 		fs::path resultsPath = "./", debugInfoPath = "./debug/";
 
 
@@ -23,15 +27,19 @@ namespace tin {
 		std::vector<cv::Rect2f> focusMasks = { {0,0,1,1} }; //If not provided, the whole screen will be the focus region
 		std::vector<cv::Rect2f> ignoreMasks = {}; //Data inside here will be always ignored
 
+		template<typename T>
+		static cv::Rect_<T> RectFromJson(nlohmann::json data);
 	public:
-		AppSettings() {};
-		AppSettings(bool saveLum, bool saveTextbox, bool saveSeparateTexbox, bool saveHist, bool saveRawTextbox, bool saveLumMasks,
-			bool textRecognition, bool valuesOnResults,bool logs, fs::path resultsPath, fs::path dbgInfoPath) :dbgSaveLuminanceMap(saveLum),
-			dbgSaveTexboxOutline(saveTextbox), dbgSaveRawTextboxOutline(saveRawTextbox),
-			dbgSaveSeparateTextboxes(saveSeparateTexbox), dbgSaveHistograms(saveHist),
-			dbgSaveLuminanceMasks(saveLumMasks), useTextRecognition(textRecognition),
-			printResultValues(valuesOnResults),dbgSaveLogs(logs),
-			resultsPath(resultsPath), debugInfoPath(dbgInfoPath) {}
+		AppSettings() :
+			dbgSaveLuminanceMap(true),
+			dbgSaveTexboxOutline(true), dbgSaveSeparateTextboxes(false),
+			dbgSaveHistograms(false), dbgSaveRawTextboxOutline(false),
+			dbgSaveLuminanceMasks(true), useTextRecognition(true),
+			printResultValues(true), dbgSaveLogs(false),
+			useDPI(false),targetDPI(0),targetResolution(0),
+			resultsPath("./"), debugInfoPath("./debugInfo") {}
+
+		void init(nlohmann::json settings);
 
 		//AppSettigs
 		bool saveLuminanceMasks() const { return dbgSaveLuminanceMasks; }
@@ -45,6 +53,8 @@ namespace tin {
 		bool printValuesOnResults() const { return printResultValues; }
 		fs::path getResultsPath() const { return resultsPath; }
 		fs::path getDebugInfoPath() const { return debugInfoPath; }
+		int getSpecifiedSize() const;
+		bool usingDPI() const { return useDPI; }
 
 		void setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore = {});
 

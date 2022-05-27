@@ -3,12 +3,15 @@
 #include <string>
 #include "Configuration.h"
 #include "Image.h"
-#include "TextboxDetection.h"
+#include "TextboxDetectionEAST.h"
+#include "TextboxRecognitionOpenCV.h"
 #include "boost/log/trivial.hpp"
 #include "Guideline.h"
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 #include "Instrumentor.h"
+#include "ContrastChecker.h"
+#include "SizeChecker.h"
 #include <limits>
 
 #include <boost/log/core.hpp>
@@ -48,7 +51,6 @@ namespace tin {
 				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
 			}
 			else {
-				// Get OCR result
 				fontSizeCheck(media, textBoxes);
 				textContrastCheck(media, textBoxes);
 			}
@@ -71,7 +73,8 @@ namespace tin {
 		linearizationLUT = config->getRGBLookupTable();
 
 		//Initialize EAST detection
-		textboxDetection = new TextboxDetection(config->getTextDetectionParams());
+		textboxDetection = new TextboxDetectionEAST();
+		textboxDetection->init(config->getTextDetectionParams());
 
 
 		//Initialize text recognition only if text recognition is enabled in config
@@ -80,27 +83,13 @@ namespace tin {
 		if (config->getAppSettings()->textRecognitionActive()) {
 			// Load models weights
 			TextRecognitionParams* recognitionParams = config->getTextRecognitionParams();
-			textRecognition = cv::dnn::TextRecognitionModel(recognitionParams->getRecognitionModel());
-			textRecognition.setDecodeType(recognitionParams->getDecodeType());
-			std::ifstream vocFile;
-			vocFile.open(recognitionParams->getVocabularyFilepath());
-			CV_Assert(vocFile.is_open());
-			std::string vocLine;
-			std::vector<std::string> vocabulary;
-			while (std::getline(vocFile, vocLine)) {
-				vocabulary.push_back(vocLine);
-			}
-			textRecognition.setVocabulary(vocabulary);
-
-			// Normalization parameters
-			auto mean = recognitionParams->getMean();
-			// The input shape
-			std::pair<int, int> size = recognitionParams->getSize();
-			textRecognition.setInputParams(recognitionParams->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
-
-			textRecognition.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
-			textRecognition.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
+			textboxRecognition = new TextboxRecognitionOpenCV();
+			textboxRecognition->init(recognitionParams);
 		}
+	
+		//Create checkers
+		contrastChecker = new ContrastChecker(config);
+		sizeChecker = new SizeChecker(config, textboxRecognition);
 	}
 
 	void TinEye::applyFocusMask(Media& image) {
@@ -110,217 +99,12 @@ namespace tin {
 		img = img & mask;
 	}
 
-	bool TinEye::fontSizeCheck(Media& img, std::vector<Textbox>& boxes) {
-		PROFILE_FUNCTION();
-		cv::Mat openCVMat = img.getImageMatrix();
-
-		AppSettings* appSettings = config->getAppSettings();
-		Guideline* guideline = config->getGuideline();
-
-		if (openCVMat.empty())
-		{
-			return false;
-		}
-
-		guideline->setActiveResolution(openCVMat.rows);
-
-		bool passes = true;
-
-#ifdef _DEBUG
-		int counter = 0;
-#endif
-
-		//add entry for this image in result struct
-		Results* testResults = img.getResultsPointer();
-		testResults->sizeResults.push_back(std::vector<ResultBox>());
-
-		for (Textbox box : boxes) {
-			//Set word detection to word bounding box
-			box.setParentMedia(&img);
-
-			bool individualPass = textboxSizeCheck(img, box);
-
-			passes = passes && individualPass;
-
-#ifdef _DEBUG
-			if (appSettings->saveSeparateTextboxes()) {
-				img.saveOutputData(box.getSubmatrix(), "textbox_" + std::to_string(counter) + ".png");
-			}
-			counter++;
-
-#endif
-		}
-
-		return passes;
-	}
-
-	bool TinEye::textboxSizeCheck(Media& image, Textbox& textbox) {
-		PROFILE_FUNCTION();
-		bool pass = true;
-		cv::Rect boxRect = textbox.getRect();
-
-		ResultType type = ResultType::PASS;
-
-		//Calculate height and width precisely
-		cv::Mat textMask = textbox.getTextMask();
-		std::vector<cv::Point> nonZero;
-		cv::findNonZero(textMask, nonZero);
-		int minY = std::numeric_limits<int>::max(),
-			maxY = std::numeric_limits<int>::min(),
-			minX = std::numeric_limits<int>::max(),
-			maxX = std::numeric_limits<int>::min();
-		for (const auto& point : nonZero) {
-			minY = std::min(point.y, minY);
-			minX = std::min(point.x, minX);
-			maxY = std::max(point.y, maxY);
-			maxX = std::max(point.x, maxX);
-		}
-
-		if (config->getAppSettings()->textRecognitionActive()) {
-			//Recognize word in region
-			std::string recognitionResult;
-			recognitionResult = textRecognition.recognize(textbox.getSubmatrix());
-
-			int width = maxX - minX;
-			//Avoids division by zero
-			int averageWidth = (recognitionResult.size() > 0) ? width / recognitionResult.size() : -1;
-
-			//Check average width
-			if (averageWidth == -1) {
-				BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
-				type = ResultType::UNRECOGNIZED;
-			}
-			else if (averageWidth < config->getGuideline()->getWidthRequirement()) {
-				pass = false;
-				type = ResultType::FAIL;
-				BOOST_LOG_TRIVIAL(info) << "Average character width for word: " << recognitionResult << " doesn't comply with minimum width, detected width: " << averageWidth <<
-					" at (" << boxRect.x << ", " << boxRect.y << ")" << std::endl;
-			}
-			else if (averageWidth < config->getGuideline()->getWidthRecommendation()) {
-				type = ResultType::WARNING;
-			}
-		}
-
-		//Check height
-		int minimumHeight = config->getGuideline()->getHeightRequirement();
-		int height = maxY - minY;
-		if (height < boxRect.height) {
-			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at " << boxRect.x << ", " << boxRect.y << std::endl;
-		}
-		if (height < minimumHeight) {
-			pass = false;
-			type = ResultType::FAIL;
-			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
-				<< minimumHeight << ", detected height: " << height << std::endl;
-		}
-		else if (height < config->getGuideline()->getHeightRecommendation() && pass) {
-			//Check for recommended guidelines
-			type = ResultType::WARNING;
-		}
-
-		Results* testResults = image.getResultsPointer();
-		testResults->sizeResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, height));
-		testResults->overallSizePass = testResults->overallSizePass && pass;
-
-		return pass;
+	bool TinEye::fontSizeCheck(Media& image, std::vector<Textbox>& boxes) {
+		return sizeChecker->check(image, boxes);
 	}
 
 	bool TinEye::textContrastCheck(Media& image, std::vector<Textbox>& boxes) {
-		PROFILE_FUNCTION();
-
-		cv::Mat openCVMat = image.getImageMatrix();
-		cv::Mat luminanceMap = image.getFrameLuminance();
-
-		AppSettings* appSettings = config->getAppSettings();
-		Guideline* guideline = config->getGuideline();
-
-#ifdef _DEBUG
-		int counter = 0;
-#endif // _DEBUG
-
-
-		if (openCVMat.empty())
-		{
-			return false;
-		}
-
-		bool imagePasses = true;
-
-		//add entry for this image in result struct
-		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.push_back(std::vector<ResultBox>());
-
-		for (Textbox box : boxes) {
-
-			box.setParentMedia(&image);
-
-			bool individualPass = textboxContrastCheck(image, box);
-
-
-#ifdef _DEBUG
-			if (appSettings->saveHistograms()) {
-				PROFILE_SCOPE("saveHistograms");
-				cv::Rect boxRect = box.getRect();
-				fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
-				Image::saveLuminanceHistogram(box.getLuminanceHistogram(),
-					savePath.string());
-
-				Image::saveHistogramCSV(image.calculateLuminanceHistogram(boxRect), image.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
-			}
-			counter++;
-
-#endif
-			imagePasses = imagePasses && individualPass;
-
-		}
-
-		return imagePasses;
-	}
-
-	bool TinEye::textboxContrastCheck(Media& image, Textbox& box) {
-		PROFILE_FUNCTION();
-		cv::Rect boxRect = box.getRect();
-
-		//Contrast checking with thresholds
-		cv::Mat maskA, maskB;
-		cv::Mat luminanceRegion = box.getLuminanceMap();
-		maskA = box.getTextMask();
-
-		//Dilate and then substract maskA to get the outline of the mask
-		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
-		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
-		//To prevent antialising messing with measurements we expand the mask to be subtracted
-		cv::Mat substraction;
-		cv::dilate(maskA, substraction, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
-		maskB -= substraction;
-
-#ifdef _DEBUG
-		if (config->getAppSettings()->saveLuminanceMasks()) {
-			image.saveOutputData(luminanceRegion, "lum.png");
-			image.saveOutputData(maskA, "mask.png");
-			image.saveOutputData(maskB, "outlineMask.png");
-		}
-#endif // _DEBUG
-
-		double ratio = ContrastBetweenRegions(luminanceRegion, maskA, maskB);
-
-		ResultType type = ResultType::PASS;
-		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();
-
-		if (!boxPasses) {
-			type = ResultType::FAIL;
-			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
-				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
-		}
-		else if(ratio < config->getGuideline()->getContrastRecommendation()) {
-			type = ResultType::WARNING;
-		}
-
-		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.back().push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
-		testResults->overallContrastPass = testResults->overallContrastPass && boxPasses;
-
-		return boxPasses;
+		return contrastChecker->check(image, boxes);
 	}
 
 	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
@@ -342,7 +126,7 @@ namespace tin {
 		PROFILE_FUNCTION();
 		std::pair<float, float> threshold = config->getTextDetectionParams()->getMergeThreshold();
 		if (threshold.first < 1.0 || threshold.second < 1.0) {
-			TextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
+			ITextboxDetection::mergeTextBoxes(textBoxes, config->getTextDetectionParams());
 		}
 	}
 
@@ -413,6 +197,20 @@ namespace tin {
 		}
 		textboxDetection = nullptr;
 
+		if (textboxRecognition != nullptr) {
+			delete textboxRecognition;
+		}
+		textboxRecognition = nullptr;
+
+		if (contrastChecker != nullptr) {
+			delete contrastChecker;
+		}
+		contrastChecker = nullptr;
+
+		if (sizeChecker != nullptr) {
+			delete sizeChecker;
+		}
+		sizeChecker = nullptr;
 
 		config = nullptr;
 		Instrumentor::Get().EndSession();
