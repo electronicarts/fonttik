@@ -65,7 +65,7 @@ namespace tin {
 		cv::Size size = cv::Size((int)videoCapture.get(cv::CAP_PROP_FRAME_WIDTH), (int)videoCapture.get(cv::CAP_PROP_FRAME_HEIGHT));
 
 		//Create output video
-		cv::VideoWriter outputVideo(path.string() + ".mp4", videoCapture.get(cv::CAP_PROP_FOURCC),
+		cv::VideoWriter outputVideo(path.string() + ".mp4", cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
 			videoCapture.get(cv::CAP_PROP_FPS), size, true);
 
 		//Iterate through every video frame
