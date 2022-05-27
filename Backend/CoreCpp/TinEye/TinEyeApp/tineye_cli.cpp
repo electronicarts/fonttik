@@ -64,20 +64,34 @@ void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& confi
 }
 
 int main(int argc, char* argv[]) {
-	if (argc < 2) {
-		std::cout << "Usage: \"TinEyeApp.exe media_path/ \n";
-		std::cin.get();
-		return 1;
-	}
+	
+	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
 
-	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
+	fs::path path;
+
+	if (argc < 2) {
+		std::cout << "Usage: \"TinEyeApp.exe media_path/ \n" <<
+			"Please, add the path of the file or directory you want to analyse \n";
+		std::string p;
+		std::cin >> p;
+		try {
+			path = fs::path(p);
+		}
+		catch (...) {
+			BOOST_LOG_TRIVIAL(error) << p << " is not a valid path";
+			std::cin.get();
+			return 1;
+		}
+	}
+	else {
+		path = fs::path(argv[1]);
+	}
+
 
 	tin::TinEye tineye = tin::TinEye();
 	tin::Configuration config = tin::Configuration("config.json");
 	tineye.init(&config);
-
-	fs::path path(argv[1]);
 
 	if (fs::exists(path)) {
 
