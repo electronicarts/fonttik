@@ -4,7 +4,7 @@
 namespace tin {
 	class ContrastChecker : public IChecker {
 	protected:
-		bool textboxContrastCheck(Media& image, Textbox& textbox);
+		bool textboxContrastCheck(Media& image, Textbox& textbox, FrameResults& results);
 	public:
 		ContrastChecker(Configuration* config) : IChecker(config) {}
 

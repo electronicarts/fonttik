@@ -24,16 +24,16 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 	if (media != nullptr) {
 		tin::Results* results = tineye.processMedia(*media);
 
-		std::cout << "SIZE: " << ((results->overallSizePass) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((results->overallContrastPass) ? "PASS" : "FAIL") << std::endl;
+		std::cout << "SIZE: " << ((results->sizePass()) ? "PASS" : "FAIL") <<
+			"\tCONTRAST: " << ((results->contrastPass()) ? "PASS" : "FAIL") << std::endl;
 
 		//if specified in config, save outlines for both size and contrast
 		tin::AppSettings* appSettings = config.getAppSettings();
 		if (appSettings->saveTexboxOutline()) {
-			media->saveResultsOutlines(results->contrastResults, 
+			media->saveResultsOutlines(results->getContrastResults(),
 				media->getOutputPath() / "contrastChecks",
 				appSettings->printValuesOnResults());
-			media->saveResultsOutlines(results->contrastResults,
+			media->saveResultsOutlines(results->getSizeResults(),
 				media->getOutputPath() / "sizeChecks",
 				appSettings->printValuesOnResults());
 		}

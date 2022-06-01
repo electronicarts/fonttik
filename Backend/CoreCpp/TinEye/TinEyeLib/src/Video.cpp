@@ -54,7 +54,7 @@ namespace tin {
 		}
 	}
 
-	void Video::saveResultsOutlines(std::vector<std::pair<int, std::vector<ResultBox>>>& results, fs::path path, bool saveNumbers) {
+	void Video::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) {
 		//Create output path
 		fs::path outputPath = getOutputPath();
 
@@ -77,14 +77,14 @@ namespace tin {
 			//clone frame for editing
 			frameCopy = frameMat.clone();
 
-			for (ResultBox& box : results[resultIndex].second) {
+			for (ResultBox& box : results[resultIndex].results) {
 				cv::Scalar color = box.getResultColor();
 				highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
 			}
 
 			//Add measurements after boxes so boxes don't cover the numbers
 			if (saveNumbers) {
-				for (ResultBox& box : results[resultIndex].second) {
+				for (ResultBox& box : results[resultIndex].results) {
 					putResultBoxValues(frameCopy, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
 				}
 			}
@@ -97,7 +97,7 @@ namespace tin {
 			videoCapture >> frameMat;
 
 			// if new frame loaded corresponds to next available result then get next result index
-			if (resultIndex + 1 < results.size() && frameIndex == results[resultIndex + 1].first ) {
+			if (resultIndex + 1 < results.size() && frameIndex == results[resultIndex + 1].frame ) {
 				resultIndex++;
 			}
 		}
