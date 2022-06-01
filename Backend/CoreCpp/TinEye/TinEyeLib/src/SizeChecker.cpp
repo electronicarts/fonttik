@@ -27,7 +27,6 @@ namespace tin {
 
 		//add entry for this image in result struct
 		FrameResults* results = image.getResultsPointer()->addSizeResults(image.getFrameCount());
-
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
 			box.setParentMedia(&image);
@@ -45,8 +44,8 @@ namespace tin {
 #endif
 		}
 
-		Results* overallResults;
-		image.getResultsPointer()->setSizePass(passes);
+		Results* overallResults = image.getResultsPointer();
+		overallResults->setSizePass(passes && overallResults->sizePass());
 		return passes;
 	}
 

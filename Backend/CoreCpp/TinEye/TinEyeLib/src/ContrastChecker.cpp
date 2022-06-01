@@ -54,6 +54,8 @@ namespace tin {
 
 		}
 
+		Results* overallResults = image.getResultsPointer();
+		overallResults->setContrastPass(imagePasses && overallResults->contrastPass());
 		return imagePasses;
 	}
 
