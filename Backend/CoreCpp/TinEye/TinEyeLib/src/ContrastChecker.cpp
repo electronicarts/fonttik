@@ -27,14 +27,14 @@ namespace tin {
 		bool imagePasses = true;
 
 		//add entry for this image in result struct
-		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.push_back({ image.getFrameCount(), std::vector<ResultBox>()});
+		FrameResults* results = image.getResultsPointer()->addContrastResults(image.getFrameCount());
+
 
 		for (Textbox box : boxes) {
 
 			box.setParentMedia(&image);
 
-			bool individualPass = textboxContrastCheck(image, box);
+			bool individualPass = textboxContrastCheck(image, box,*results);
 
 
 #ifdef _DEBUG
@@ -57,7 +57,7 @@ namespace tin {
 		return imagePasses;
 	}
 
-	bool ContrastChecker::textboxContrastCheck(Media& image, Textbox& textbox) {
+	bool ContrastChecker::textboxContrastCheck(Media& image, Textbox& textbox,FrameResults& results) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = textbox.getRect();
 
@@ -96,9 +96,7 @@ namespace tin {
 			type = ResultType::WARNING;
 		}
 
-		Results* testResults = image.getResultsPointer();
-		testResults->contrastResults.back().second.push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
-		testResults->overallContrastPass = testResults->overallContrastPass && boxPasses;
+		results.results.push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, ratio));
 
 		return boxPasses;
 	}

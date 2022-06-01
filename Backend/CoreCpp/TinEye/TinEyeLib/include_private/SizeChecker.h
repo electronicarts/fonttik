@@ -7,7 +7,7 @@ namespace tin {
 	protected:
 		ITextboxRecognition* textboxRecognition = nullptr;
 
-		bool textboxSizeCheck(Media& image, Textbox& textbox);
+		bool textboxSizeCheck(Media& image, Textbox& textbox, FrameResults& results);
 	public:
 		SizeChecker(Configuration* config, ITextboxRecognition* textboxRecognition) : IChecker(config), textboxRecognition(textboxRecognition) {}
 

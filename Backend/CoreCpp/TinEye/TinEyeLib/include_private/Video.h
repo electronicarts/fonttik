@@ -17,7 +17,7 @@ namespace tin {
 
 		virtual bool nextFrame() override;
 
-		virtual void saveResultsOutlines(std::vector<std::pair<int, std::vector<ResultBox>>>& results, fs::path path, bool saveNumbers) override;
+		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) override;
 
 		/// <summary>
 		/// Compares the given image matrix to the video's previousFrame.

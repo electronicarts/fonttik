@@ -39,22 +39,79 @@ namespace tin {
 		}
 	};
 
-	struct Results {
+	struct FrameResults {
+		int frame;
+		std::vector<ResultBox> results;
+
+		constexpr bool operator <(const FrameResults& b) const {
+			return frame < b.frame;
+		};
+
+		constexpr bool operator >(const FrameResults& b) const {
+			return frame > b.frame;
+		};
+
+	};
+
+	class Results {
+		friend class FrameSorting;
+
+
 		bool overallContrastPass = true;
 		bool overallSizePass = true;
-		bool warningsRaised = false;
+		bool warningsRaisedFlag = false;
 
 		//Pairs' int value identifies the frame number of the result
-		std::vector<std::pair<int,std::vector<ResultBox>>> contrastResults;
-		std::vector<std::pair<int, std::vector<ResultBox>>> sizeResults;
+		bool sortedContrast = false,
+			sortedSize = false;
+		std::vector<FrameResults> contrastResults;
+		std::vector<FrameResults> sizeResults;
 
+	public:
 		void clear() {
 			overallContrastPass = true;
 			overallSizePass = true;
-			warningsRaised = false;
+			warningsRaisedFlag = false;
 
 			contrastResults.clear();
 			sizeResults.clear();
 		}
+		bool contrastPass() const { return overallContrastPass; }
+		bool sizePass() const { return overallSizePass; }
+		bool warningsRaised() const { return warningsRaisedFlag; }
+		void setContrastPass(bool to) { overallContrastPass = to; }
+		void setSizePass(bool to) { overallSizePass = to; }
+		void setWarningsRaised(bool to) { warningsRaisedFlag = to; }
+		//Adds a frame with the specified ID and returns a reference to it
+		FrameResults* addContrastResults(int frameID) {
+			//TODO thread safety
+			contrastResults.push_back({ frameID, {}});
+			sortedContrast = false;
+			return &contrastResults.back();
+		}
+		//Adds a frame with the specified ID and returns a reference to it
+		FrameResults* addSizeResults(int frameID) {
+			//TODO thread safety
+			sizeResults.push_back({ frameID, {} });
+			sortedSize = false;
+			return &sizeResults.back();
+		}
+
+		std::vector<FrameResults>& getContrastResults() {
+			if (!sortedContrast) {
+				std::sort(contrastResults.begin(), contrastResults.end());
+				sortedContrast = true;
+			}
+			return contrastResults;
+		}
+
+		std::vector<FrameResults>& getSizeResults() {
+			if (!sortedSize) {
+				std::sort(sizeResults.begin(), sizeResults.end());
+				sortedSize= true;
+			}
+			return sizeResults;
+		}
+
 	};
 }
