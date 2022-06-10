@@ -36,7 +36,9 @@ namespace tin {
 		targetResolution = settings["targetResolution"];
 
 		int framesToSkip = settings["videoFramesToSkip"];
+		int videoFrameOutputInterval = settings["videoImageOutputInterval"];
 		Video::setFramesToSkip(framesToSkip);
+		Video::setFrameOutputInterval(videoFrameOutputInterval);
 	}
 
 	void AppSettings::setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore) {

@@ -41,6 +41,7 @@ namespace tin {
 
 	struct FrameResults {
 		int frame;
+		bool overallPass = true;
 		std::vector<ResultBox> results;
 
 		constexpr bool operator <(const FrameResults& b) const {
