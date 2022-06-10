@@ -2,6 +2,7 @@
 #include <boost/log/trivial.hpp>
 #include <fstream>
 #include "Media.h"
+#include "Frame.h"
 
 namespace fs = std::filesystem;
 

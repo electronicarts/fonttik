@@ -6,41 +6,24 @@
 
 namespace fs = std::filesystem;
 
-
 namespace tin {
-	class Frame;
-	class Media {
-	protected:
+	class Media;
+	class Frame {
+		Media* parentMedia;
+		int frameNumber;
 		cv::Mat imageMatrix;
 		cv::Mat luminanceMap;
-		fs::path path;
-
-		Results results;
-
 
 		static cv::Mat generateLuminanceHistogramImage(cv::Mat histogram);
-		
-		Media(fs::path filePath) :path(filePath) {}
+
 	public:
-		virtual ~Media();
-		//Factory Method that creates a video or an image depending on the file
-		//returns nullptr in case of invalid file
-		static Media* CreateMedia(fs::path path);
-
-		//gets a copy of the current frame, USER IS RESPONSIBLE FOR DELETION
-		virtual Frame* getFrame();
-		//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
-		virtual bool nextFrame() = 0;
-
-		//Generates outlines for the image's results and saves them
-		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers = false) = 0;
-
-		//Path of the original image or the video its coming from
-		fs::path getPath() { return path; };
-
+		Frame(Media* parent, int number,cv::Mat imageMat):
+		parentMedia(parent), frameNumber(number),
+		imageMatrix(imageMat),luminanceMap() {}
+		virtual ~Frame();
 		//Returns loaded image matrix
 		cv::Mat getImageMatrix();
-		
+
 		//Returns loaded image's luminance map, if map hasn't been calculated calculates it as well
 		cv::Mat getFrameLuminance();
 
@@ -75,12 +58,6 @@ namespace tin {
 		//Saves the data in the image sub folder
 		void saveOutputData(cv::Mat data, fs::path path);
 
-		//Returns output path and if it doesn't exist creates it
-		fs::path getOutputPath();
-
-		//Returns a pointer to the image's results struct for editing or reviewing
-		Results* getResultsPointer() { return &results; }
-
 		/*
 		Operators and Calculations
 		*/
@@ -93,6 +70,9 @@ namespace tin {
 		static double LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask);
 
 		//Returns current frame number identifier, by default is 0
-		virtual int getFrameCount() { return 0; }
+		virtual size_t getFrameNumber() { return frameNumber; }
+
+		//Path of the original image or the video its coming from
+		fs::path getPath();
 	};
 }

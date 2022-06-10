@@ -3,26 +3,10 @@
 #include "TinEye.h"
 #include "Video.h"
 #include "Image.h"
-#include "Frame.h"
+#include "Media.h"
 
 namespace tin {
-	Media* Media::CreateMedia(fs::path path) {
-		Media* media = nullptr;
-		cv::Mat imgMat = cv::imread(path.string(), cv::IMREAD_COLOR);
-		if (!imgMat.empty()) {
-			media = new Image(path, imgMat);
-		}
-		else {
-			cv::VideoCapture capture(path.string());
-			if (capture.isOpened()) {
-				media = new Video(path, capture);
-			}
-		}
-
-		return media;
-	}
-
-	Media::~Media() {
+	Frame::~Frame() {
 		if (!imageMatrix.empty()) {
 			imageMatrix.release();
 		}
@@ -31,12 +15,12 @@ namespace tin {
 		}
 	}
 
-	cv::Mat Media::getImageMatrix()
+	cv::Mat Frame::getImageMatrix()
 	{
 		return imageMatrix;
 	}
 
-	cv::Mat Media::getFrameLuminance() {
+	cv::Mat Frame::getFrameLuminance() {
 		//Make sure that image has been loaded and we haven't previously calculated the luminance already
 		if (!imageMatrix.empty() && luminanceMap.empty()) {
 			luminanceMap = TinEye::calculateLuminance(imageMatrix);
@@ -45,9 +29,7 @@ namespace tin {
 		return luminanceMap;
 	}
 
-	Frame* Media::getFrame() { return new Frame(this, getFrameCount(), imageMatrix.clone()); }
-
-	void Media::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
+	void Frame::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
 	{
 		PROFILE_FUNCTION();
 		if (!matrix.empty()) {
@@ -58,7 +40,7 @@ namespace tin {
 		}
 	}
 
-	void Media::putResultBoxValues(cv::Mat& matrix, ResultBox& box, int precision) {
+	void Frame::putResultBoxValues(cv::Mat& matrix, ResultBox& box, int precision) {
 		std::stringstream stream;
 		stream << std::fixed << std::setprecision(precision) << box.value;
 		std::string text = stream.str();
@@ -76,7 +58,7 @@ namespace tin {
 		cv::putText(matrix, text, originPoint, cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(255, 255, 255), 1);
 	}
 
-	cv::Mat Media::calculateLuminanceHistogram(cv::Rect rect, cv::Rect ignoreRegion)
+	cv::Mat Frame::calculateLuminanceHistogram(cv::Rect rect, cv::Rect ignoreRegion)
 	{
 		PROFILE_FUNCTION();
 		if (luminanceMap.empty()) {
@@ -97,12 +79,12 @@ namespace tin {
 		return histogram;
 	}
 
-	cv::Mat Media::calculateLuminanceHistogram()
+	cv::Mat Frame::calculateLuminanceHistogram()
 	{
 		return calculateLuminanceHistogram();
 	}
 
-	void Media::flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2)
+	void Frame::flipLuminance(const int& x1, const int& y1, const int& x2, const int& y2)
 	{
 		PROFILE_FUNCTION();
 		if (!luminanceMap.empty()) {
@@ -111,7 +93,7 @@ namespace tin {
 		}
 	}
 
-	void Media::flipLuminance()
+	void Frame::flipLuminance()
 	{
 
 		if (!luminanceMap.empty()) {
@@ -120,7 +102,7 @@ namespace tin {
 	}
 
 
-	void Media::displayLuminanceHistogram(cv::Mat histogram)
+	void Frame::displayLuminanceHistogram(cv::Mat histogram)
 	{
 		PROFILE_FUNCTION();
 		cv::Mat histImage = generateLuminanceHistogramImage(histogram);
@@ -128,13 +110,13 @@ namespace tin {
 		cv::waitKey();
 	}
 
-	void Media::saveLuminanceHistogram(cv::Mat histogram, std::string filepath)
+	void Frame::saveLuminanceHistogram(cv::Mat histogram, std::string filepath)
 	{
 		cv::Mat histImage = generateLuminanceHistogramImage(histogram);
 		cv::imwrite(filepath, histImage);
 	}
 
-	cv::Mat Media::generateLuminanceHistogramImage(cv::Mat histogram)
+	cv::Mat Frame::generateLuminanceHistogramImage(cv::Mat histogram)
 	{
 		PROFILE_FUNCTION();
 		//Display the histogram
@@ -152,7 +134,7 @@ namespace tin {
 		return histImage;
 	}
 
-	void Media::saveHistogramCSV(cv::Mat histogram, std::string filename)
+	void Frame::saveHistogramCSV(cv::Mat histogram, std::string filename)
 	{
 		PROFILE_FUNCTION();
 		std::ofstream filestream;
@@ -161,24 +143,17 @@ namespace tin {
 		filestream.close();
 	}
 
-	double Media::LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask) {
+	double Frame::LuminanceMeanWithMask(const cv::Mat& mat, const cv::Mat& mask) {
 		return cv::mean(mat, mask)[0];
 	}
 
-	void Media::saveOutputData(cv::Mat data, fs::path path) {
+	void Frame::saveOutputData(cv::Mat data, fs::path path) {
 		PROFILE_FUNCTION();
 
 		cv::imwrite(path.string(), data);
 	}
 
-	fs::path Media::getOutputPath() {
-		std::string out= path.parent_path().string() +"/" + (path.stem().string() + "_output");
-		fs::path outputPath(out);
-
-		if (!fs::is_directory(outputPath) || !fs::exists(outputPath)) {
-			fs::create_directory(outputPath);
-		}
-
-		return outputPath;
+	fs::path Frame::getPath() {
+		return parentMedia->getPath(); 
 	}
 }

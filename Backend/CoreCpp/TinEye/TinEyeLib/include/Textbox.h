@@ -1,7 +1,7 @@
 #pragma once
-
+#include "Frame.h"
 #include <opencv2/core.hpp>
-#include "Media.h"
+
 
 namespace tin {
 	class Textbox {
@@ -12,7 +12,7 @@ namespace tin {
 		cv::Mat luminanceHistogram;
 		cv::Mat textMask;
 
-		Media* parentImage = nullptr;
+		Frame* parentImage = nullptr;
 		cv::Mat calculateTextMask();
 	public:
 		/* Operator method
@@ -27,7 +27,7 @@ namespace tin {
 		Textbox(const std::vector<cv::Point >& points, int padding = 0);
 		Textbox(cv::Rect rect);
 		//Sets textbox's parent image and calculates its submatrix
-		void setParentMedia(Media* media);
+		void setParentMedia(Frame* media);
 
 		void mergeWith(Textbox& other) { textboxRect = textboxRect | other.getRect(); };
 

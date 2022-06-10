@@ -40,8 +40,10 @@ namespace tin {
 	};
 
 	struct FrameResults {
-		int frame;
-		std::vector<ResultBox> results;
+		int frame = 0;
+		std::vector<ResultBox> results = {};
+		
+		bool pass = false;
 
 		constexpr bool operator <(const FrameResults& b) const {
 			return frame < b.frame;
@@ -50,6 +52,8 @@ namespace tin {
 		constexpr bool operator >(const FrameResults& b) const {
 			return frame > b.frame;
 		};
+
+		FrameResults(int frameID) :frame(frameID) {};
 
 	};
 
@@ -82,19 +86,21 @@ namespace tin {
 		void setContrastPass(bool to) { overallContrastPass = to; }
 		void setSizePass(bool to) { overallSizePass = to; }
 		void setWarningsRaised(bool to) { warningsRaisedFlag = to; }
-		//Adds a frame with the specified ID and returns a reference to it
-		FrameResults* addContrastResults(int frameID) {
+		
+		//Ads an already filled contrast results
+		void addContrastResults(FrameResults res) {
 			//TODO thread safety
-			contrastResults.push_back({ frameID, {}});
+			contrastResults.push_back(res);
 			sortedContrast = false;
-			return &contrastResults.back();
+			overallContrastPass = overallContrastPass && res.pass;
 		}
-		//Adds a frame with the specified ID and returns a reference to it
-		FrameResults* addSizeResults(int frameID) {
+
+		//Ads an already filled contrast results
+		void addSizeResults(FrameResults res) {
 			//TODO thread safety
-			sizeResults.push_back({ frameID, {} });
+			sizeResults.push_back(res);
 			sortedSize = false;
-			return &sizeResults.back();
+			overallSizePass = overallSizePass && res.pass;
 		}
 
 		std::vector<FrameResults>& getContrastResults() {

@@ -47,7 +47,7 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
-			return !imageMatrix.empty();
+			return true;
 		}
 		else {
 			return false;

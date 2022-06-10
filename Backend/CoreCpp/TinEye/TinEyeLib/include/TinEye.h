@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 #include "Media.h"
+#include "Frame.h"
 #include "Textbox.h"
 #include <gtest/gtest.h>
 #include <boost/log/utility/setup/file.hpp>
@@ -14,6 +15,7 @@ namespace tin {
 	class ITextboxDetection;
 	class ITextboxRecognition;
 	class IChecker;
+	class Frame;
 
 	class TinEye {
 		boost::shared_ptr<sink_t> logSink;
@@ -36,14 +38,15 @@ namespace tin {
 		~TinEye();
 		void init(Configuration* configuration);
 
-		std::vector<Textbox> getTextBoxes(Media& image);
+		std::vector<Textbox> getTextBoxes(Frame& image);
 		void mergeTextBoxes(std::vector<Textbox>& textBoxes);
 
-		void applyFocusMask(Media& image);
+		void applyFocusMask(Frame& frame);
 
-		bool fontSizeCheck(Media& img, std::vector<Textbox>& boxes);
-		bool textContrastCheck(Media& image, std::vector<Textbox>& boxes);
+		FrameResults fontSizeCheck(Frame& frame, std::vector<Textbox>& boxes);
+		FrameResults textContrastCheck(Frame& frame, std::vector<Textbox>& boxes);
 		Results* processMedia(Media& media);
+		std::pair<FrameResults,FrameResults> processFrame(Frame* frame);
 
 		//Operator
 		//Calculates the luminance of a given image matrix

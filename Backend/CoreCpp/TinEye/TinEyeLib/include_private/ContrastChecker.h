@@ -4,12 +4,12 @@
 namespace tin {
 	class ContrastChecker : public IChecker {
 	protected:
-		bool textboxContrastCheck(Media& image, Textbox& textbox, FrameResults& results);
+		bool textboxContrastCheck(Frame& image, Textbox& textbox, FrameResults& results);
 	public:
 		ContrastChecker(Configuration* config) : IChecker(config) {}
 
 		virtual ~ContrastChecker() {}
 
-		virtual bool check(Media& image, std::vector<Textbox>& boxes);
+		virtual FrameResults check(Frame& image, std::vector<Textbox>& boxes);
 	};
 }

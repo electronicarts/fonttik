@@ -18,9 +18,9 @@ namespace tin {
 		textboxRect = rect;
 	}
 
-	void Textbox::setParentMedia(Media* media) {
-		parentImage = media;
-		submatrix = parentImage->getImageMatrix()(textboxRect);
+	void Textbox::setParentMedia(Frame* frame) {
+		parentImage = frame;
+		submatrix = frame->getImageMatrix()(textboxRect);
 	}
 
 	cv::Mat Textbox::getLuminanceHistogram() {
