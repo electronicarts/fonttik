@@ -48,6 +48,7 @@ namespace tin {
 			std::pair<FrameResults,FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
 			mediaRes->addContrastResults(res.second);
+			delete nextFrame;
 		} while (media.nextFrame());
 
 		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<

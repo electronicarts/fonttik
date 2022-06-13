@@ -20,11 +20,15 @@ namespace tin {
 			
 			std::vector<Textbox> textBoxes;
 			textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
-			bool contrastPass = tineye.textContrastCheck(*img, textBoxes);
+
+
+			Frame* frame = img->getFrame();
+			FrameResults res= tineye.textContrastCheck(*frame, textBoxes);
 
 			delete img;
+			delete frame;
 
-			return contrastPass;
+			return res.pass;
 		}
 
 		TinEye tineye;
