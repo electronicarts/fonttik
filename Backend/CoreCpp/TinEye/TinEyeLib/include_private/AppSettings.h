@@ -36,7 +36,7 @@ namespace tin {
 			dbgSaveHistograms(false), dbgSaveRawTextboxOutline(false),
 			dbgSaveLuminanceMasks(true), useTextRecognition(true),
 			printResultValues(true), dbgSaveLogs(false),
-			useDPI(false),targetDPI(0),targetResolution(0),
+			useDPI(false), targetDPI(0), targetResolution(0),
 			resultsPath("./"), debugInfoPath("./debugInfo") {}
 
 		void init(nlohmann::json settings);

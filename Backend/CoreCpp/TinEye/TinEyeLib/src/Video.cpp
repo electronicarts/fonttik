@@ -3,6 +3,7 @@
 
 namespace tin {
 	int Video::framesToSkip = 0;
+	int Video::frameOutputInterval = 0;
 
 	Video::Video(fs::path filePath, cv::VideoCapture capture) : Media(filePath), videoCapture(capture)
 	{
@@ -70,7 +71,7 @@ namespace tin {
 
 		//Iterate through every video frame
 		//If specific result is not available for that frame, reuse previous result
-		int resultIndex = 0, frameIndex = 0;
+		int resultIndex = 0, frameIndex = 0, lastFrameGenerated = 0;
 		cv::Mat frameMat, frameCopy;
 		videoCapture >> frameMat;
 		while (!frameMat.empty()) {
@@ -92,12 +93,19 @@ namespace tin {
 			//output frame to result video
 			outputVideo << frameCopy;
 
+			//Output frameCopy into an image if sufficient frames have gone by and frameOutputInterval is set and current frame has a detected fail
+			if (frameOutputInterval != 0 && frameIndex - lastFrameGenerated > frameOutputInterval && !results[resultIndex].overallPass) {
+				lastFrameGenerated = frameIndex;
+				std::string pathSuffix = "_" + std::to_string(lastFrameGenerated) + ".png";
+				saveOutputData(frameCopy, path.string() + pathSuffix);
+			}
+
 			//get next frame
 			frameIndex++;
 			videoCapture >> frameMat;
 
 			// if new frame loaded corresponds to next available result then get next result index
-			if (resultIndex + 1 < results.size() && frameIndex == results[resultIndex + 1].frame ) {
+			if (resultIndex + 1 < results.size() && frameIndex == results[resultIndex + 1].frame) {
 				resultIndex++;
 			}
 		}
@@ -126,6 +134,11 @@ namespace tin {
 	void Video::setFramesToSkip(int numberOfFrames)
 	{
 		framesToSkip = numberOfFrames;
+	}
+
+	void Video::setFrameOutputInterval(int numberOfFrames)
+	{
+		frameOutputInterval = numberOfFrames;
 	}
 }
 

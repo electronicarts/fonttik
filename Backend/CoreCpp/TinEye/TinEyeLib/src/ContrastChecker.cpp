@@ -54,6 +54,10 @@ namespace tin {
 
 		}
 
+		//set if individual frame passes
+		results->overallPass = imagePasses;
+
+		//Set if whole analysis passes or not depending on previous and current result
 		Results* overallResults = image.getResultsPointer();
 		overallResults->setContrastPass(imagePasses && overallResults->contrastPass());
 		return imagePasses;

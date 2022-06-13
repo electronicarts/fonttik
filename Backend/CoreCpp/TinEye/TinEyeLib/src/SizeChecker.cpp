@@ -44,6 +44,10 @@ namespace tin {
 #endif
 		}
 
+		//set if individual frame passes
+		results->overallPass = passes;
+		
+		//Set if whole analysis passes or not depending on previous and current result
 		Results* overallResults = image.getResultsPointer();
 		overallResults->setSizePass(passes && overallResults->sizePass());
 		return passes;
