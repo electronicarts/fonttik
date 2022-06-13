@@ -27,7 +27,7 @@ namespace tin {
 			delete img;
 			delete frame;
 
-			return res.pass;
+			return res.overallPass;
 		}
 
 		TinEye tineye;
