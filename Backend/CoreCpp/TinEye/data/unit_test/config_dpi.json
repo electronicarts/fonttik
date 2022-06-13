@@ -15,6 +15,7 @@
     "saveLogs":true,
     "printValuesOnResults": false,
     "videoFramesToSkip": 5,
+    "videoImageOutputInterval" : 0,
     "focusMask": [
       {
         "x": 0,

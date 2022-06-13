@@ -53,7 +53,7 @@ namespace tin {
 			imagePasses = imagePasses && individualPass;
 
 		}
-		contrastResults.pass = imagePasses;
+		contrastResults.overallPass = imagePasses;
 
 		return contrastResults;
 	}

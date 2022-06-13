@@ -40,10 +40,9 @@ namespace tin {
 	};
 
 	struct FrameResults {
-		int frame = 0;
+		int frame;
+		bool overallPass = true;
 		std::vector<ResultBox> results = {};
-		
-		bool pass = false;
 
 		constexpr bool operator <(const FrameResults& b) const {
 			return frame < b.frame;
@@ -92,7 +91,7 @@ namespace tin {
 			//TODO thread safety
 			contrastResults.push_back(res);
 			sortedContrast = false;
-			overallContrastPass = overallContrastPass && res.pass;
+			overallContrastPass = overallContrastPass && res.overallPass;
 		}
 
 		//Ads an already filled contrast results
@@ -100,7 +99,7 @@ namespace tin {
 			//TODO thread safety
 			sizeResults.push_back(res);
 			sortedSize = false;
-			overallSizePass = overallSizePass && res.pass;
+			overallSizePass = overallSizePass && res.overallPass;
 		}
 
 		std::vector<FrameResults>& getContrastResults() {

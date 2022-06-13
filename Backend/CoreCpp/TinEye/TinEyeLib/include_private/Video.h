@@ -9,6 +9,7 @@ namespace tin {
 
 		int frameCount = 0;
 		static int framesToSkip;
+		static int frameOutputInterval;
 
 		friend class VideoTests;
 	public:
@@ -28,6 +29,9 @@ namespace tin {
 
 		//Sets how many frames should video processing skip between each frame analyzed
 		static void setFramesToSkip(int numberOfFrames);
+
+		//Sets the interval of frames where an image output should be created for a failing frame when analyzing video
+		static void setFrameOutputInterval(int numberOfFrames);
 
 		//Returns current frame number identifier
 		virtual int getFrameCount() override { return frameCount; }

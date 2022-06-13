@@ -13,7 +13,7 @@ namespace tin {
 
 		if (openCVMat.empty())
 		{
-			sizeResults.pass = false;
+			sizeResults.overallPass = false;
 			return sizeResults;
 		}
 
@@ -45,7 +45,7 @@ namespace tin {
 #endif
 		}
 
-		sizeResults.pass = passes;
+		sizeResults.overallPass = passes;
 		return sizeResults;
 	}
 
