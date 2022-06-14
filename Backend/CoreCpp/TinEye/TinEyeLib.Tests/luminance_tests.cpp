@@ -36,7 +36,7 @@ namespace tin {
 
 		cv::Mat mask = cv::Mat::ones({ luminanceMap.cols, luminanceMap.rows }, CV_8UC1);
 
-		double mean = Media::LuminanceMeanWithMask(luminanceMap, mask);
+		double mean = Frame::LuminanceMeanWithMask(luminanceMap, mask);
 
 		ASSERT_DOUBLE_EQ(mean, 1);
 	}
@@ -49,17 +49,17 @@ namespace tin {
 		cv::Mat whiteLuminanceMap = whiteImg->getFrameLuminance();
 
 		cv::Mat mask = cv::Mat::zeros({ bwLuminanceMap.cols, bwLuminanceMap.rows }, CV_8UC1);
-		double meanTwoHalves = Media::LuminanceMeanWithMask(bwLuminanceMap, mask);
+		double meanTwoHalves = Frame::LuminanceMeanWithMask(bwLuminanceMap, mask);
 
 		cv::Mat half = mask({ 0,0,bwLuminanceMap.cols / 2,bwLuminanceMap.rows });
 		cv::bitwise_not(half, half);
 
 		//White half mean
-		double meanHalf = Media::LuminanceMeanWithMask(bwLuminanceMap, mask);
+		double meanHalf = Frame::LuminanceMeanWithMask(bwLuminanceMap, mask);
 
 		//White image
 		mask = cv::Mat::ones({ whiteLuminanceMap.cols, whiteLuminanceMap.rows }, CV_8UC1 );
-		double meanWhite = Media::LuminanceMeanWithMask(whiteLuminanceMap, mask);
+		double meanWhite = Frame::LuminanceMeanWithMask(whiteLuminanceMap, mask);
 
 		ASSERT_DOUBLE_EQ(meanHalf, meanWhite);
 		ASSERT_NE(meanWhite, meanTwoHalves);
