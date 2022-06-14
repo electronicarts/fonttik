@@ -44,12 +44,14 @@ namespace tin {
 		}
 		Frame* nextFrame = media.getFrame();
 		Results* mediaRes= media.getResultsPointer();
-		do {
+		while(nextFrame != nullptr) {
 			std::pair<FrameResults,FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
 			mediaRes->addContrastResults(res.second);
 			delete nextFrame;
-		} while (media.nextFrame());
+			media.nextFrame();
+			nextFrame = media.getFrame();
+		}
 
 		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<
 			"\tCONTRAST: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") << std::endl;
@@ -123,10 +125,10 @@ namespace tin {
 
 	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
 		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = Media::LuminanceMeanWithMask(luminanceMap, maskA);
+		double meanLight = Frame::LuminanceMeanWithMask(luminanceMap, maskA);
 
 		//Invert mask to calculate mean of the darker colors
-		double meanDark = Media::LuminanceMeanWithMask(luminanceMap, maskB);
+		double meanDark = Frame::LuminanceMeanWithMask(luminanceMap, maskB);
 
 		return (std::max(meanLight, meanDark) + 0.05) / (std::min(meanLight, meanDark) + 0.05);
 	}

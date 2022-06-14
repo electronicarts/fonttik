@@ -11,18 +11,22 @@ namespace tin {
 			config = Configuration("unit_test/config_resolution.json");
 			tineye.init(&config);
 
-			whiteImg = Media::CreateMedia("unit_test/luminance/white.png");
-			blackWhiteImg = Media::CreateMedia("unit_test/luminance/blackWhite.png");
+			whiteMedia = Media::CreateMedia("unit_test/luminance/white.png");
+			blackWhiteMedia = Media::CreateMedia("unit_test/luminance/blackWhite.png");
+
+			whiteImg = whiteMedia->getFrame();
+			blackWhiteImg = blackWhiteMedia->getFrame();
 		}
 
 		void TearDown() override {
-			delete whiteImg;
-			delete blackWhiteImg;
+			delete whiteImg, blackWhiteImg;
+			delete blackWhiteMedia, whiteMedia;
 		}
 
 		TinEye tineye;
 		Configuration config;
-		Media* whiteImg, * blackWhiteImg;
+		Media* whiteMedia, *blackWhiteMedia;
+		Frame* whiteImg, * blackWhiteImg;
 	};
 
 
