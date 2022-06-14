@@ -42,16 +42,15 @@ namespace tin {
 				logging::core::get()->remove_sink(logSink);
 			}
 		}
-		Frame* nextFrame = media.getFrame();
+
 		Results* mediaRes= media.getResultsPointer();
 		 do{
+			Frame* nextFrame = media.getFrame();
 			std::pair<FrameResults,FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
 			mediaRes->addContrastResults(res.second);
 			delete nextFrame;
-			media.nextFrame();
-			nextFrame = media.getFrame();
-		}while (media.nextFrame());
+		 } while (media.nextFrame());
 
 		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<
 			"\tCONTRAST: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") << std::endl;

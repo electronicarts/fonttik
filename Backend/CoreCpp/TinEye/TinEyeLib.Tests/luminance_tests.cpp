@@ -19,13 +19,15 @@ namespace tin {
 		}
 
 		void TearDown() override {
-			delete whiteImg, blackWhiteImg;
-			delete blackWhiteMedia, whiteMedia;
+			delete whiteImg;
+			delete blackWhiteImg;
+			delete blackWhiteMedia;
+			delete whiteMedia;
 		}
 
 		TinEye tineye;
 		Configuration config;
-		Media* whiteMedia, *blackWhiteMedia;
+		Media* whiteMedia, * blackWhiteMedia;
 		Frame* whiteImg, * blackWhiteImg;
 	};
 
@@ -58,7 +60,7 @@ namespace tin {
 		double meanHalf = Frame::LuminanceMeanWithMask(bwLuminanceMap, mask);
 
 		//White image
-		mask = cv::Mat::ones({ whiteLuminanceMap.cols, whiteLuminanceMap.rows }, CV_8UC1 );
+		mask = cv::Mat::ones({ whiteLuminanceMap.cols, whiteLuminanceMap.rows }, CV_8UC1);
 		double meanWhite = Frame::LuminanceMeanWithMask(whiteLuminanceMap, mask);
 
 		ASSERT_DOUBLE_EQ(meanHalf, meanWhite);
