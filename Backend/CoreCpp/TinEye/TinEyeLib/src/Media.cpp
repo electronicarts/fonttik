@@ -31,7 +31,7 @@ namespace tin {
 		}
 	}
 
-	Frame* Media::getFrame() { return new Frame(this, getFrameCount(), imageMatrix.clone()); }
+	Frame* Media::getFrame() { return (imageMatrix.empty()) ? nullptr : new Frame(this, getFrameCount(), imageMatrix.clone()); }
 
 	void Media::saveOutputData(cv::Mat data, fs::path path) {
 		PROFILE_FUNCTION();

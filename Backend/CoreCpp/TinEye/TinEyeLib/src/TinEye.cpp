@@ -44,14 +44,14 @@ namespace tin {
 		}
 		Frame* nextFrame = media.getFrame();
 		Results* mediaRes= media.getResultsPointer();
-		while(nextFrame != nullptr) {
+		 do{
 			std::pair<FrameResults,FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
 			mediaRes->addContrastResults(res.second);
 			delete nextFrame;
 			media.nextFrame();
 			nextFrame = media.getFrame();
-		}
+		}while (media.nextFrame());
 
 		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<
 			"\tCONTRAST: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") << std::endl;
