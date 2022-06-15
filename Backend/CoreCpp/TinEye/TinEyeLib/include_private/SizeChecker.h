@@ -7,12 +7,12 @@ namespace tin {
 	protected:
 		ITextboxRecognition* textboxRecognition = nullptr;
 
-		bool textboxSizeCheck(Media& image, Textbox& textbox, FrameResults& results);
+		bool textboxSizeCheck(Frame& image, Textbox& textbox, FrameResults& results);
 	public:
 		SizeChecker(Configuration* config, ITextboxRecognition* textboxRecognition) : IChecker(config), textboxRecognition(textboxRecognition) {}
 
 		virtual ~SizeChecker() { textboxRecognition = nullptr; }
 
-		virtual bool check(Media& image, std::vector<Textbox>& boxes);
+		virtual FrameResults check(Frame& image, std::vector<Textbox>& boxes);
 	};
 }

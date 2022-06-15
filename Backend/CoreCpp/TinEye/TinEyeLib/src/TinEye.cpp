@@ -42,24 +42,39 @@ namespace tin {
 				logging::core::get()->remove_sink(logSink);
 			}
 		}
-		do {
-			//Check if image has text recognized by OCR
-			applyFocusMask(media);
-			std::vector<tin::Textbox> textBoxes = getTextBoxes(media);
-			mergeTextBoxes(textBoxes);
-			if (textBoxes.empty()) {
-				BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
-			}
-			else {
-				fontSizeCheck(media, textBoxes);
-				textContrastCheck(media, textBoxes);
-			}
-		} while (media.nextFrame());
+
+		Results* mediaRes= media.getResultsPointer();
+		 do{
+			Frame* nextFrame = media.getFrame();
+			std::pair<FrameResults,FrameResults> res = processFrame(nextFrame);
+			mediaRes->addSizeResults(res.first);
+			mediaRes->addContrastResults(res.second);
+			delete nextFrame;
+		 } while (media.nextFrame());
 
 		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<
 			"\tCONTRAST: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") << std::endl;
 
 		return media.getResultsPointer();
+	}
+
+	std::pair<FrameResults,FrameResults> TinEye::processFrame(Frame* frame) {
+		//Check if image has text recognized by OCR
+		applyFocusMask(*frame);
+		std::vector<tin::Textbox> textBoxes = getTextBoxes(*frame);
+		mergeTextBoxes(textBoxes);
+		FrameResults sizeRes(-1);
+		FrameResults contrastRes(-1);
+
+		if (textBoxes.empty()) {
+			BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+		}
+		else {
+			sizeRes = fontSizeCheck(*frame, textBoxes);
+			contrastRes = textContrastCheck(*frame, textBoxes);
+		}
+
+		return std::make_pair(sizeRes, contrastRes);
 	}
 
 	void TinEye::init(Configuration* configuration)
@@ -92,32 +107,32 @@ namespace tin {
 		sizeChecker = new SizeChecker(config, textboxRecognition);
 	}
 
-	void TinEye::applyFocusMask(Media& image) {
+	void TinEye::applyFocusMask(Frame& frame) {
 		PROFILE_FUNCTION();
-		cv::Mat img = image.getImageMatrix();
+		cv::Mat img = frame.getImageMatrix();
 		cv::Mat mask = config->getAppSettings()->calculateMask(img.cols, img.rows);
 		img = img & mask;
 	}
 
-	bool TinEye::fontSizeCheck(Media& image, std::vector<Textbox>& boxes) {
-		return sizeChecker->check(image, boxes);
+	FrameResults TinEye::fontSizeCheck(Frame& frame, std::vector<Textbox>& boxes) {
+		return sizeChecker->check(frame, boxes);
 	}
 
-	bool TinEye::textContrastCheck(Media& image, std::vector<Textbox>& boxes) {
-		return contrastChecker->check(image, boxes);
+	FrameResults TinEye::textContrastCheck(Frame& frame, std::vector<Textbox>& boxes) {
+		return contrastChecker->check(frame, boxes);
 	}
 
 	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
 		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = Media::LuminanceMeanWithMask(luminanceMap, maskA);
+		double meanLight = Frame::LuminanceMeanWithMask(luminanceMap, maskA);
 
 		//Invert mask to calculate mean of the darker colors
-		double meanDark = Media::LuminanceMeanWithMask(luminanceMap, maskB);
+		double meanDark = Frame::LuminanceMeanWithMask(luminanceMap, maskB);
 
 		return (std::max(meanLight, meanDark) + 0.05) / (std::min(meanLight, meanDark) + 0.05);
 	}
 
-	std::vector<Textbox> TinEye::getTextBoxes(Media& image) {
+	std::vector<Textbox> TinEye::getTextBoxes(Frame& image) {
 		PROFILE_FUNCTION();
 		return textboxDetection->detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
 	}

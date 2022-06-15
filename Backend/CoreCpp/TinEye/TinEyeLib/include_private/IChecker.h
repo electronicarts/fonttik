@@ -1,7 +1,8 @@
 #pragma once
 #include "Configuration.h"
-#include "Media.h"
+#include "Frame.h"
 #include "Textbox.h"
+#include "Results.h"
 #include <vector>
 
 namespace tin {
@@ -14,7 +15,7 @@ namespace tin {
 	public:
 		virtual ~IChecker() { config = nullptr; }
 
-		virtual bool check(Media& image, std::vector<Textbox>& boxes) = 0;
+		virtual FrameResults check(Frame& image, std::vector<Textbox>& boxes) = 0;
 	};
 
 }

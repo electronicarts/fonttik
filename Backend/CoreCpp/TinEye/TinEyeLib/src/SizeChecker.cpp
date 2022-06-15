@@ -2,17 +2,19 @@
 #include "Instrumentor.h"
 
 namespace tin {
-	bool tin::SizeChecker::check(Media& image, std::vector<Textbox>& boxes)
+	FrameResults tin::SizeChecker::check(Frame& image, std::vector<Textbox>& boxes)
 	{
 		PROFILE_FUNCTION();
 		cv::Mat openCVMat = image.getImageMatrix();
 
 		AppSettings* appSettings = config->getAppSettings();
 		Guideline* guideline = config->getGuideline();
+		FrameResults sizeResults(image.getFrameNumber());
 
 		if (openCVMat.empty())
 		{
-			return false;
+			sizeResults.overallPass = false;
+			return sizeResults;
 		}
 
 		int activeSize = appSettings->getSpecifiedSize();
@@ -25,13 +27,12 @@ namespace tin {
 		int counter = 0;
 #endif
 
-		//add entry for this image in result struct
-		FrameResults* results = image.getResultsPointer()->addSizeResults(image.getFrameCount());
+		
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
 			box.setParentMedia(&image);
 
-			bool individualPass = textboxSizeCheck(image, box,*results);
+			bool individualPass = textboxSizeCheck(image, box, sizeResults);
 
 			passes = passes && individualPass;
 
@@ -44,16 +45,11 @@ namespace tin {
 #endif
 		}
 
-		//set if individual frame passes
-		results->overallPass = passes;
-		
-		//Set if whole analysis passes or not depending on previous and current result
-		Results* overallResults = image.getResultsPointer();
-		overallResults->setSizePass(passes && overallResults->sizePass());
-		return passes;
+		sizeResults.overallPass = passes;
+		return sizeResults;
 	}
 
-	bool tin::SizeChecker::textboxSizeCheck(Media& image, Textbox& textbox,FrameResults& results)
+	bool tin::SizeChecker::textboxSizeCheck(Frame& image, Textbox& textbox, FrameResults& results)
 	{
 		PROFILE_FUNCTION();
 		bool pass = true;

@@ -15,7 +15,7 @@ namespace tin {
 		Image(fs::path path, cv::Mat frame);
 		virtual ~Image() {}
 
-		virtual bool nextFrame() override { return false; }
+		virtual bool nextFrame() override { return false; };
 
 		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) override;
 	};

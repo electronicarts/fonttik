@@ -13,18 +13,21 @@ namespace tin {
 
 		bool checkContrast(fs::path path) {
 			img = Media::CreateMedia(path);
+			Frame* frame = img->getFrame();
 
 			//get matrix to know size of the image to be tested
-			cv::Mat matrix = img->getImageMatrix();
-			bool a = matrix.empty();
+			cv::Mat matrix = frame->getImageMatrix();
 			
 			std::vector<Textbox> textBoxes;
 			textBoxes.emplace_back(cv::Rect(0, 0, matrix.cols, matrix.rows));
-			bool contrastPass = tineye.textContrastCheck(*img, textBoxes);
+
+
+			FrameResults res= tineye.textContrastCheck(*frame, textBoxes);
 
 			delete img;
+			delete frame;
 
-			return contrastPass;
+			return res.overallPass;
 		}
 
 		TinEye tineye;

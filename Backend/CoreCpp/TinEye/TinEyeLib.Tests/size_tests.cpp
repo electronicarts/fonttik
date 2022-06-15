@@ -15,17 +15,19 @@ namespace tin {
 			//Open input image with openCV
 			Media* img = Media::CreateMedia(path);
 
-			bool passesSize = false;
+			Frame* frame = img->getFrame();
+
 			//Check if image has text recognized by OCR
-			tineye.applyFocusMask(*img);
-			std::vector<Textbox> textBoxes = tineye.getTextBoxes(*img);
+			tineye.applyFocusMask(*frame);
+			std::vector<Textbox> textBoxes = tineye.getTextBoxes(*frame);
 			tineye.mergeTextBoxes(textBoxes);
 
-			passesSize = tineye.fontSizeCheck(*img, textBoxes);
+			FrameResults res = tineye.fontSizeCheck(*frame, textBoxes);
 
 			delete img;
+			delete frame;
 
-			return passesSize;
+			return res.overallPass;
 		}
 
 		TinEye tineye;

@@ -2,6 +2,7 @@
 #include <boost/log/trivial.hpp>
 #include <fstream>
 #include "Media.h"
+#include "Frame.h"
 
 namespace fs = std::filesystem;
 
@@ -16,13 +17,13 @@ namespace tin {
 
 		for (ResultBox& box : results.back().results) {
 			cv::Scalar color = box.getResultColor();
-			highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, highlights, 2);
+			Frame::highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, highlights, 2);
 		}
 
 		//Add measurements after boxes so boxes don't cover the numbers
 		if (saveNumbers) {
 			for (ResultBox& box : results.back().results) {
-				putResultBoxValues(highlights, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
+				Frame::putResultBoxValues(highlights, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
 			}
 		}
 
