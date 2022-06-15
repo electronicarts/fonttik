@@ -63,7 +63,10 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
-			ret = !imageMatrix.empty();
+			return !imageMatrix.empty();
+		}
+		else {
+			return false;
 		}
 
 		frame_mtx.unlock();
@@ -95,13 +98,13 @@ namespace tin {
 
 			for (ResultBox& box : results[resultIndex].results) {
 				cv::Scalar color = box.getResultColor();
-				highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
+				Frame::highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
 			}
 
 			//Add measurements after boxes so boxes don't cover the numbers
 			if (saveNumbers) {
 				for (ResultBox& box : results[resultIndex].results) {
-					putResultBoxValues(frameCopy, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
+					Frame::putResultBoxValues(frameCopy, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
 				}
 			}
 

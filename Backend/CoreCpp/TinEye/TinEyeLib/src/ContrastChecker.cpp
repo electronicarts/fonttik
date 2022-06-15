@@ -42,10 +42,10 @@ namespace tin {
 				PROFILE_SCOPE("saveHistograms");
 				cv::Rect boxRect = box.getRect();
 				fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
-				Media::saveLuminanceHistogram(box.getLuminanceHistogram(),
+				Frame::saveLuminanceHistogram(box.getLuminanceHistogram(),
 					savePath.string());
 
-				Media::saveHistogramCSV(image.calculateLuminanceHistogram(boxRect), image.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
+				Frame::saveHistogramCSV(image.calculateLuminanceHistogram(boxRect), image.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
 			}
 			counter++;
 

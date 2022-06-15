@@ -11,17 +11,21 @@ namespace tin {
 			config = Configuration("unit_test/config_resolution.json");
 			tineye.init(&config);
 
-			image = Media::CreateMedia("unit_test/luminance/chat_window_closed.png");
+			media = Media::CreateMedia("unit_test/luminance/chat_window_closed.png");
+
+			image = media->getFrame();
 
 		}
 
 		void TearDown() override {
+			delete media;
 			delete image;
 		}
 
 		TinEye tineye;
 		Configuration config;
-		Media* image;
+		Media* media;
+		Frame* image;
 	};
 
 	//All flipped pixels should be max luminance(255)-original value

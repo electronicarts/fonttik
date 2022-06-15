@@ -42,7 +42,7 @@ namespace tin {
 				logging::core::get()->remove_sink(logSink);
 			}
 		}
-		Frame* nextFrame = media.getFrame();
+
 		Results* mediaRes= media.getResultsPointer();
 		while (nextFrame != nullptr) {
 			std::pair<FrameResults, FrameResults> res = processFrame(nextFrame);
@@ -125,10 +125,10 @@ namespace tin {
 
 	double TinEye::ContrastBetweenRegions(const cv::Mat& luminanceMap, const cv::Mat& maskA, const cv::Mat& maskB) {
 		//Calculate the mean of the luminance for the light regions of the luminance
-		double meanLight = Media::LuminanceMeanWithMask(luminanceMap, maskA);
+		double meanLight = Frame::LuminanceMeanWithMask(luminanceMap, maskA);
 
 		//Invert mask to calculate mean of the darker colors
-		double meanDark = Media::LuminanceMeanWithMask(luminanceMap, maskB);
+		double meanDark = Frame::LuminanceMeanWithMask(luminanceMap, maskB);
 
 		return (std::max(meanLight, meanDark) + 0.05) / (std::min(meanLight, meanDark) + 0.05);
 	}
