@@ -68,7 +68,9 @@ namespace tin {
 		bool sortedContrast = false,
 			sortedSize = false;
 		std::vector<FrameResults> contrastResults;
+		std::mutex contrast_mtx;
 		std::vector<FrameResults> sizeResults;
+		std::mutex size_mtx;
 
 	public:
 		void clear() {
@@ -88,33 +90,49 @@ namespace tin {
 		
 		//Ads an already filled contrast results
 		void addContrastResults(FrameResults res) {
-			//TODO thread safety
+			contrast_mtx.lock();
+			
 			contrastResults.push_back(res);
 			sortedContrast = false;
 			overallContrastPass = overallContrastPass && res.overallPass;
+
+			contrast_mtx.unlock();
 		}
 
 		//Ads an already filled contrast results
 		void addSizeResults(FrameResults res) {
-			//TODO thread safety
+			size_mtx.lock();
+			
 			sizeResults.push_back(res);
 			sortedSize = false;
 			overallSizePass = overallSizePass && res.overallPass;
+			
+			size_mtx.unlock();
 		}
 
 		std::vector<FrameResults>& getContrastResults() {
+			contrast_mtx.lock();
+
 			if (!sortedContrast) {
 				std::sort(contrastResults.begin(), contrastResults.end());
 				sortedContrast = true;
 			}
-			return contrastResults;
+			std::vector<FrameResults>& res = contrastResults;
+			
+			contrast_mtx.unlock();
+			return res;
 		}
 
 		std::vector<FrameResults>& getSizeResults() {
+			size_mtx.lock();
+
 			if (!sortedSize) {
 				std::sort(sizeResults.begin(), sizeResults.end());
 				sortedSize= true;
 			}
+			std::vector<FrameResults>& res = sizeResults;
+			
+			size_mtx.unlock();
 			return sizeResults;
 		}
 

@@ -45,8 +45,6 @@ namespace tin {
 		return luminanceMap;
 	}
 
-	Frame* Media::getFrame() { return new Frame(this, getFrameCount(), imageMatrix.clone()); }
-
 	void Media::highlightBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& matrix, int thickness)
 	{
 		PROFILE_FUNCTION();

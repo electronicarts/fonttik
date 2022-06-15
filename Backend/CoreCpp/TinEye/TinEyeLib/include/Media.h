@@ -14,6 +14,7 @@ namespace tin {
 		cv::Mat imageMatrix;
 		cv::Mat luminanceMap;
 		fs::path path;
+		std::mutex frame_mtx;
 
 		Results results;
 
@@ -28,7 +29,7 @@ namespace tin {
 		static Media* CreateMedia(fs::path path);
 
 		//gets a copy of the current frame, USER IS RESPONSIBLE FOR DELETION
-		virtual Frame* getFrame();
+		virtual Frame* getFrame() = 0;
 		//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 		virtual bool nextFrame() = 0;
 

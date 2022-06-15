@@ -1,5 +1,6 @@
 #include "Video.h"
 #include "boost/log/trivial.hpp"
+#include "Frame.h"
 
 namespace tin {
 	int Video::framesToSkip = 0;
@@ -24,8 +25,22 @@ namespace tin {
 		}
 	}
 
+	Frame* Video::getFrame() {
+		frame_mtx.lock();
+		
+		Frame* frame = (imageMatrix.empty()) ? nullptr : new Frame(this, getFrameCount(),imageMatrix);
+
+		frame_mtx.unlock();
+
+		return frame;
+	}
+
 	bool Video::nextFrame()
 	{
+		bool ret = false;
+		
+		frame_mtx.lock();
+		
 		imageMatrix.release();
 		luminanceMap.release();
 
@@ -48,11 +63,11 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
-			return true;
+			ret = !imageMatrix.empty();
 		}
-		else {
-			return false;
-		}
+
+		frame_mtx.unlock();
+		return ret;
 	}
 
 	void Video::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) {
