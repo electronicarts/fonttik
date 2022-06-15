@@ -18,6 +18,7 @@ namespace tin {
 		}
 
 		void TearDown() override {
+			delete media;
 			delete image;
 		}
 
