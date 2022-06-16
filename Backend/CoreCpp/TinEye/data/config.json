@@ -13,7 +13,7 @@
     "targetResolution":0,
     "targetDPI":0,
     "saveLogs":true,
-    "printValuesOnResults": false,
+    "printValuesOnResults": true,
     "videoFramesToSkip": 5,
     "videoImageOutputInterval" : 0,
     "focusMask": [

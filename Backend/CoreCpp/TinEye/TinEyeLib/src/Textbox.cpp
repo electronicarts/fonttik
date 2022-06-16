@@ -63,10 +63,26 @@ namespace tin {
 
 	cv::Mat Textbox::calculateTextMask() {
 		//OTSU threshold automatically calculates best fitting threshold values
-		cv::Mat unsignedLuminance,mask;
+		cv::Mat unsignedLuminance, mask;
 		cv::Mat luminanceRegion = getLuminanceMap();
 		luminanceRegion.convertTo(unsignedLuminance, CV_8UC1, 255);
 		cv::threshold(unsignedLuminance, mask, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
+
+		/*
+		Ensure that text is being highlighted
+		If text mask has an 'outline' of the box on top and bottom sides it means that most probably is inverted.
+		Another possible approach is to count masked pixels and non-masked pixels but for wider or bolder fonts
+		it doesn't work.
+		*/
+
+		cv::Mat topSide = mask(cv::Range(0, 1), cv::Range::all()),
+			botSide = mask(cv::Range(mask.rows - 1, mask.rows), cv::Range::all());
+
+		//If there's more positive pixels in top and bottom row than pixels in a single row, invert the mask
+		if (cv::countNonZero(topSide) + cv::countNonZero(botSide) - mask.cols > 0) {
+			cv::bitwise_not(mask, mask);
+		}
+
 		return mask;
 	}
 }
