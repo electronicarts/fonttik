@@ -32,9 +32,11 @@ namespace tin {
 		FRIEND_TEST(LuminanceTests, MaxContrast);
 		FRIEND_TEST(LuminanceTests, Commutative);
 	public:
-		TinEye() {};
+		TinEye();
+		TinEye(const TinEye& other);
 		//Overloaded constructor that automatically calls init with provided configuration
 		TinEye(Configuration* configuration) { init(configuration); }
+		//TinEye(TinEye&& src) noexcept;
 		~TinEye();
 		void init(Configuration* configuration);
 

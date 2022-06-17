@@ -31,10 +31,8 @@ namespace tin {
 	}
 
 	Frame* Image::getFrame() {
-		frame_mtx.lock();
-		Frame* frame = (processed) ? new Frame(this,0,imageMatrix) : nullptr;
+		Frame* frame = (!processed) ? new Frame(this,0,imageMatrix) : nullptr;
 		processed = true;
-		frame_mtx.unlock();
 
 		return frame;
 	}

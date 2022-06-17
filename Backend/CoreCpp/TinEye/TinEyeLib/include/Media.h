@@ -14,7 +14,6 @@ namespace tin {
 		cv::Mat imageMatrix;
 		cv::Mat luminanceMap;
 		fs::path path;
-		std::mutex frame_mtx;
 
 		Results results;
 

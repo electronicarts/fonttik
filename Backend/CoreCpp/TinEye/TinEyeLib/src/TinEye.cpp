@@ -20,6 +20,18 @@
 #include <boost/log/utility/setup/file.hpp>
 
 namespace tin {
+	TinEye::TinEye() {
+		std::cout << "Built Tineye" << std::endl;
+	};
+
+	TinEye::TinEye(const TinEye& other) {
+		std::cout << "TinEye Copy";
+		config = other.config;
+		if (config != nullptr) {
+			init(config);
+		}
+	}
+
 	std::vector<double>* TinEye::linearizationLUT = nullptr;
 
 	Results* TinEye::processMedia(Media& media) {
@@ -44,6 +56,7 @@ namespace tin {
 		}
 
 		Results* mediaRes= media.getResultsPointer();
+		Frame* nextFrame = media.getFrame();
 		while (nextFrame != nullptr) {
 			std::pair<FrameResults, FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
@@ -208,6 +221,8 @@ namespace tin {
 
 	TinEye::~TinEye()
 	{
+		std::cout << "Deleting TinEye" << std::endl;
+
 		if (textboxDetection != nullptr) {
 			delete textboxDetection;
 		}

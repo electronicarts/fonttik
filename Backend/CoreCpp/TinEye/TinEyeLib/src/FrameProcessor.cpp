@@ -1,18 +1,29 @@
-#include "FrameProcessingThread.h"
+#include "FrameProcessor.h"
 
 namespace tin {
-	FrameProcessingThread::FrameProcessingThread(Configuration* config):tineye(config) {}
+	void FrameProcessor::init(Configuration* config) {
+		tineye.init(config);
+	}
 
-	void FrameProcessingThread::work(Media* media) {
+	void FrameProcessor::work(Media* media, std::mutex* mtx) {
+		mtx->lock();
 		Frame* frame = media->getFrame();
+		media->nextFrame();
+		mtx->unlock();
 		Results* mediaRes = media->getResultsPointer();
 		while (frame!=nullptr) {
 				std::pair<FrameResults, FrameResults> res = tineye.processFrame(frame);
 				mediaRes->addSizeResults(res.first);
 				mediaRes->addContrastResults(res.second);
 				delete frame;
-				media->nextFrame();
+				mtx->lock();
 				frame = media->getFrame();
+				media->nextFrame();
+				mtx->unlock();
 		}
 	}
+
+	//std::thread spawn(Media* media) {
+	//	
+	//}
 }

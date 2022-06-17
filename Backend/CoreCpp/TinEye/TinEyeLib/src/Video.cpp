@@ -26,11 +26,8 @@ namespace tin {
 	}
 
 	Frame* Video::getFrame() {
-		frame_mtx.lock();
 		
-		Frame* frame = (imageMatrix.empty()) ? nullptr : new Frame(this, getFrameCount(),imageMatrix);
-
-		frame_mtx.unlock();
+		Frame* frame = (imageMatrix.empty()) ? nullptr : new Frame(this, getFrameCount(),imageMatrix.clone());
 
 		return frame;
 	}
@@ -38,9 +35,7 @@ namespace tin {
 	bool Video::nextFrame()
 	{
 		bool ret = false;
-		
-		frame_mtx.lock();
-		
+
 		imageMatrix.release();
 		luminanceMap.release();
 
@@ -63,13 +58,12 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
-			return !imageMatrix.empty();
+			ret = !imageMatrix.empty();
 		}
 		else {
-			return false;
+			ret = false;
 		}
 
-		frame_mtx.unlock();
 		return ret;
 	}
 

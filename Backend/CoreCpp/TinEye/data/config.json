@@ -8,7 +8,7 @@
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
-    "useTextRecognition": true,
+    "useTextRecognition": false,
     "useDPI":false,
     "targetResolution":0,
     "targetDPI":0,
