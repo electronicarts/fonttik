@@ -74,5 +74,8 @@ namespace tin {
 
 		//Path of the original image or the video its coming from
 		fs::path getPath();
+
+		//Parent media of the frame
+		Media* getMedia();
 	};
 }
