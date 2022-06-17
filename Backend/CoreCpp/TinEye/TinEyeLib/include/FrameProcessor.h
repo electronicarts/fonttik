@@ -7,16 +7,14 @@ namespace tin {
 	class FrameProcessor {
 		TinEye tineye;
 	public:
-		FrameProcessor() { std::cout << "Constructed FP" << std::endl; };
-		virtual ~FrameProcessor() {
-			std::cout << "Deleted FP" << std::endl;
-			//if (tineye != nullptr) {
-			//	delete tineye;
-			//}
-			//tineye = nullptr;
-		}
+		FrameProcessor() {};
+		virtual ~FrameProcessor() {		};
 		FrameProcessor(const FrameProcessor& source) {
-		std::cout << "FP copy constructor" << std::endl;
+			//Can't copy TinEye, we need to create a new one with the same config;
+			auto cfg = source.tineye.getConfig();
+			if (cfg != nullptr) {
+				init(cfg);
+			}
 		};
 		void work(Media* media, std::mutex* mtx);
 		void init(Configuration* config);

@@ -22,8 +22,4 @@ namespace tin {
 				mtx->unlock();
 		}
 	}
-
-	//std::thread spawn(Media* media) {
-	//	
-	//}
 }

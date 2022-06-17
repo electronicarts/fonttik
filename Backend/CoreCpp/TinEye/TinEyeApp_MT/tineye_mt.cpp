@@ -23,9 +23,8 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 	tin::Media* media = tin::Media::CreateMedia(path);
 
 	if (media != nullptr) {
-		//TODO This is a naive implementation to test worker threads. A propper thread management
-		//Must be implemented.
-
+		//TODO This implementation only improves video performance, if different images need to be processed
+		//If further improvements were needed for single images, media processor threads would need to be created
 		std::vector<std::thread> threads;
 		std::mutex media_mtx;
 		for (auto& worker : workers) {
@@ -35,9 +34,6 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 		for (auto& thread : threads) {
 			thread.join();
 		}
-		//for (auto& worker : *workers) {
-		//	worker.work(media);
-		//}
 
 		tin::Results* results = media->getResultsPointer();
 		std::cout << "SIZE: " << ((results->sizePass()) ? "PASS" : "FAIL") <<
@@ -110,12 +106,11 @@ int main(int argc, char* argv[]) {
 
 	int n_threads = std::thread::hardware_concurrency();
 	std::vector<tin::FrameProcessor*> workers;
-	//workers.reserve(n_threads);
+
 	for (int i = 0; i < n_threads; i++) {
 		workers.emplace_back(new tin::FrameProcessor());
 		workers.back()->init(&config);
 	}
-	//std::vector<std::thread> threads(FrameProcessingThread(config), std::thread::hardware_concurrency());
 
 
 	if (fs::exists(path)) {

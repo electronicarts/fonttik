@@ -49,6 +49,7 @@ namespace tin {
 		FrameResults textContrastCheck(Frame& frame, std::vector<Textbox>& boxes);
 		Results* processMedia(Media& media);
 		std::pair<FrameResults,FrameResults> processFrame(Frame* frame);
+		Configuration* getConfig() const { return config; }
 
 		//Operator
 		//Calculates the luminance of a given image matrix

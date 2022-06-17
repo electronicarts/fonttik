@@ -20,12 +20,9 @@
 #include <boost/log/utility/setup/file.hpp>
 
 namespace tin {
-	TinEye::TinEye() {
-		std::cout << "Built Tineye" << std::endl;
-	};
+	TinEye::TinEye() {	};
 
 	TinEye::TinEye(const TinEye& other) {
-		std::cout << "TinEye Copy";
 		config = other.config;
 		if (config != nullptr) {
 			init(config);
@@ -221,8 +218,6 @@ namespace tin {
 
 	TinEye::~TinEye()
 	{
-		std::cout << "Deleting TinEye" << std::endl;
-
 		if (textboxDetection != nullptr) {
 			delete textboxDetection;
 		}
