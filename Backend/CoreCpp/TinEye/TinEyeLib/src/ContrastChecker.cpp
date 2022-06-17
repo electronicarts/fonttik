@@ -41,7 +41,7 @@ namespace tin {
 			if (appSettings->saveHistograms()) {
 				PROFILE_SCOPE("saveHistograms");
 				cv::Rect boxRect = box.getRect();
-				fs::path savePath = image.getPath().replace_filename("img" + std::to_string(counter) + "histogram.png").string();
+				fs::path savePath = image.getMedia()->getOutputPath() / ("img" + std::to_string(counter) + "histogram.png");
 				Frame::saveLuminanceHistogram(box.getLuminanceHistogram(),
 					savePath.string());
 
@@ -58,7 +58,7 @@ namespace tin {
 		return contrastResults;
 	}
 
-	bool ContrastChecker::textboxContrastCheck(Frame& image, Textbox& textbox,FrameResults& results) {
+	bool ContrastChecker::textboxContrastCheck(Frame& image, Textbox& textbox, FrameResults& results) {
 		PROFILE_FUNCTION();
 		cv::Rect boxRect = textbox.getRect();
 
@@ -77,9 +77,9 @@ namespace tin {
 
 #ifdef _DEBUG
 		if (config->getAppSettings()->saveLuminanceMasks()) {
-			image.saveOutputData(luminanceRegion, "lum.png");
-			image.saveOutputData(maskA, "mask.png");
-			image.saveOutputData(maskB, "outlineMask.png");
+			//image.saveOutputData(luminanceRegion, "lum.png");
+			image.saveOutputData(maskA, image.getMedia()->getOutputPath() / ("mask" + std::to_string(textbox.getRect().x) + ".png"));
+			//BOOST_LOG_TRIVIAL(info) << "Mask positive: " << cv::countNonZero(maskA) << " mask negative: " << maskA.rows * maskA.cols - cv::countNonZero(maskA) << std::endl;
 		}
 #endif // _DEBUG
 

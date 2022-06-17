@@ -1,5 +1,6 @@
 #include "SizeChecker.h"
 #include "Instrumentor.h"
+#include "Media.h"
 
 namespace tin {
 	FrameResults tin::SizeChecker::check(Frame& image, std::vector<Textbox>& boxes)
@@ -38,7 +39,7 @@ namespace tin {
 
 #ifdef _DEBUG
 			if (appSettings->saveSeparateTextboxes()) {
-				image.saveOutputData(box.getSubmatrix(), "textbox_" + std::to_string(counter) + ".png");
+				image.saveOutputData(box.getSubmatrix(), image.getMedia()->getOutputPath() / ("textbox_" + std::to_string(counter) + ".png"));
 			}
 			counter++;
 

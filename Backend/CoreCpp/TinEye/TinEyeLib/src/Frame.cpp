@@ -156,4 +156,8 @@ namespace tin {
 	fs::path Frame::getPath() {
 		return parentMedia->getPath(); 
 	}
+
+	Media* Frame::getMedia() {
+		return parentMedia;
+	}
 }
