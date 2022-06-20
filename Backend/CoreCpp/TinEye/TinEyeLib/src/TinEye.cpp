@@ -20,6 +20,15 @@
 #include <boost/log/utility/setup/file.hpp>
 
 namespace tin {
+	TinEye::TinEye() {	};
+
+	TinEye::TinEye(const TinEye& other) {
+		config = other.config;
+		if (config != nullptr) {
+			init(config);
+		}
+	}
+
 	std::vector<double>* TinEye::linearizationLUT = nullptr;
 
 	Results* TinEye::processMedia(Media& media) {
@@ -44,13 +53,15 @@ namespace tin {
 		}
 
 		Results* mediaRes= media.getResultsPointer();
-		 do{
-			Frame* nextFrame = media.getFrame();
-			std::pair<FrameResults,FrameResults> res = processFrame(nextFrame);
+		Frame* nextFrame = media.getFrame();
+		while (nextFrame != nullptr) {
+			std::pair<FrameResults, FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
 			mediaRes->addContrastResults(res.second);
 			delete nextFrame;
-		 } while (media.nextFrame());
+			media.nextFrame();
+			nextFrame = media.getFrame();
+		}
 
 		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<
 			"\tCONTRAST: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") << std::endl;

@@ -32,9 +32,11 @@ namespace tin {
 		FRIEND_TEST(LuminanceTests, MaxContrast);
 		FRIEND_TEST(LuminanceTests, Commutative);
 	public:
-		TinEye() {};
+		TinEye();
+		TinEye(const TinEye& other);
 		//Overloaded constructor that automatically calls init with provided configuration
 		TinEye(Configuration* configuration) { init(configuration); }
+		//TinEye(TinEye&& src) noexcept;
 		~TinEye();
 		void init(Configuration* configuration);
 
@@ -47,6 +49,7 @@ namespace tin {
 		FrameResults textContrastCheck(Frame& frame, std::vector<Textbox>& boxes);
 		Results* processMedia(Media& media);
 		std::pair<FrameResults,FrameResults> processFrame(Frame* frame);
+		Configuration* getConfig() const { return config; }
 
 		//Operator
 		//Calculates the luminance of a given image matrix

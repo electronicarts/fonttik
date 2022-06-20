@@ -10,7 +10,7 @@
 namespace tin {
 	class Image : public Media {
 	protected:
-
+		bool processed = false;
 	public:
 		Image(fs::path path, cv::Mat frame);
 		virtual ~Image() {}
@@ -18,5 +18,7 @@ namespace tin {
 		virtual bool nextFrame() override { return false; };
 
 		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) override;
+
+		virtual Frame* getFrame() override;
 	};
 }

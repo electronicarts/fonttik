@@ -16,6 +16,8 @@ namespace tin {
 		Video(fs::path path, cv::VideoCapture capture);
 		virtual ~Video();
 
+		virtual Frame* getFrame() override;
+
 		virtual bool nextFrame() override;
 
 		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) override;

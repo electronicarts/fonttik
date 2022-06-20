@@ -34,7 +34,6 @@ namespace tin {
 	protected:
 		Results r;
 		void SetUp() override {
-			r = Results();
 			int frameNumbers[4] = { 6,3,76,2 };
 			for (const int& number:frameNumbers) {
 				r.addContrastResults(number);

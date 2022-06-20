@@ -29,4 +29,11 @@ namespace tin {
 
 		saveOutputData(highlights, path.string() + ".png");
 	}
+
+	Frame* Image::getFrame() {
+		Frame* frame = (!processed) ? new Frame(this,0,imageMatrix) : nullptr;
+		processed = true;
+
+		return frame;
+	}
 }

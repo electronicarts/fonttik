@@ -25,8 +25,17 @@ namespace tin {
 		}
 	}
 
+	Frame* Video::getFrame() {
+		
+		Frame* frame = (imageMatrix.empty()) ? nullptr : new Frame(this, getFrameCount(),imageMatrix.clone());
+
+		return frame;
+	}
+
 	bool Video::nextFrame()
 	{
+		bool ret = false;
+
 		imageMatrix.release();
 		luminanceMap.release();
 
@@ -49,11 +58,13 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
 
 			previousFrame = imageMatrix;
-			return !imageMatrix.empty();
+			ret = !imageMatrix.empty();
 		}
 		else {
-			return false;
+			ret = false;
 		}
+
+		return ret;
 	}
 
 	void Video::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) {
