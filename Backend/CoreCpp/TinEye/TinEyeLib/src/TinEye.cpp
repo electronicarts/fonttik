@@ -238,5 +238,4 @@ namespace tin {
 
 		config = nullptr;
 	}
-
 }
