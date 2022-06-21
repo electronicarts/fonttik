@@ -139,9 +139,9 @@ profile-tool:
         # run the tool in single threaded mode
         - echo "Profiling run for TinEye"
         - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
-        - ./TinEyeApp resources/knockout/Knockout720Subs.mp4 -c configurations/test_benchmarks.json
-        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp_MT
-        - ./TinEyeApp resources/knockout/Knockout720Subs.mp4 -c configurations/test_benchmarks.json
+        - ./TinEyeApp resources/knockout/720Subs.mp4 -c configurations/test_benchmarks.json
+        - cd ../TinEyeApp_MT
+        - ./TinEyeApp resources/knockout/720Subs.mp4 -c configurations/test_benchmarks.json
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
