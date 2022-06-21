@@ -13,6 +13,16 @@ namespace fs = std::filesystem;
 
 const std::regex outputDir("_output$");
 
+char* getCmdOption(char** begin, char** end, const std::string& option)
+{
+	char** itr = std::find(begin, end, option);
+	if (itr != end && ++itr != end)
+	{
+		return *itr;
+	}
+	return 0;
+}
+
 bool cmdOptionExists(char** begin, char** end, const std::string& option)
 {
 	return std::find(begin, end, option) != end;
@@ -90,7 +100,13 @@ int main(int argc, char* argv[]) {
 
 
 	tin::TinEye tineye = tin::TinEye();
-	tin::Configuration config = tin::Configuration("config.json");
+	char* configFilename = getCmdOption(argv, argv + argc, "-c");
+	std::string configPath((configFilename) ? configFilename : "config.json");
+	if (!fs::exists(configPath)) {
+		BOOST_LOG_TRIVIAL(error) << configPath << " configuration file was not found, using default file";
+		configPath = std::string("config.json");
+	}
+ 	tin::Configuration config = tin::Configuration(configPath);
 	tineye.init(&config);
 
 	if (fs::exists(path)) {

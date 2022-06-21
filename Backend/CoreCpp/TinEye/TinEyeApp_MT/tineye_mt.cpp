@@ -19,6 +19,16 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 	return std::find(begin, end, option) != end;
 }
 
+char* getCmdOption(char** begin, char** end, const std::string& option)
+{
+	char** itr = std::find(begin, end, option);
+	if (itr != end && ++itr != end)
+	{
+		return *itr;
+	}
+	return 0;
+}
+
 void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path path, tin::Configuration& config) {
 	tin::Media* media = tin::Media::CreateMedia(path);
 
@@ -30,7 +40,7 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 		for (auto& worker : workers) {
 			threads.push_back(std::thread(&tin::FrameProcessor::work, worker, media, &media_mtx));
 		}
-		
+
 		for (auto& thread : threads) {
 			thread.join();
 		}
@@ -101,8 +111,14 @@ int main(int argc, char* argv[]) {
 		path = fs::path(argv[1]);
 	}
 
+	char* configFilename = getCmdOption(argv, argv + argc, "-c");
 
-	tin::Configuration config = tin::Configuration("config.json");
+	std::string configPath((configFilename) ? configFilename : "config.json");
+	if (!fs::exists(configPath)) {
+		BOOST_LOG_TRIVIAL(error) << configPath << " configuration file was not found, using default file";
+		configPath = std::string("config.json");
+	}
+	tin::Configuration config = tin::Configuration(configPath);
 
 	int n_threads = std::thread::hardware_concurrency();
 	std::vector<tin::FrameProcessor*> workers;
