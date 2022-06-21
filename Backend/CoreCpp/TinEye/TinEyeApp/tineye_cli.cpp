@@ -1,6 +1,7 @@
 #include "TinEye.h"
 #include "Configuration.h"
 #include "Media.h"
+#include "Instrumentor.h"
 
 #include <iostream>
 #include <algorithm>
@@ -77,6 +78,7 @@ int main(int argc, char* argv[]) {
 	
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
+	Instrumentor::Get().BeginSession("Profile", "profiling.json");
 
 	fs::path path;
 
@@ -122,5 +124,5 @@ int main(int argc, char* argv[]) {
 		std::cerr << "Path not found " << std::endl;
 	}
 
-
+	Instrumentor::Get().EndSession();
 }

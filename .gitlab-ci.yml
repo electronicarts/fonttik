@@ -65,6 +65,7 @@ build-corecpp:
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
+            - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp_MT
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/TinEyeLib.Tests
             - $TINEYE_CPP_BUILD_PATH/linux-debug/TinEye/AddressSanitizer.Tests
@@ -135,28 +136,13 @@ profile-tool:
         changes:
             - "Backend/CoreCpp/**/*" 
     script:
-        # run the tool
+        # run the tool in single threaded mode
         - echo "Profiling run for TinEye"
         - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
-        - ./TinEyeApp resources/knockout/Knockout1080.bmp
+        - ./TinEyeApp resources/knockout/Knockout720Subs.mp4 -c configurations/test_benchmarks.json
+        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp_MT
+        - ./TinEyeApp resources/knockout/Knockout720Subs.mp4 -c configurations/test_benchmarks.json
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
-benchmark-tool:
-    stage: test-corecpp
-    image: docker.artifactory.ea.com/gcc:latest
-    #Right now, the benchmarks are snippets that dont rely on TinEyes real functionality
-    #Once the benchmarks start targetting TinEye code, change this job to run
-    #Every time the library is changed
-    only:
-        changes:
-            - "Backend/CoreCpp/TinEye/TinEyeLib.Benchmarks/*" 
-    tags:
-        - docker
-    dependencies:
-        - build-corecpp
-    script:
-        # run the tool
-        - echo "Running TinEye benchmarks"
-        - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeLib.Benchmarks
-        - ./TinEyeLib.Benchmarks
+            - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp_MT/profiling.json

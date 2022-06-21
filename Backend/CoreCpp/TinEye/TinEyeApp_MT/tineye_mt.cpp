@@ -1,6 +1,7 @@
 #include "FrameProcessor.h"
 #include "Configuration.h"
 #include "Media.h"
+#include "Instrumentor.h"
 
 #include <iostream>
 #include <algorithm>
@@ -86,6 +87,7 @@ void processFolder(const std::vector<tin::FrameProcessor*>& workers, fs::path pa
 }
 
 int main(int argc, char* argv[]) {
+	Instrumentor::Get().BeginSession("Profile", "profiling.json");
 
 	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
 	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
@@ -146,4 +148,5 @@ int main(int argc, char* argv[]) {
 		delete* it;
 	}
 
+	Instrumentor::Get().EndSession();
 }
