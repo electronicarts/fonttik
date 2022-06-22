@@ -90,8 +90,6 @@ namespace tin {
 
 	void TinEye::init(Configuration* configuration)
 	{
-
-		Instrumentor::Get().BeginSession("Profile", "profiling.json");	
 		PROFILE_FUNCTION();
 		config = configuration;
 
@@ -239,6 +237,5 @@ namespace tin {
 		sizeChecker = nullptr;
 
 		config = nullptr;
-		Instrumentor::Get().EndSession();
 	}
 }
