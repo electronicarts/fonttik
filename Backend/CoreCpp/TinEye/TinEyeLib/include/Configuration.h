@@ -19,6 +19,8 @@ namespace tin {
 		TextDetectionParams textDetectionParams;//EAST detection and post processing
 		TextRecognitionParams textRecognitionParams;//OpenCV's OCR recognition
 		std::vector<double> rgbLookUp;//look up table to optimize color space transformation
+
+		void logLoadingError(std::string name);
 	public:
 		Configuration();
 		Configuration(fs::path configPath);
