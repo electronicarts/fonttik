@@ -21,6 +21,7 @@ namespace tin {
 
 		for (auto boxIt = boxes.begin(); boxIt != boxes.end(); boxIt++) {
 			for (auto targetIt = boxIt; targetIt != boxes.end(); ) {
+				//If two boxes overlap over our thresholds, we merge them
 				if (boxIt != targetIt) {
 					auto overlap = Textbox::OverlapAxisPercentage(*boxIt, *targetIt);
 					if (overlap.first >= mergeThreshold.first && overlap.second >= mergeThreshold.second) {

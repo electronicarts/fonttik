@@ -10,9 +10,13 @@ namespace tin {
 
 		cv::Mat submatrix;
 		cv::Mat luminanceHistogram;
-		cv::Mat textMask;
+		cv::Mat textMask; //Shows where text is located in the image (text as 1s and not text as 0s)
 
 		Frame* parentImage = nullptr;
+		/// <summary>
+		/// Determines where text is located
+		/// </summary>
+		/// <returns></returns>
 		cv::Mat calculateTextMask();
 	public:
 		/* Operator method
@@ -29,6 +33,10 @@ namespace tin {
 		//Sets textbox's parent image and calculates its submatrix
 		void setParentMedia(Frame* media);
 
+		/// <summary>
+		/// Changes this textbox into one that includes itself and another
+		/// </summary>
+		/// <param name="other">absorbed textbox</param>
 		void mergeWith(Textbox& other) { textboxRect = textboxRect | other.getRect(); };
 
 		//Returns and saves the luminance histogram of the specified textbox rect

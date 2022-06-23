@@ -67,9 +67,10 @@ namespace tin {
 		cv::Mat luminanceRegion = textbox.getLuminanceMap();
 		maskA = textbox.getTextMask();
 
-		//Dilate and then substract maskA to get the outline of the mask
+		//Dilate and then substract maskA to get the outline of the text
 		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
 		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
+		
 		//To prevent antialising messing with measurements we expand the mask to be subtracted
 		cv::Mat substraction;
 		cv::dilate(maskA, substraction, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));

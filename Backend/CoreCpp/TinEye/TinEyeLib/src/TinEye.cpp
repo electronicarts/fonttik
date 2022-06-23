@@ -70,9 +70,11 @@ namespace tin {
 	}
 
 	std::pair<FrameResults,FrameResults> TinEye::processFrame(Frame* frame) {
-		//Check if image has text recognized by OCR
+		//Ignore portions of image as specifid by configuration files
 		applyFocusMask(*frame);
+		//Detect relevant text
 		std::vector<tin::Textbox> textBoxes = getTextBoxes(*frame);
+		//Post processing to improve OpenCV's NMS algorithm, taking into account that text is aligned
 		mergeTextBoxes(textBoxes);
 		FrameResults sizeRes(-1);
 		FrameResults contrastRes(-1);

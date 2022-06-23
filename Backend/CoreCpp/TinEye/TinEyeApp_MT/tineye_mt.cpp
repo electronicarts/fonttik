@@ -76,6 +76,7 @@ void processFolder(const std::vector<tin::FrameProcessor*>& workers, fs::path pa
 		}
 		//Ignore output results
 		else if (fs::is_directory(directoryEntry)) {
+			//Avoid endless recursion produced by analysing results and producing more results to analyse
 			if (std::regex_search(directoryEntry.path().string(), outputDir)) {
 				std::cout << directoryEntry << "is already a results folder" << std::endl;
 			}

@@ -26,9 +26,6 @@ namespace tin {
 		if (!imageMatrix.empty()) {
 			imageMatrix.release();
 		}
-		if (!luminanceMap.empty()) {
-			luminanceMap.release();
-		}
 	}
 
 	void Media::saveOutputData(cv::Mat data, fs::path path) {

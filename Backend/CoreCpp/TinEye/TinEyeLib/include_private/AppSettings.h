@@ -56,6 +56,11 @@ namespace tin {
 		int getSpecifiedSize() const;
 		bool usingDPI() const { return useDPI; }
 
+		/// <summary>
+		/// Applies a mask that sets to 0 al pixels set to be ignored
+		/// </summary>
+		/// <param name="focus">anything not contained here will be ignored</param>
+		/// <param name="ignore">rects to be ignored</param>
 		void setFocusMask(std::vector<cv::Rect2f> focus, std::vector<cv::Rect2f> ignore = {});
 
 		cv::Mat calculateMask(int width, int height);

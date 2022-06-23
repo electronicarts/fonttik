@@ -59,6 +59,8 @@ namespace tin {
 		ResultType type = ResultType::PASS;
 
 		//Calculate height and width precisely
+		//Instead of using the size of the rect, we use the positions of the white mask pixels (representing text)
+		//with highest and lowest x and y coordinates.
 		cv::Mat textMask = textbox.getTextMask();
 		std::vector<cv::Point> nonZero;
 		cv::findNonZero(textMask, nonZero);

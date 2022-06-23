@@ -12,7 +12,7 @@
 
 namespace fs = std::filesystem;
 
-const std::regex outputDir("_output$");
+const std::regex outputDir("_output$"); //ignored directories
 
 char* getCmdOption(char** begin, char** end, const std::string& option)
 {
@@ -64,6 +64,7 @@ void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& confi
 		}
 		//Ignore output results
 		else if (fs::is_directory(directoryEntry)) {
+			//Avoid endless recursion produced by analysing results and producing more results to analyse
 			if (std::regex_search(directoryEntry.path().string(), outputDir)) {
 				std::cout << directoryEntry << "is already a results folder" << std::endl;
 			}

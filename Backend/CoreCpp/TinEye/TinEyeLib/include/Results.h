@@ -57,16 +57,21 @@ namespace tin {
 	};
 
 	class Results {
-		friend class FrameSorting;
+		friend class FrameSorting; //Unit testing class
 
 
 		bool overallContrastPass = true;
 		bool overallSizePass = true;
 		bool warningsRaisedFlag = false;
 
-		//Pairs' int value identifies the frame number of the result
+		// Flags to keep track of the sorted status of the results
+		// Flase: a result has been added and we can't ensure they are sorted
+		// True: we can ensure the results are sorted
 		bool sortedContrast = false,
 			sortedSize = false;
+		
+		//both mutex allow for different threads saving their results in any order
+		
 		std::vector<FrameResults> contrastResults;
 		std::mutex contrast_mtx;
 		std::vector<FrameResults> sizeResults;
@@ -110,9 +115,13 @@ namespace tin {
 			size_mtx.unlock();
 		}
 
+		/// <summary>
+		/// Returns the sorted contrast resutls
+		/// </summary>
+		/// <returns></returns>
 		std::vector<FrameResults>& getContrastResults() {
 			contrast_mtx.lock();
-
+			//Data is only sorted upon retrieval
 			if (!sortedContrast) {
 				std::sort(contrastResults.begin(), contrastResults.end());
 				sortedContrast = true;
@@ -122,10 +131,14 @@ namespace tin {
 			contrast_mtx.unlock();
 			return res;
 		}
-
+		
+		/// <summary>
+		/// /// Returns the sorted size resutls
+		/// </summary>
+		/// <returns></returns>
 		std::vector<FrameResults>& getSizeResults() {
 			size_mtx.lock();
-
+			//Data is only sorted upon retrieval
 			if (!sortedSize) {
 				std::sort(sizeResults.begin(), sizeResults.end());
 				sortedSize= true;
