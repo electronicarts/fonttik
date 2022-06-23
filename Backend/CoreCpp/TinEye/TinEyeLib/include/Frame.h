@@ -8,9 +8,10 @@ namespace fs = std::filesystem;
 
 namespace tin {
 	class Media;
+	//Holds the necessary information to 
 	class Frame {
-		Media* parentMedia;
-		int frameNumber;
+		Media* parentMedia;//Original media the frame belongs to, useful for getting output path
+		int frameNumber; //Needed to sort frames during multi processing
 		cv::Mat imageMatrix;
 		cv::Mat luminanceMap;
 

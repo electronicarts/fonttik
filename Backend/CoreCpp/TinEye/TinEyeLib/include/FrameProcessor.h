@@ -10,7 +10,7 @@ namespace tin {
 		FrameProcessor() {};
 		virtual ~FrameProcessor() {		};
 		FrameProcessor(const FrameProcessor& source) {
-			//Can't copy TinEye, we need to create a new one with the same config;
+			//Can't copy TinEye, two instances cant access the same text detector or OCR, we need to create a new one with the same config;
 			auto cfg = source.tineye.getConfig();
 			if (cfg != nullptr) {
 				init(cfg);

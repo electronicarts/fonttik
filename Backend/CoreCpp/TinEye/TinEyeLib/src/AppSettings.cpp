@@ -53,8 +53,10 @@ namespace tin {
 	}
 
 	cv::Mat AppSettings::calculateMask(int width, int height) {
+		//by default everything is ignored
 		cv::Mat mat(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
 
+		//Regions inside focus maks are not ignored
 		for (cv::Rect2f rect : focusMasks) {
 			cv::Rect absRect(rect.x * width, rect.y * height,
 				rect.width * width, rect.height * height);

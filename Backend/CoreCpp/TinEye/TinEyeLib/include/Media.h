@@ -11,9 +11,8 @@ namespace tin {
 	class Frame;
 	class Media {
 	protected:
-		cv::Mat imageMatrix;
-		cv::Mat luminanceMap;
-		fs::path path;
+		cv::Mat imageMatrix; //Image matrix for the current frame.
+		fs::path path; //Location of the original file, used for creating a sub-directory with the results
 
 		Results results;
 
@@ -27,7 +26,10 @@ namespace tin {
 		//returns nullptr in case of invalid file
 		static Media* CreateMedia(fs::path path);
 
-		//gets a copy of the current frame, USER IS RESPONSIBLE FOR DELETION
+		/// <summary>
+		/// gets a copy of the current frame, USER IS RESPONSIBLE FOR DELETION
+		/// </summary>
+		/// <returns></returns>
 		virtual Frame* getFrame() = 0;
 		//If loaded file is a video grabs the next frame and returns true, if no frame available or file is an image returns false
 		virtual bool nextFrame() = 0;

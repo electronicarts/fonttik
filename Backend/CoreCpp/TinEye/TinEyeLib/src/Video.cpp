@@ -37,7 +37,6 @@ namespace tin {
 		bool ret = false;
 
 		imageMatrix.release();
-		luminanceMap.release();
 
 		if (videoCapture.isOpened()) {
 			videoCapture >> imageMatrix;

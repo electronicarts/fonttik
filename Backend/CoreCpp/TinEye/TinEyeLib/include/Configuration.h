@@ -14,11 +14,11 @@ namespace tin {
 
 	class Configuration {
 	private:
-		AppSettings appSettings;
-		Guideline guideline;
-		TextDetectionParams textDetectionParams;
-		TextRecognitionParams textRecognitionParams;
-		std::vector<double> rgbLookUp;
+		AppSettings appSettings; //Values for user preferences, such as what data to save
+		Guideline guideline; //Values for text and contrast measurements
+		TextDetectionParams textDetectionParams;//EAST detection and post processing
+		TextRecognitionParams textRecognitionParams;//OpenCV's OCR recognition
+		std::vector<double> rgbLookUp;//look up table to optimize color space transformation
 	public:
 		Configuration();
 		Configuration(fs::path configPath);
