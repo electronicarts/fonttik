@@ -100,7 +100,7 @@ namespace tin {
 
 		//Initialize EAST detection
 		textboxDetection = new TextboxDetectionEAST();
-		textboxDetection->init(config->getTextDetectionParams());
+		textboxDetection->init(config->getTextDetectionParams(), config->getAppSettings());
 
 
 		//Initialize text recognition only if text recognition is enabled in config
@@ -145,7 +145,7 @@ namespace tin {
 
 	std::vector<Textbox> TinEye::getTextBoxes(Frame& image) {
 		PROFILE_FUNCTION();
-		return textboxDetection->detectBoxes(image.getImageMatrix(), config->getAppSettings(), config->getTextDetectionParams());
+		return textboxDetection->detectBoxes(image.getImageMatrix());
 	}
 
 	void TinEye::mergeTextBoxes(std::vector<Textbox>& textBoxes) {
