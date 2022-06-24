@@ -66,7 +66,7 @@ namespace tin {
 
 	void Configuration::logLoadingError(std::string name) {
 		BOOST_LOG_TRIVIAL(error) << "ATTENTION! There was a problem loading: " << name
-			<< ", one or more of its value are possibly malformed or missing.\n" <<
-			name << " configuration values will be reverted to DEFAULT configuration." << std::endl;
+			<< ", one or more of its value are possibly malformed or missing.\n" << std::endl;
+		BOOST_LOG_TRIVIAL(error) << name << " configuration values will be reverted to DEFAULT configuration during this execution." << std::endl;
 	}
 }
