@@ -14,12 +14,16 @@ namespace tin {
 	
 		//Initialize textbox detection with configuration parameters, must be called before any detection calls
 		ITextboxDetection() {};
+
+		//Caching of appSettings and textDetectionParams pointers
+		const TextDetectionParams* detectionParams = nullptr;
+		const AppSettings* appSettings = nullptr;
 	public:
-		virtual void init(const TextDetectionParams* params) = 0;
+		virtual void init(const TextDetectionParams* params, const AppSettings* appSettingsCfg) = 0;
 		//Releases memory used by textbox detection model
 		virtual ~ITextboxDetection() {};
 
-		virtual std::vector<Textbox> detectBoxes(const cv::Mat& img, const AppSettings* appSettigs, const TextDetectionParams* params) = 0;
+		virtual std::vector<Textbox> detectBoxes(const cv::Mat& img) = 0;
 
 		//Merges textboxes given a certain threshold for horizontal and vertical overlap
 		static void mergeTextBoxes(std::vector<Textbox>& textBoxes, const TextDetectionParams* params);

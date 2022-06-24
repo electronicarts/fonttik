@@ -14,12 +14,12 @@ namespace tin {
 		TextboxDetectionEAST() :ITextboxDetection() {};
 
 		//Initialize textbox detection with configuration parameters, must be called before any detection calls
-		virtual void init(const TextDetectionParams* params);
+		virtual void init(const TextDetectionParams* params, const AppSettings* appSettingsCfg);
 
 		//Releases memory used by textbox detection model
 		virtual ~TextboxDetectionEAST();
 
-		virtual std::vector<Textbox> detectBoxes(const cv::Mat& img, const AppSettings* appSettigs, const TextDetectionParams* params);
+		virtual std::vector<Textbox> detectBoxes(const cv::Mat& img);
 	};
 
 }

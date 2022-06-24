@@ -9,21 +9,24 @@
 #include "Instrumentor.h"
 
 namespace tin {
-	void TextboxDetectionEAST::init(const TextDetectionParams* params)
+	void TextboxDetectionEAST::init(const TextDetectionParams* params, const AppSettings* appSettingsCfg)
 	{
-		east = new cv::dnn::TextDetectionModel_EAST(params->getDetectionModel());
+		detectionParams = params;
+		appSettings = appSettingsCfg;
+
+		east = new cv::dnn::TextDetectionModel_EAST(detectionParams->getDetectionModel());
 
 		BOOST_LOG_TRIVIAL(trace) << "Confidence set to "
-			<< params->getConfidenceThreshold() << std::endl;
+			<< detectionParams->getConfidenceThreshold() << std::endl;
 		//Confidence on textbox threshold
-		east->setConfidenceThreshold(params->getConfidenceThreshold());
+		east->setConfidenceThreshold(detectionParams->getConfidenceThreshold());
 		//Non Maximum supression
-		east->setNMSThreshold(params->getNMSThreshold());
+		east->setNMSThreshold(detectionParams->getNMSThreshold());
 
-		east->setInputScale(params->getDetectionScale());
+		east->setInputScale(detectionParams->getDetectionScale());
 
 		//Default values from documentation are (123.68, 116.78, 103.94);
-		auto mean = params->getDetectionMean();
+		auto mean = detectionParams->getDetectionMean();
 		cv::Scalar detMean(mean[0], mean[1], mean[2]);
 		east->setInputMean(detMean);
 
@@ -50,7 +53,7 @@ namespace tin {
 		warpPerspective(frame, result, rotationMatrix, outputSize);
 	}
 
-	std::vector<Textbox> TextboxDetectionEAST::detectBoxes(const cv::Mat& img, const AppSettings* appSettings, const TextDetectionParams* params)
+	std::vector<Textbox> TextboxDetectionEAST::detectBoxes(const cv::Mat& img)
 	{
 		//Calculate needed conversion for new width and height to be multiples of 32
 		////This needs to be multiple of 32
@@ -94,7 +97,7 @@ namespace tin {
 
 		std::vector<Textbox> boxes;
 		for (std::vector<cv::Point > points : detResults) {
-			if (HorizontalTiltAngle(points[1], points[2]) < params->getRotationThresholdRadians()) {
+			if (HorizontalTiltAngle(points[1], points[2]) < detectionParams->getRotationThresholdRadians()) {
 				boxes.emplace_back(points);
 			}
 			else {
