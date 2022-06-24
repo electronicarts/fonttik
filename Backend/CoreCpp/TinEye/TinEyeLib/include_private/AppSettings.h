@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <nlohmann/json.hpp>
 
+#include "Results.h"
+
 namespace fs = std::filesystem;
 
 namespace tin {
@@ -21,6 +23,7 @@ namespace tin {
 		int targetDPI = 0,
 			targetResolution = 0;
 		fs::path resultsPath = "./", debugInfoPath = "./debug/";
+		std::vector<cv::Scalar> outlineColors = std::vector<cv::Scalar>(ResultType::RESULTYPE_COUNT,cv::Scalar(1.0));
 
 
 		//All mask measurement range from 0 to 1, this will be scaled in functino of image size
@@ -29,6 +32,7 @@ namespace tin {
 
 		template<typename T>
 		static cv::Rect_<T> RectFromJson(nlohmann::json data);
+		static cv::Scalar ScalarFromJson(nlohmann::json data);
 	public:
 		AppSettings() :
 			dbgSaveLuminanceMap(true),
@@ -55,6 +59,7 @@ namespace tin {
 		fs::path getDebugInfoPath() const { return debugInfoPath; }
 		int getSpecifiedSize() const;
 		bool usingDPI() const { return useDPI; }
+		const auto& getColors() { return outlineColors; }
 
 		/// <summary>
 		/// Applies a mask that sets to 0 al pixels set to be ignored

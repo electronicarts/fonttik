@@ -35,6 +35,11 @@ namespace tin {
 		targetDPI = settings["targetDPI"];
 		targetResolution = settings["targetResolution"];
 
+		outlineColors[PASS] = ScalarFromJson(settings["textboxOutlineColors"]["pass"]);
+		outlineColors[WARNING] = ScalarFromJson(settings["textboxOutlineColors"]["warning"]);
+		outlineColors[FAIL] = ScalarFromJson(settings["textboxOutlineColors"]["fail"]);
+		outlineColors[UNRECOGNIZED] = ScalarFromJson(settings["textboxOutlineColors"]["unrecognized"]);
+
 		int framesToSkip = settings["videoFramesToSkip"];
 		int videoFrameOutputInterval = settings["videoImageOutputInterval"];
 		Video::setFramesToSkip(framesToSkip);
@@ -83,5 +88,14 @@ namespace tin {
 	template<typename T>
 	cv::Rect_<T> AppSettings::RectFromJson(nlohmann::json data) {
 		return { data["x"], data["y"], data["w"], data["h"] };
+	}
+
+	cv::Scalar AppSettings::ScalarFromJson(nlohmann::json data) {
+		cv::Scalar v;
+		int size = data.size();
+		for (int i = 0; i < 4; i++) {
+			v[i] = (i<size)?data[i]:1;
+		}
+		return v;
 	}
 }

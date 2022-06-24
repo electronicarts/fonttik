@@ -5,10 +5,13 @@
 namespace tin {
 	enum ResultType
 	{
-		PASS,
+		PASS = 0,
 		FAIL,
 		WARNING,
-		UNRECOGNIZED
+		UNRECOGNIZED,
+		//Not an actual result, but usefull to know how many types of resutls there are 
+		//Keep always as the last item
+		RESULTYPE_COUNT
 	};
 
 	struct ResultBox {

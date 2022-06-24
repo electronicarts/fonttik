@@ -4,6 +4,12 @@
     "debugInfoPath": "./debug_info/",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
+    "textboxOutlineColors":{
+      "pass": [0,136,255],
+      "warning": [255,193,7],
+      "fail": [255,0,93],
+      "unrecognized":[25,25,25]
+    },
     "saveSeparateTexboxes": false,
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
