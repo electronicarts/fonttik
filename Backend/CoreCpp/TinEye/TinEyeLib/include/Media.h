@@ -35,7 +35,7 @@ namespace tin {
 		virtual bool nextFrame() = 0;
 
 		//Generates outlines for the image's results and saves them
-		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers = false) = 0;
+		virtual void saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, const std::vector<cv::Scalar>& colors, bool saveNumbers = false) = 0;
 
 		//Path of the original image or the video its coming from
 		fs::path getPath() { return path; };

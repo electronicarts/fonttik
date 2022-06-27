@@ -66,7 +66,7 @@ namespace tin {
 		return ret;
 	}
 
-	void Video::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) {
+	void Video::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, const std::vector<cv::Scalar>& colors, bool saveNumbers) {
 		//Create output path
 		fs::path outputPath = getOutputPath();
 
@@ -90,7 +90,7 @@ namespace tin {
 			frameCopy = frameMat.clone();
 
 			for (ResultBox& box : results[resultIndex].results) {
-				cv::Scalar color = box.getResultColor();
+				cv::Scalar color = colors[box.type];
 				Frame::highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy, 2);
 			}
 

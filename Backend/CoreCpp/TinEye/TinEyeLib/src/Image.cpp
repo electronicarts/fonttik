@@ -12,11 +12,11 @@ namespace tin {
 		imageMatrix = imgMat;
 	}
 
-	void Image::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, bool saveNumbers) {
+	void Image::saveResultsOutlines(std::vector<FrameResults>& results, fs::path path, const std::vector<cv::Scalar>& colors, bool saveNumbers) {
 		cv::Mat highlights = imageMatrix.clone();
 
 		for (ResultBox& box : results.back().results) {
-			cv::Scalar color = box.getResultColor();
+			cv::Scalar color = colors[box.type];
 			Frame::highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, highlights, 2);
 		}
 

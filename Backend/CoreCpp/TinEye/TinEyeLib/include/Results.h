@@ -5,10 +5,13 @@
 namespace tin {
 	enum ResultType
 	{
-		PASS,
+		PASS = 0,
 		FAIL,
 		WARNING,
-		UNRECOGNIZED
+		UNRECOGNIZED,
+		//Not an actual result, but usefull to know how many types of resutls there are 
+		//Keep always as the last item
+		RESULTYPE_COUNT
 	};
 
 	struct ResultBox {
@@ -19,24 +22,6 @@ namespace tin {
 		ResultBox(ResultType type, int x, int y, int w, int h, double value) :
 			type(type), x(x), y(y), width(w), height(h), value(value) {}
 
-		cv::Scalar getResultColor() {
-			cv::Scalar color;
-			switch (type) {
-			case ResultType::PASS:
-				color = cv::Scalar(0, 255, 0);
-				break;
-			case ResultType::FAIL:
-				color = cv::Scalar(0, 0, 255);
-				break;
-			case ResultType::UNRECOGNIZED:
-				color = cv::Scalar(255, 0, 0);
-				break;
-			case ResultType::WARNING:
-				color = cv::Scalar(0, 170, 255);
-				break;
-			}
-			return color;
-		}
 	};
 
 	struct FrameResults {
