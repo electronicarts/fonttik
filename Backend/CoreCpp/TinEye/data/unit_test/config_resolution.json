@@ -5,9 +5,9 @@
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
     "textboxOutlineColors":{
-      "pass": [0,136,255],
-      "warning": [255,193,7],
-      "fail": [255,0,93],
+      "pass": [0,255,0],
+      "warning": [0,0,255],
+      "fail": [255,0,0],
       "unrecognized":[25,25,25]
     },
     "saveSeparateTexboxes": false,

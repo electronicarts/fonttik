@@ -54,10 +54,10 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 		tin::AppSettings* appSettings = config.getAppSettings();
 		if (appSettings->saveTexboxOutline()) {
 			media->saveResultsOutlines(results->getContrastResults(),
-				media->getOutputPath() / "contrastChecks",
+				media->getOutputPath() / "contrastChecks", appSettings->getColors(),
 				appSettings->printValuesOnResults());
 			media->saveResultsOutlines(results->getSizeResults(),
-				media->getOutputPath() / "sizeChecks",
+				media->getOutputPath() / "sizeChecks", appSettings->getColors(),
 				appSettings->printValuesOnResults());
 		}
 
