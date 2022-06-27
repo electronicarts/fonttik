@@ -35,10 +35,10 @@ namespace tin {
 		targetDPI = settings["targetDPI"];
 		targetResolution = settings["targetResolution"];
 
-		outlineColors[PASS] = ScalarFromJson(settings["textboxOutlineColors"]["pass"]);
-		outlineColors[WARNING] = ScalarFromJson(settings["textboxOutlineColors"]["warning"]);
-		outlineColors[FAIL] = ScalarFromJson(settings["textboxOutlineColors"]["fail"]);
-		outlineColors[UNRECOGNIZED] = ScalarFromJson(settings["textboxOutlineColors"]["unrecognized"]);
+		outlineColors[PASS] = ColorFromJson(settings["textboxOutlineColors"]["pass"]);
+		outlineColors[WARNING] = ColorFromJson(settings["textboxOutlineColors"]["warning"]);
+		outlineColors[FAIL] = ColorFromJson(settings["textboxOutlineColors"]["fail"]);
+		outlineColors[UNRECOGNIZED] = ColorFromJson(settings["textboxOutlineColors"]["unrecognized"]);
 
 		int framesToSkip = settings["videoFramesToSkip"];
 		int videoFrameOutputInterval = settings["videoImageOutputInterval"];
@@ -90,12 +90,18 @@ namespace tin {
 		return { data["x"], data["y"], data["w"], data["h"] };
 	}
 
-	cv::Scalar AppSettings::ScalarFromJson(nlohmann::json data) {
+	cv::Scalar AppSettings::ColorFromJson(nlohmann::json data) {
 		cv::Scalar v;
 		int size = data.size();
 		for (int i = 0; i < 4; i++) {
+			//Fills empty positions with 1s, mainly for alpha channel
 			v[i] = (i<size)?static_cast<int>(data[i]):1;
 		}
+		//swaps from rgb to bgr
+		int aux = v[2];
+		v[2] = v[0];
+		v[0] = aux;
+
 		return v;
 	}
 }

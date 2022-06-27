@@ -32,7 +32,14 @@ namespace tin {
 
 		template<typename T>
 		static cv::Rect_<T> RectFromJson(nlohmann::json data);
-		static cv::Scalar ScalarFromJson(nlohmann::json data);
+
+		/// <summary>
+		/// Loads a color from a JSON, expects RGB because is the most common format for users
+		/// The output is BGR because of OpenCVs implementation
+		/// </summary>
+		/// <param name="data"></param>
+		/// <returns></returns>
+		static cv::Scalar ColorFromJson(nlohmann::json data);
 	public:
 		AppSettings() :
 			dbgSaveLuminanceMap(true),

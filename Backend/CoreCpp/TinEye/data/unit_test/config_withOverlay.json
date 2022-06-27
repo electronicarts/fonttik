@@ -7,7 +7,7 @@
     "saveSeparateTexboxes": false,
     "textboxOutlineColors":{
       "pass": [0,255,0],
-      "warning": [0,0,255],
+      "warning": [255,170,0],
       "fail": [255,0,0],
       "unrecognized":[25,25,25]
     },

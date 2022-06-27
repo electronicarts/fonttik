@@ -24,12 +24,11 @@ namespace tin {
 			cv::Mat result = cv::imread((media->getOutputPath() / (name + ".png")).string(), cv::IMREAD_COLOR);
 			cv::Mat expected = cv::imread(path, cv::IMREAD_COLOR);
 
-			return (cv::sum(result != expected) == cv::Scalar(0, 0, 0, 0));;
+			return (cv::sum(result != expected) == cv::Scalar(0, 0, 0, 0));
 		}
 
 		TinEye tineye;
 		Media* media;
-		Configuration config;
 	};
 
 	TEST_F(ResultsTests, ContrastNoOverlay) {
@@ -40,7 +39,7 @@ namespace tin {
 
 		//Check that obtained results are the same as expected ones
 		ASSERT_TRUE(compareResults("unit_test/sizes/contrastNoOverlay1080BoldPass.png", res->getContrastResults(),
-			false, config.getAppSettings()->getColors()));
+			false, config.getAppSettings()->getColors(),"contrastChecks"));
 	}
 
 
@@ -53,7 +52,7 @@ namespace tin {
 
 		//Check that obtained results are the same as expected ones
 		ASSERT_TRUE(compareResults("unit_test/sizes/sizeNoOverlay1080BoldPass.png", 
-			res->getSizeResults(), false,config.getAppSettings()->getColors()));
+			res->getSizeResults(), false,config.getAppSettings()->getColors(),"sizeChecks"));
 	}
 
 
@@ -66,7 +65,7 @@ namespace tin {
 
 		//Check that obtained results are the same as expected ones
 		ASSERT_TRUE(compareResults("unit_test/sizes/sizeOverlay1080BoldPass.png",
-			res->getSizeResults(), true, config.getAppSettings()->getColors()));
+			res->getSizeResults(), true, config.getAppSettings()->getColors(),"sizeChecks"));
 	}
 
 	TEST_F(ResultsTests, ContrastOverlay) {
