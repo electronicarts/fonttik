@@ -94,7 +94,7 @@ namespace tin {
 		cv::Scalar v;
 		int size = data.size();
 		for (int i = 0; i < 4; i++) {
-			v[i] = (i<size)?data[i]:1;
+			v[i] = (i<size)?static_cast<int>(data[i]):1;
 		}
 		return v;
 	}
