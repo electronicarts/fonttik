@@ -1,0 +1,15 @@
+{
+  "name": "tineye",
+  "version-string": "0.0.1",
+  "dependencies": [
+    {
+      "name": "opencv",
+      "features": [ "ffmpeg" ]
+    },
+
+    "nlohmann-json",
+    "gtest",
+    "boost-log",
+    "benchmark"
+  ]
+}
