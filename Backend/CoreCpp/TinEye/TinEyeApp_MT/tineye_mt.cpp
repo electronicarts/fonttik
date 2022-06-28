@@ -123,12 +123,38 @@ int main(int argc, char* argv[]) {
 	}
 	tin::Configuration config = tin::Configuration(configPath);
 
-	int n_threads = std::thread::hardware_concurrency();
+	char* opt_threads = getCmdOption(argv, argv + argc, "-t");
+	int n_threads;
+	//Number of threads specified by argument, minimum is 1
+	try {
+		n_threads = (opt_threads) ? std::stoi(opt_threads) : 1;
+	}
+	catch (std::exception const& e)
+	{
+		std::cerr << "Invalid thread number" << std::endl;
+		return 1;
+	}
+	int max_threads = std::thread::hardware_concurrency();
+	if (n_threads > max_threads) {
+		std::cout << "Too many threads, using system max of " << max_threads << std::endl;
+		n_threads = max_threads;
+	}
+	
 	std::vector<tin::FrameProcessor*> workers;
 
+	//Allocation of frame processors
 	for (int i = 0; i < n_threads; i++) {
 		workers.emplace_back(new tin::FrameProcessor());
-		workers.back()->init(&config);
+	}
+	//Paralell initialisation of frame processors
+	std::vector<std::thread> threads;
+	for (auto& worker : workers) {
+		threads.push_back(std::thread(&tin::FrameProcessor::init, worker, &config));
+	}
+
+	//Wait for all threads to be initialised before processing media
+	for (auto& thread : threads) {
+		thread.join();
 	}
 
 
