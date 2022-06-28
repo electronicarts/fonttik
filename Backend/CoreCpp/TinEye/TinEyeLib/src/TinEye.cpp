@@ -205,7 +205,7 @@ namespace tin {
 
 			//Adds up all three channels into one luminance value channel
 			//Extracted from Iris's RelativeLuminance.h
-			linearBGR.forEach<cv::Vec3f>([&luminanceMap](cv::Vec3f& pixel, const int* position)-> void {
+			linearBGR.forEach<cv::Vec3d>([&luminanceMap](cv::Vec3d& pixel, const int* position)-> void {
 				//Y = 0.0722 * B + 0.7152 * G + 0.2126 * R where B, G and R
 				luminanceMap.ptr<double>(position[0])[position[1]] = 0.0722 * pixel[0] + 0.7152 * pixel[1] + 0.2126 * pixel[2];
 				});
