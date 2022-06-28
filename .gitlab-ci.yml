@@ -141,7 +141,7 @@ profile-tool:
         - cd $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp
         - ./TinEyeApp resources/knockout/720Subs.mp4 -c configurations/test_benchmarks.json
         - cd ../TinEyeApp_MT
-        - ./TinEyeApp_MT resources/knockout/720Subs.mp4 -c configurations/test_benchmarks.json
+        - ./TinEyeApp_MT resources/knockout/720Subs.mp4 -c configurations/test_benchmarks.json -t 4
     artifacts:
         paths:
             - $TINEYE_CPP_BUILD_PATH/linux-release/TinEye/TinEyeApp/profiling.json
