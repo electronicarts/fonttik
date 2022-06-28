@@ -183,18 +183,16 @@ namespace tin {
 				cv::LUT(imageMatrix, *linearizationLUT, linearBGR);
 			}
 			else {
-				for (int y = 0; y < imageMatrix.rows; y++) {
-					for (int x = 0; x < imageMatrix.cols; x++) {
-						cv::Vec3b colorVals = imageMatrix.at<cv::Vec3b>(y, x);
-
-						//TODO lookup table, inexpensive, only 256 values, one for each lum value
-						//Could also use three separate lookup tables and merge them into one result directly
-						linearBGR.at<cv::Vec3d>(y, x) = {
-							linearize8bitRGB(colorVals.val[0]),
-							linearize8bitRGB(colorVals.val[1]),
-							linearize8bitRGB(colorVals.val[2]) };
-					}
-				}
+				imageMatrix.forEach< cv::Vec3b>([&linearBGR](cv::Vec3b& pixel, const int* position)-> void {
+					//at operator is used because we can't guarantee continuity
+					//Can be extended to be more efficient in cases where continuity is guaranteed by 
+					//adding a check with isContinuous()
+					//check https://docs.opencv.org/4.x/d3/d63/classcv_1_1Mat.html#aa90cea495029c7d1ee0a41361ccecdf3
+					linearBGR.at<cv::Vec3d>(position[0], position[1]) = {
+						linearize8bitRGB(pixel[0]),
+						linearize8bitRGB(pixel[1]),
+						linearize8bitRGB(pixel[2]) };
+					});
 			}
 
 			luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_64FC1); //1 channel (luminance)
@@ -207,7 +205,8 @@ namespace tin {
 			//Extracted from Iris's RelativeLuminance.h
 			linearBGR.forEach<cv::Vec3d>([&luminanceMap](cv::Vec3d& pixel, const int* position)-> void {
 				//Y = 0.0722 * B + 0.7152 * G + 0.2126 * R where B, G and R
-				luminanceMap.ptr<double>(position[0])[position[1]] = 0.0722 * pixel[0] + 0.7152 * pixel[1] + 0.2126 * pixel[2];
+				//at is used because we can't guarantee continuity
+				luminanceMap.at<double>(position[0], position[1]) = 0.0722 * pixel[0] + 0.7152 * pixel[1] + 0.2126 * pixel[2];
 				});
 		}
 
