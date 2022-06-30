@@ -1,8 +1,9 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "benchmark/benchmark.h"
 #include "TinEye.h"
 #include "Configuration.h"
 #include "Media.h"
-
 
 
 static void BM_EASTDetection(benchmark::State& state) {
