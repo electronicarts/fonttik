@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "ITextboxDetection.h"
 #include <opencv2/dnn.hpp>
 #include <opencv2/highgui.hpp>

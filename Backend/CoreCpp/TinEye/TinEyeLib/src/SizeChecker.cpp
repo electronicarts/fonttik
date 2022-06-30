@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "SizeChecker.h"
 #include "Instrumentor.h"
 #include "Media.h"

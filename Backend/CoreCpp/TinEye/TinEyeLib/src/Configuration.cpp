@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "Configuration.h"
 #include "AppSettings.h"
 #include "Guideline.h"
