@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "Video.h"
 #include "boost/log/trivial.hpp"
 #include "Frame.h"

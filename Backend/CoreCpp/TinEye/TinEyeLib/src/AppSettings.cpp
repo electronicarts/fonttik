@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "AppSettings.h"
 #include <tuple>
 #include <opencv2/imgcodecs.hpp>

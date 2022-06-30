@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc.hpp>
