@@ -51,7 +51,7 @@
     }
   },
   "textDetection": {
-    "detectionModel": "frozen_east_text_detection.pb",
+    "detectionModel": "DB_IC15_resnet50.onnx",
     "confidence": 0.5,
     "nmsThreshold": 0.4,
     "detectionScale": 1.0,

@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include "Image.h"
 #include "TextboxDetectionEAST.h"
+#include "TextboxDetectionDB.h"
 #include "TextboxRecognitionOpenCV.h"
 #include "boost/log/trivial.hpp"
 #include "Guideline.h"
@@ -99,7 +100,7 @@ namespace tin {
 		linearizationLUT = config->getRGBLookupTable();
 
 		//Initialize EAST detection
-		textboxDetection = new TextboxDetectionEAST();
+		textboxDetection = new TextboxDetectionDB();
 		textboxDetection->init(config->getTextDetectionParams(), config->getAppSettings());
 
 
