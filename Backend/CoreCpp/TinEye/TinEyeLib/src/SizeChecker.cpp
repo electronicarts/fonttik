@@ -30,7 +30,7 @@ namespace tin {
 		int counter = 0;
 #endif
 
-		
+
 		for (Textbox box : boxes) {
 			//Set word detection to word bounding box
 			box.setParentMedia(&image);
@@ -57,13 +57,14 @@ namespace tin {
 		PROFILE_FUNCTION();
 		bool pass = true;
 		cv::Rect boxRect = textbox.getRect();
+		cv::Mat textMask = textbox.getTextMask();
 
 		ResultType type = ResultType::PASS;
 
-		//Calculate height and width precisely
-		//Instead of using the size of the rect, we use the positions of the white mask pixels (representing text)
-		//with highest and lowest x and y coordinates.
-		cv::Mat textMask = textbox.getTextMask();
+		/*Calculate heightand width more accurately:
+		Instead of using the size of the rect, we use the outermost positions of the text mask
+		with highest and lowest x and y coordinates, which represent the edges of the text.
+		*/
 		std::vector<cv::Point> nonZero;
 		cv::findNonZero(textMask, nonZero);
 		int minY = std::numeric_limits<int>::max(),
@@ -104,10 +105,14 @@ namespace tin {
 
 		//Check height
 		int minimumHeight = config->getGuideline()->getHeightRequirement();
+
+		//If new calculated height is smaller than textbox add a trace
 		int height = maxY - minY;
 		if (height < boxRect.height) {
 			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at " << boxRect.x << ", " << boxRect.y << std::endl;
 		}
+
+		//Check for minimum height based on guidelines
 		if (height < minimumHeight) {
 			pass = false;
 			type = ResultType::FAIL;
@@ -119,7 +124,9 @@ namespace tin {
 			type = ResultType::WARNING;
 		}
 
-		results.results.push_back(ResultBox(type, boxRect.x, boxRect.y, boxRect.width, boxRect.height, height));
+		//The min and max values for x and y work as offsets inside the textbox, that's why original boxRect has to be accounted for.
+		//-1 and +2 values to add margin accounting for the outline width
+		results.results.push_back(ResultBox(type, boxRect.x + minX - 1, boxRect.y + minY - 1, maxX - minX + 2, height + 2, height));
 
 		return pass;
 	}
