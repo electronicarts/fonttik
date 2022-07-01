@@ -14,12 +14,9 @@ namespace tin {
 		Guideline* guideline = config->getGuideline();
 		FrameResults sizeResults(image.getFrameNumber());
 
-		if (openCVMat.empty())
-		{
-			sizeResults.overallPass = false;
-			return sizeResults;
-		}
-
+		//Check if user has set manual source resolution or if using DPI guidelines
+		//Set guideline values accordingly
+		//If DPI is off and no manual resolution is set, resolution will be extracted from image itself
 		int activeSize = appSettings->getSpecifiedSize();
 		guideline->setDPI(appSettings->usingDPI());
 		guideline->setActiveGuideline((activeSize != 0) ? activeSize : openCVMat.rows);
@@ -31,8 +28,8 @@ namespace tin {
 #endif
 
 
+		//Run size check for each textbox in image
 		for (Textbox box : boxes) {
-			//Set word detection to word bounding box
 			box.setParentMedia(&image);
 
 			bool individualPass = textboxSizeCheck(image, box, sizeResults);
