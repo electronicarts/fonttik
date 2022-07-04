@@ -76,7 +76,7 @@ namespace tin {
 		if (config->getAppSettings()->saveLuminanceMasks()) {
 			//frame.saveOutputData(luminanceRegion, "lum.png");
 			image.saveOutputData(textMask, image.getMedia()->getOutputPath() / ("mask" + std::to_string(textbox.getRect().x) + ".png"));
-			//BOOST_LOG_TRIVIAL(info) << "Mask positive: " << cv::countNonZero(textMask) << " mask negative: " << maskA.rows * maskA.cols - cv::countNonZero(maskA) << std::endl;
+			//BOOST_LOG_TRIVIAL(info) << "Mask positive: " << cv::countNonZero(textMask) << " mask negative: " << textMask.rows * textMask.cols - cv::countNonZero(textMask) << std::endl;
 		}
 #endif // _DEBUG
 
