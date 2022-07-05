@@ -55,7 +55,7 @@ TinEye can be configured by a .json file, default configuration provided under [
 TinEye has been created as a CMake project and can be compiled in any C++ compatible system. There are various subprojects, all of them compile their necessary inter-project dependencies as well:
 - TinEyeLib: Logical backend for TinEye, has everything needed for analysis.
 - TinEyeApp: Standard TinEye executable, connects to TinEyeLib.
-- TinEyeApp_MT: CPU multithreaded TinEye executable, it'll run on as many cores as available in the system.
+- TinEyeApp_MT: CPU multithreaded TinEye executable, it'll run on as many cores as available in the system by default. Number of threads can be configured with the `-t` parameter.
 - TinEyeLib.Benchmarks: Multithreading benchmarks for different TinEye operations
 - TinEyeLib.Tests: All of the acceptance, integration and unit tests for the TinEye code. Any change to the code must pass or update these tests.
 
@@ -77,6 +77,7 @@ TinEye would proceed to analyze the file 'chat_window_closed.png' with the confi
 When running TinEye the following optional arguments can be passed to alter the functionality of the tool:
 
 - `-c`: Specify configuration file. Given a path to a specific configuration file uses that one during this execution. By default TinEye looks for config.json in its own folder.
+- `-t`: Specify the number of threads for multithreading. Only available when running 'TinEyeApp_MT'.
 
 ## LICENSE
 
