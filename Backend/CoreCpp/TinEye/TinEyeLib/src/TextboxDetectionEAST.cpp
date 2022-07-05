@@ -80,8 +80,6 @@ namespace tin {
 
 		BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << " boxes\n";
 
-		//Return smart pointer?
-
 		//Transform points to original image size
 		{
 			PROFILE_SCOPE("Point scaling");

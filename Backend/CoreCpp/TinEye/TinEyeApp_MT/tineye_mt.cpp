@@ -37,7 +37,7 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 
 	if (media != nullptr) {
 		//TODO This implementation only improves video performance, if different images need to be processed
-		//If further improvements were needed for single images, media processor threads would need to be created
+		//in parallel, different media processor threads would need to be created
 		std::vector<std::thread> threads;
 		std::mutex media_mtx;
 		for (auto& worker : workers) {

@@ -56,6 +56,8 @@ namespace tin {
 
 		Results* mediaRes = media.getResultsPointer();
 		Frame* nextFrame = media.getFrame();
+
+		//Process each frame and add received frame's results to the media results
 		while (nextFrame != nullptr) {
 			std::pair<FrameResults, FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
@@ -161,6 +163,7 @@ namespace tin {
 	double TinEye::linearize8bitRGB(const uchar& colorBits) {
 		//Profiling this function kills performance
 		//PROFILE_FUNCTION();
+		
 		//ref https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance
 		double color = colorBits / 255.0;
 
