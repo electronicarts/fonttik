@@ -14,7 +14,7 @@
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
-    "useTextRecognition": false,
+    "useTextRecognition": true,
     "useDPI":false,
     "targetResolution":0,
     "targetDPI":0,

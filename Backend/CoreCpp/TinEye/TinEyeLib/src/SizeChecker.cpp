@@ -3,6 +3,10 @@
 #include "SizeChecker.h"
 #include "Instrumentor.h"
 #include "Media.h"
+#include <regex>
+
+const std::regex ascenders("[bdfhkltA-Z0-9]"); //All characters with ascender
+const std::regex descenders("[gjpqy]"); //Characters with descenders
 
 namespace tin {
 	FrameResults tin::SizeChecker::check(Frame& image, std::vector<Textbox>& boxes)
@@ -75,16 +79,29 @@ namespace tin {
 			maxX = std::max(point.x, maxX);
 		}
 
+		int height = maxY - minY, measuredHeight = height;
+
+		//If new calculated height is smaller than textbox add a trace
+		if (height < boxRect.height) {
+			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at " << boxRect.x << ", " << boxRect.y << std::endl;
+		}
+
+		//If not using text recognition test height is chekced by accepting word as full-height
 		if (config->getAppSettings()->textRecognitionActive()) {
+			//bool hasAscender = false, hasDescender = false;
+
 			//Recognize word in region
 			std::string recognitionResult;
 			recognitionResult = textboxRecognition->recognizeBox(textbox);
 
-			int width = maxX - minX;
+
+			//Average width is no longer checked for due to legal saying it's not necessary.
+			/*int width = maxX - minX;
 			//Avoids division by zero
 			int averageWidth = (recognitionResult.size() > 0) ? width / recognitionResult.size() : -1;
 
-			//Check average width
+
+			Check average width
 			if (averageWidth == -1) {
 				BOOST_LOG_TRIVIAL(warning) << "Text inside " << boxRect << " couldn't be recognized, it is suggested to increase the text recognition minimum confidence" << std::endl;
 				type = ResultType::UNRECOGNIZED;
@@ -97,33 +114,41 @@ namespace tin {
 			}
 			else if (averageWidth < config->getGuideline()->getWidthRecommendation()) {
 				type = ResultType::WARNING;
-			}
+			}*/
+
+			//Check for ascender or descender presence with regex
+			bool hasAscender = (std::regex_search(recognitionResult, ascenders)) ? true : false;
+			bool hasDescender = (std::regex_search(recognitionResult, descenders)) ? true : false;
+
+			//TODO use configuration values, starting off with 1:3:1 ratio by default
+			float ascRatio = 1, descRatio = 1, xRatio = 3;
+			float ratioTotal = ascRatio + descRatio + xRatio;
+			float accumulatedRatio = ((hasAscender) ? ascRatio : 0) + ((hasDescender) ? descRatio : 0) + xRatio;
+
+			//size in the output will be full word size based on actual measurements
+			measuredHeight = ratioTotal * measuredHeight / accumulatedRatio;
 		}
 
 		//Check height
 		int minimumHeight = config->getGuideline()->getHeightRequirement();
 
-		//If new calculated height is smaller than textbox add a trace
-		int height = maxY - minY;
-		if (height < boxRect.height) {
-			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at " << boxRect.x << ", " << boxRect.y << std::endl;
-		}
-
 		//Check for minimum height based on guidelines
-		if (height < minimumHeight) {
+		if (measuredHeight < minimumHeight) {
 			pass = false;
 			type = ResultType::FAIL;
 			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
 				<< minimumHeight << ", detected height: " << height << std::endl;
 		}
-		else if (height < config->getGuideline()->getHeightRecommendation() && pass) {
+		else if (measuredHeight < config->getGuideline()->getHeightRecommendation() && pass) {
 			//Check for recommended guidelines
 			type = ResultType::WARNING;
 		}
 
+
+
 		//The min and max values for x and y work as offsets inside the textbox, that's why original boxRect has to be accounted for.
 		//-1 and +2 values to add margin accounting for the outline width
-		results.results.push_back(ResultBox(type, boxRect.x + minX - 1, boxRect.y + minY - 1, maxX - minX + 2, height + 2, height));
+		results.results.push_back(ResultBox(type, boxRect.x + minX - 1, boxRect.y + minY - 1, maxX - minX + 2, height + 2, measuredHeight));
 
 		return pass;
 	}
