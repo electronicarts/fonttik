@@ -117,8 +117,8 @@ namespace tin {
 			}*/
 
 			//Check for ascender or descender presence with regex
-			bool hasAscender = (std::regex_search(recognitionResult, ascenders)) ? true : false;
-			bool hasDescender = (std::regex_search(recognitionResult, descenders)) ? true : false;
+			bool hasAscender = std::regex_search(recognitionResult, ascenders);
+			bool hasDescender = std::regex_search(recognitionResult, descenders);
 
 			//TODO use configuration values, starting off with 1:3:1 ratio by default
 			float ascRatio = 1, descRatio = 1, xRatio = 3;
