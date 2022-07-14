@@ -34,8 +34,6 @@ namespace tin {
 		useTextRecognition = settings["useTextRecognition"];
 		printResultValues = settings["printValuesOnResults"];
 		dbgSaveLogs = settings["saveLogs"];
-		resultsPath = std::string(settings["resultsPath"]);
-		debugInfoPath = std::string(settings["debugInfoPath"]);
 		useDPI = settings["useDPI"];
 		targetDPI = settings["targetDPI"];
 		targetResolution = settings["targetResolution"];
