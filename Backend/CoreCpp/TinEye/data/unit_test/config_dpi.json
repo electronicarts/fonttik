@@ -1,7 +1,5 @@
 {
   "appSettings": {
-    "resultsPath": "./results/",
-    "debugInfoPath": "./debug_info/",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
     "textboxOutlineColors":{
@@ -90,7 +88,8 @@
         "width": 4,
         "height": 30
       }
-    }
+    },
+    "textSizeRatio": [1,3,1]
   },
   "sRGBLinearizationValues": [
     0,
