@@ -16,10 +16,6 @@ namespace tin {
 		db = new cv::dnn::TextDetectionModel_DB(dbParams->getDetectionModel());
 
 		// Post-processing parameters
-		float binThresh = 0.3;
-		float polyThresh = 0.5;
-		uint maxCandidates = 200;
-		double unclipRatio = 2.0;
 		db->setBinaryThreshold(dbParams->getBinaryThreshold())
 			.setPolygonThreshold(dbParams->getPolygonThreshold())
 			.setMaxCandidates(dbParams->getMaxCandidates())
