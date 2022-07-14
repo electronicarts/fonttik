@@ -10,6 +10,11 @@ namespace fs = std::filesystem;
 
 namespace tin {
 	class AppSettings {
+	public:
+		enum DetectionBackend {EAST, DB};
+	private:
+		DetectionBackend detectionBackend = DetectionBackend::EAST; //Text detection can use EAST or DB
+
 		bool dbgSaveLuminanceMap = false,
 			dbgSaveTexboxOutline = false,
 			dbgSaveSeparateTextboxes = false,
@@ -42,6 +47,7 @@ namespace tin {
 		static cv::Scalar ColorFromJson(nlohmann::json data);
 	public:
 		AppSettings() :
+			detectionBackend(DetectionBackend::EAST),
 			dbgSaveLuminanceMap(true),
 			dbgSaveTexboxOutline(true), dbgSaveSeparateTextboxes(false),
 			dbgSaveHistograms(false), dbgSaveRawTextboxOutline(false),
@@ -53,6 +59,7 @@ namespace tin {
 		void init(nlohmann::json settings);
 
 		//AppSettigs
+		DetectionBackend getDetectionBackend() const { return detectionBackend; }
 		bool saveLuminanceMasks() const { return dbgSaveLuminanceMasks; }
 		bool saveLuminanceMap() const { return dbgSaveLuminanceMap; }
 		bool saveTexboxOutline() const { return dbgSaveTexboxOutline; }

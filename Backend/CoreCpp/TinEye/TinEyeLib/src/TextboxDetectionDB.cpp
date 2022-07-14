@@ -9,29 +9,32 @@
 namespace tin {
 	void TextboxDetectionDB::init(const TextDetectionParams* params, const AppSettings* appSettingsCfg) {
 		detectionParams = params;
+
+		const DBDetectionParams* dbParams = params->getDBParams();
 		
 		//Models can be found in https://github.com/opencv/opencv/blob/master/doc/tutorials/dnn/dnn_text_spotting/dnn_text_spotting.markdown
-		db = new cv::dnn::TextDetectionModel_DB(detectionParams->getDetectionModel());
+		db = new cv::dnn::TextDetectionModel_DB(dbParams->getDetectionModel());
 
 		// Post-processing parameters
 		float binThresh = 0.3;
 		float polyThresh = 0.5;
 		uint maxCandidates = 200;
 		double unclipRatio = 2.0;
-		db->setBinaryThreshold(binThresh)
-			.setPolygonThreshold(polyThresh)
-			.setMaxCandidates(maxCandidates)
-			.setUnclipRatio(unclipRatio)
+		db->setBinaryThreshold(dbParams->getBinaryThreshold())
+			.setPolygonThreshold(dbParams->getPolygonThreshold())
+			.setMaxCandidates(dbParams->getMaxCandidates())
+			.setUnclipRatio(dbParams->getUnclipRatio())
 			;
 
 		// Normalization parameters
 		//Not the same as in EASt
-		double scale = 1.0 / 255.0;
+		double scale = dbParams->getScale();
 		//Default values from documentation are (123.68, 116.78, 103.94);
-		auto mean = detectionParams->getDetectionMean();
+		auto mean = dbParams->getMean();
 		cv::Scalar detMean(mean[0], mean[1], mean[2]);
 
 		// The input shape
+		auto size = dbParams->getInputSize();
 		cv::Size inputSize = cv::Size(736, 736);
 
 		db->setInputParams(scale, inputSize, detMean);

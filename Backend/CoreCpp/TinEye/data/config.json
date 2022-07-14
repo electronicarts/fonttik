@@ -1,27 +1,44 @@
 {
   "appSettings": {
+    "detectionBackend": "DB",
     "resultsPath": "./results/",
     "debugInfoPath": "./debug_info/",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
-    "textboxOutlineColors":{
-      "pass": [0,255,0],
-      "warning": [255,170,0],
-      "fail": [255,0,0],
-      "unrecognized":[25,25,25]
+    "textboxOutlineColors": {
+      "pass": [
+        0,
+        255,
+        0
+      ],
+      "warning": [
+        255,
+        170,
+        0
+      ],
+      "fail": [
+        255,
+        0,
+        0
+      ],
+      "unrecognized": [
+        25,
+        25,
+        25
+      ]
     },
     "saveSeparateTexboxes": false,
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
     "useTextRecognition": false,
-    "useDPI":false,
-    "targetResolution":0,
-    "targetDPI":0,
-    "saveLogs":true,
+    "useDPI": false,
+    "targetResolution": 0,
+    "targetDPI": 0,
+    "saveLogs": true,
     "printValuesOnResults": true,
     "videoFramesToSkip": 5,
-    "videoImageOutputInterval" : 0,
+    "videoImageOutputInterval": 0,
     "focusMask": [
       {
         "x": 0,
@@ -51,19 +68,40 @@
     }
   },
   "textDetection": {
-    "detectionModel": "DB_IC15_resnet50.onnx",
     "confidence": 0.5,
-    "nmsThreshold": 0.4,
-    "detectionScale": 1.0,
-    "detectionMean": [
-      123.68,
-      116.78,
-      103.94
-    ],
     "rotationThresholdDegrees": 10,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
+    },
+    "EAST": {
+      "detectionModel": "frozen_east_text_detection.pb",
+      "nmsThreshold": 0.4,
+      "detectionScale": 1.0,
+      "detectionMean": [
+        123.68,
+        116.78,
+        103.94
+      ]
+    
+    
+    },
+    "DB" : {
+      "detectionModel":"DB_IC15_resnet50.onnx",
+      "binaryThreshold":0.3,
+      "polygonThreshold":0.5,
+      "maxCandidates":200,
+      "unclipRatio":2.0,
+      "scale":0.00392,
+      "detectionMean": [
+        123.68,
+        116.78,
+        103.94
+      ],
+      "inputSize":[
+        736,
+        736
+      ]
     }
   },
   "guideline": {
@@ -84,8 +122,8 @@
         "height": 52
       }
     },
-    "heightPer100DPI":18,
-    "resolutionsRecommendations":{
+    "heightPer100DPI": 18,
+    "resolutionsRecommendations": {
       "1080": {
         "width": 4,
         "height": 30

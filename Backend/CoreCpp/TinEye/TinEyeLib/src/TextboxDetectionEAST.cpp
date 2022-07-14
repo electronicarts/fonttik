@@ -14,19 +14,21 @@ namespace tin {
 		detectionParams = params;
 		appSettings = appSettingsCfg;
 
-		east = new cv::dnn::TextDetectionModel_EAST(detectionParams->getDetectionModel());
+		const EASTDetectionParams* eastParams = params->getEASTParams();
+
+		east = new cv::dnn::TextDetectionModel_EAST(eastParams->getDetectionModel());
 
 		BOOST_LOG_TRIVIAL(trace) << "Confidence set to "
 			<< detectionParams->getConfidenceThreshold() << std::endl;
 		//Confidence on textbox threshold
 		east->setConfidenceThreshold(detectionParams->getConfidenceThreshold());
 		//Non Maximum supression
-		east->setNMSThreshold(detectionParams->getNMSThreshold());
+		east->setNMSThreshold(eastParams->getNMSThreshold());
 
-		east->setInputScale(detectionParams->getDetectionScale());
+		east->setInputScale(eastParams->getDetectionScale());
 
 		//Default values from documentation are (123.68, 116.78, 103.94);
-		auto mean = detectionParams->getDetectionMean();
+		auto mean = eastParams->getDetectionMean();
 		cv::Scalar detMean(mean[0], mean[1], mean[2]);
 		east->setInputMean(detMean);
 

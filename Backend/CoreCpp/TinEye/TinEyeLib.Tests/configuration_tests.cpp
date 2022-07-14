@@ -88,7 +88,7 @@ namespace tin {
 	TEST_F(MissingConfiguration, default_guideline) {
 		Guideline* guideline = cfg.getGuideline();
 		guideline->setActiveGuideline(1080);
-		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
+		ASSERT_FLOAT_EQ(guideline->getContrastRequirement(), 4.5);
 		ASSERT_EQ(guideline->getWidthRequirement(), 4);
 		ASSERT_EQ(guideline->getHeightRequirement(), 28);
 	}
@@ -97,9 +97,10 @@ namespace tin {
 	TEST_F(MissingConfiguration, default_detection) {
 		TextDetectionParams* params = cfg.getTextDetectionParams();
 		ASSERT_FLOAT_EQ(0.5, params->getConfidenceThreshold());
-		ASSERT_FLOAT_EQ(0.4, params->getNMSThreshold());
-		ASSERT_FLOAT_EQ(1.0, params->getDetectionScale());
-		ASSERT_THAT(params->getDetectionMean(), ::testing::ElementsAre(123.68, 116.78, 103.94));
+		//TODO separate tests for DB and EAST
+		ASSERT_FLOAT_EQ(0.4, params->getEASTParams()->getNMSThreshold());
+		ASSERT_FLOAT_EQ(1.0, params->getEASTParams()->getDetectionScale());
+		ASSERT_THAT(params->getEASTParams()->getDetectionMean(), ::testing::ElementsAre(123.68, 116.78, 103.94));
 		ASSERT_FLOAT_EQ(params->getMergeThreshold().first, 1.0);
 		ASSERT_FLOAT_EQ(params->getMergeThreshold().second, 1.0);
 		ASSERT_FLOAT_EQ(0.17, params->getRotationThresholdRadians());
@@ -128,9 +129,9 @@ namespace tin {
 	TEST_F(MalformedConfiguration, default_detection) {
 		TextDetectionParams* params = cfg.getTextDetectionParams();
 		ASSERT_FLOAT_EQ(0.5, params->getConfidenceThreshold());
-		ASSERT_FLOAT_EQ(0.4, params->getNMSThreshold());
-		ASSERT_FLOAT_EQ(1.0, params->getDetectionScale());
-		ASSERT_THAT(params->getDetectionMean(), ::testing::ElementsAre(123.68, 116.78, 103.94));
+		ASSERT_FLOAT_EQ(0.4, params->getEASTParams()->getNMSThreshold());
+		ASSERT_FLOAT_EQ(1.0, params->getEASTParams()->getDetectionScale());
+		ASSERT_THAT(params->getEASTParams()->getDetectionMean(), ::testing::ElementsAre(123.68, 116.78, 103.94));
 		ASSERT_FLOAT_EQ(params->getMergeThreshold().first, 1.0);
 		ASSERT_FLOAT_EQ(params->getMergeThreshold().second, 1.0);
 		ASSERT_FLOAT_EQ(0.17, params->getRotationThresholdRadians());

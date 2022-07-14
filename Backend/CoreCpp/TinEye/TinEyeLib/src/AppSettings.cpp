@@ -5,6 +5,17 @@
 
 namespace tin {
 	void AppSettings::init(nlohmann::json settings) {
+
+		if (settings["detectionBackend"] == "DB") {
+			detectionBackend = DB;
+		}
+		else if (settings["detectionBackend"] == "EAST") {
+			detectionBackend = EAST;
+		}
+		else {
+			throw "Invalid Backend";
+		}
+
 		std::vector<cv::Rect2f> focus;
 		for (auto it = settings["focusMask"].begin(); it != settings["focusMask"].end(); ++it)
 		{
