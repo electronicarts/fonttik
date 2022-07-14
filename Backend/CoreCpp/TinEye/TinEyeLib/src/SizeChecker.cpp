@@ -56,6 +56,8 @@ namespace tin {
 	bool tin::SizeChecker::textboxSizeCheck(Frame& image, Textbox& textbox, FrameResults& results)
 	{
 		PROFILE_FUNCTION();
+		Guideline* guideline = config->getGuideline();
+
 		bool pass = true;
 		cv::Rect boxRect = textbox.getRect();
 		cv::Mat textMask = textbox.getTextMask();
@@ -120,8 +122,8 @@ namespace tin {
 			bool hasAscender = std::regex_search(recognitionResult, ascenders);
 			bool hasDescender = std::regex_search(recognitionResult, descenders);
 
-			//TODO use configuration values, starting off with 1:3:1 ratio by default
-			float ascRatio = 1, descRatio = 1, xRatio = 3;
+			float* textSizeRatio = guideline->getTextSizeRatio();
+			float ascRatio = textSizeRatio[0], xRatio = textSizeRatio[1], descRatio = textSizeRatio[2];
 			float ratioTotal = ascRatio + descRatio + xRatio;
 			float accumulatedRatio = ((hasAscender) ? ascRatio : 0) + ((hasDescender) ? descRatio : 0) + xRatio;
 
@@ -130,7 +132,7 @@ namespace tin {
 		}
 
 		//Check height
-		int minimumHeight = config->getGuideline()->getHeightRequirement();
+		int minimumHeight = guideline->getHeightRequirement();
 
 		//Check for minimum height based on guidelines
 		if (measuredHeight < minimumHeight) {
@@ -139,7 +141,7 @@ namespace tin {
 			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
 				<< minimumHeight << ", detected height: " << height << std::endl;
 		}
-		else if (measuredHeight < config->getGuideline()->getHeightRecommendation() && pass) {
+		else if (measuredHeight < guideline->getHeightRecommendation() && pass) {
 			//Check for recommended guidelines
 			type = ResultType::WARNING;
 		}

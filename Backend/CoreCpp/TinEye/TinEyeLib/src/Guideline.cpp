@@ -23,6 +23,10 @@ namespace tin {
 		contrastRatio = guidelineJson["contrast"];
 		contrastRatioRecommendation = guidelineJson["recommendedContrast"];
 		textBackgroundRadius = guidelineJson["textBackgroundRadius"];
+
+		for (int i = 0; i < 3; i++) {
+			textSizeRatio[i] = guidelineJson["textSizeRatio"][i];
+		}
 	}
 
 	void Guideline::setActiveGuideline(int resolution) {
