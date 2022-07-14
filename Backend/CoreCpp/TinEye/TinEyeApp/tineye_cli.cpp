@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "TinEye.h"
 #include "Configuration.h"
 #include "Media.h"
@@ -57,6 +59,7 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 	}
 }
 
+//Recursively analyze all files in folder except for subfolders which correspond to outputs
 void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& config) {
 	for (const auto& directoryEntry : fs::directory_iterator(path)) {
 		if (fs::is_regular_file(directoryEntry)) {

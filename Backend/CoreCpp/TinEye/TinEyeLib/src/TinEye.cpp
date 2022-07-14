@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "TinEye.h"
 #include <iostream>
 #include <string>
@@ -52,8 +54,10 @@ namespace tin {
 			}
 		}
 
-		Results* mediaRes= media.getResultsPointer();
+		Results* mediaRes = media.getResultsPointer();
 		Frame* nextFrame = media.getFrame();
+
+		//Process each frame and add received frame's results to the media results
 		while (nextFrame != nullptr) {
 			std::pair<FrameResults, FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
@@ -63,13 +67,13 @@ namespace tin {
 			nextFrame = media.getFrame();
 		}
 
-		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") << std::endl;
+		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") <<
+			"\tCONTRAST: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") << std::endl;
 
 		return media.getResultsPointer();
 	}
 
-	std::pair<FrameResults,FrameResults> TinEye::processFrame(Frame* frame) {
+	std::pair<FrameResults, FrameResults> TinEye::processFrame(Frame* frame) {
 		//Ignore portions of image as specifid by configuration files
 		applyFocusMask(*frame);
 		//Detect relevant text
@@ -110,7 +114,7 @@ namespace tin {
 			textboxRecognition = new TextboxRecognitionOpenCV();
 			textboxRecognition->init(recognitionParams);
 		}
-	
+
 		//Create checkers
 		contrastChecker = new ContrastChecker(config);
 		sizeChecker = new SizeChecker(config, textboxRecognition);
@@ -157,6 +161,7 @@ namespace tin {
 	double TinEye::linearize8bitRGB(const uchar& colorBits) {
 		//Profiling this function kills performance
 		//PROFILE_FUNCTION();
+		
 		//ref https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance
 		double color = colorBits / 255.0;
 
@@ -181,18 +186,16 @@ namespace tin {
 				cv::LUT(imageMatrix, *linearizationLUT, linearBGR);
 			}
 			else {
-				for (int y = 0; y < imageMatrix.rows; y++) {
-					for (int x = 0; x < imageMatrix.cols; x++) {
-						cv::Vec3b colorVals = imageMatrix.at<cv::Vec3b>(y, x);
-
-						//TODO lookup table, inexpensive, only 256 values, one for each lum value
-						//Could also use three separate lookup tables and merge them into one result directly
-						linearBGR.at<cv::Vec3d>(y, x) = {
-							linearize8bitRGB(colorVals.val[0]),
-							linearize8bitRGB(colorVals.val[1]),
-							linearize8bitRGB(colorVals.val[2]) };
-					}
-				}
+				imageMatrix.forEach< cv::Vec3b>([&linearBGR](cv::Vec3b& pixel, const int* position)-> void {
+					//at operator is used because we can't guarantee continuity
+					//Can be extended to be more efficient in cases where continuity is guaranteed by 
+					//adding a check with isContinuous()
+					//check https://docs.opencv.org/4.x/d3/d63/classcv_1_1Mat.html#aa90cea495029c7d1ee0a41361ccecdf3
+					linearBGR.at<cv::Vec3d>(position[0], position[1]) = {
+						linearize8bitRGB(pixel[0]),
+						linearize8bitRGB(pixel[1]),
+						linearize8bitRGB(pixel[2]) };
+					});
 			}
 
 			luminanceMap = cv::Mat::zeros(imageMatrix.size(), CV_64FC1); //1 channel (luminance)
@@ -201,14 +204,13 @@ namespace tin {
 			//from https://stackoverflow.com/questions/30666224/how-can-i-turn-a-three-channel-mat-into-a-summed-up-one-channel-mat
 			//cv::transform(linearBGR, luminanceMap, cv::Matx13f(1, 1, 1));
 
-			//Adds up all three channels into one luminance value channel 
-			for (int y = 0; y < imageMatrix.rows; y++) {
-				for (int x = 0; x < imageMatrix.cols; x++) {
-					cv::Vec3d lumVals = linearBGR.at<cv::Vec3d>(y, x);
-					//BGR order
-					luminanceMap.at<double>(y, x) = cv::saturate_cast<double>((lumVals.val[0] * 0.0722 + lumVals.val[1] * 0.7152 + lumVals.val[2] * 0.2126));
-				}
-			}
+			//Adds up all three channels into one luminance value channel
+			//Extracted from Iris's RelativeLuminance.h
+			linearBGR.forEach<cv::Vec3d>([&luminanceMap](cv::Vec3d& pixel, const int* position)-> void {
+				//Y = 0.0722 * B + 0.7152 * G + 0.2126 * R where B, G and R
+				//at is used because we can't guarantee continuity
+				luminanceMap.at<double>(position[0], position[1]) = 0.0722 * pixel[0] + 0.7152 * pixel[1] + 0.2126 * pixel[2];
+				});
 		}
 
 		return luminanceMap;

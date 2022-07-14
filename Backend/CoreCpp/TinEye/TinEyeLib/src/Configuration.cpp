@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "Configuration.h"
 #include "AppSettings.h"
 #include "Guideline.h"
@@ -14,6 +16,8 @@ namespace tin {
 	Configuration::Configuration(fs::path configPath) : Configuration() {
 		std::ifstream configFile(configPath);
 
+		//If config file is opened correctly attempts to load each config category
+		//If any of them result in failure load their default values
 		if (configFile) {
 			json config;
 			configFile >> config;

@@ -1,15 +1,17 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "ContrastChecker.h"
 #include "Instrumentor.h"
 #include "TinEye.h"
 
 namespace tin {
 
-	FrameResults tin::ContrastChecker::check(Frame& image, std::vector<Textbox>& boxes)
+	FrameResults tin::ContrastChecker::check(Frame& frame, std::vector<Textbox>& boxes)
 	{
 		PROFILE_FUNCTION();
 
-		cv::Mat openCVMat = image.getImageMatrix();
-		cv::Mat luminanceMap = image.getFrameLuminance();
+		cv::Mat imageMatrix = frame.getImageMatrix();
+		cv::Mat luminanceMap = frame.getFrameLuminance();
 
 		AppSettings* appSettings = config->getAppSettings();
 		Guideline* guideline = config->getGuideline();
@@ -18,34 +20,28 @@ namespace tin {
 		int counter = 0;
 #endif // _DEBUG
 
-
-		if (openCVMat.empty())
-		{
-			return false;
-		}
-
 		bool imagePasses = true;
 
-		//add entry for this image in result struct
-		FrameResults contrastResults(image.getFrameNumber());
+		//add entry for this frame in result struct
+		FrameResults contrastResults(frame.getFrameNumber());
 
-
+		//Run contrast check for each textbox in image
 		for (Textbox box : boxes) {
 
-			box.setParentMedia(&image);
+			box.setParentMedia(&frame);
 
-			bool individualPass = textboxContrastCheck(image, box, contrastResults);
+			bool individualPass = textboxContrastCheck(frame, box, contrastResults);
 
 
 #ifdef _DEBUG
 			if (appSettings->saveHistograms()) {
 				PROFILE_SCOPE("saveHistograms");
 				cv::Rect boxRect = box.getRect();
-				fs::path savePath = image.getMedia()->getOutputPath() / ("img" + std::to_string(counter) + "histogram.png");
+				fs::path savePath = frame.getMedia()->getOutputPath() / ("img" + std::to_string(counter) + "histogram.png");
 				Frame::saveLuminanceHistogram(box.getLuminanceHistogram(),
 					savePath.string());
 
-				Frame::saveHistogramCSV(image.calculateLuminanceHistogram(boxRect), image.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
+				Frame::saveHistogramCSV(frame.calculateLuminanceHistogram(boxRect), frame.getPath().replace_filename("histogram" + std::to_string(counter) + ".csv").string());
 			}
 			counter++;
 
@@ -63,28 +59,28 @@ namespace tin {
 		cv::Rect boxRect = textbox.getRect();
 
 		//Contrast checking with thresholds
-		cv::Mat maskA, maskB;
+		cv::Mat textMask, outlineMask;
 		cv::Mat luminanceRegion = textbox.getLuminanceMap();
-		maskA = textbox.getTextMask();
+		textMask = textbox.getTextMask();
 
-		//Dilate and then substract maskA to get the outline of the text
+		//Dilate and then substract textMask to get the outline of the text
 		int dilationSize = config->getGuideline()->getTextBackgroundRadius() * 2 + 1;
-		cv::dilate(maskA, maskB, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
+		cv::dilate(textMask, outlineMask, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize)));
 		
 		//To prevent antialising messing with measurements we expand the mask to be subtracted
 		cv::Mat substraction;
-		cv::dilate(maskA, substraction, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
-		maskB -= substraction;
+		cv::dilate(textMask, substraction, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
+		outlineMask -= substraction;
 
 #ifdef _DEBUG
 		if (config->getAppSettings()->saveLuminanceMasks()) {
-			//image.saveOutputData(luminanceRegion, "lum.png");
-			image.saveOutputData(maskA, image.getMedia()->getOutputPath() / ("mask" + std::to_string(textbox.getRect().x) + ".png"));
-			//BOOST_LOG_TRIVIAL(info) << "Mask positive: " << cv::countNonZero(maskA) << " mask negative: " << maskA.rows * maskA.cols - cv::countNonZero(maskA) << std::endl;
+			//frame.saveOutputData(luminanceRegion, "lum.png");
+			image.saveOutputData(textMask, image.getMedia()->getOutputPath() / ("mask" + std::to_string(textbox.getRect().x) + ".png"));
+			//BOOST_LOG_TRIVIAL(info) << "Mask positive: " << cv::countNonZero(textMask) << " mask negative: " << textMask.rows * textMask.cols - cv::countNonZero(textMask) << std::endl;
 		}
 #endif // _DEBUG
 
-		double ratio = TinEye::ContrastBetweenRegions(luminanceRegion, maskA, maskB);
+		double ratio = TinEye::ContrastBetweenRegions(luminanceRegion, textMask, outlineMask);
 
 		ResultType type = ResultType::PASS;
 		bool boxPasses = ratio >= config->getGuideline()->getContrastRequirement();

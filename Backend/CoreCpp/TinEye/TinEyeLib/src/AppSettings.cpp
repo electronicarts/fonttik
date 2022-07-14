@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "AppSettings.h"
 #include <tuple>
 #include <opencv2/imgcodecs.hpp>
@@ -15,6 +17,7 @@ namespace tin {
 		else {
 			throw "Invalid Backend";
 		}
+		//Load all of the focus and ignore regions from config
 
 		std::vector<cv::Rect2f> focus;
 		for (auto it = settings["focusMask"].begin(); it != settings["focusMask"].end(); ++it)
@@ -31,6 +34,7 @@ namespace tin {
 			setFocusMask(focus, ignore);
 		}
 
+		//Load individual values from json
 		dbgSaveLuminanceMap = settings["saveLuminanceMap"];
 		dbgSaveTexboxOutline = settings["saveTextboxOutline"];
 		dbgSaveRawTextboxOutline = settings["saveSeparateTexboxes"];
@@ -51,6 +55,7 @@ namespace tin {
 		outlineColors[FAIL] = ColorFromJson(settings["textboxOutlineColors"]["fail"]);
 		outlineColors[UNRECOGNIZED] = ColorFromJson(settings["textboxOutlineColors"]["unrecognized"]);
 
+		//Load and set video processing configuration
 		int framesToSkip = settings["videoFramesToSkip"];
 		int videoFrameOutputInterval = settings["videoImageOutputInterval"];
 		Video::setFramesToSkip(framesToSkip);
@@ -62,7 +67,7 @@ namespace tin {
 			focusMasks = focus;
 		}
 		else {
-			focusMasks = { {0,0,1,1} }; //If theres no focus region, we will analyse everything
+			focusMasks = { {0,0,1,1} }; //If there are no focus regions, we will analyse everything
 		}
 
 		ignoreMasks = ignore;
@@ -72,7 +77,7 @@ namespace tin {
 		//by default everything is ignored
 		cv::Mat mat(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
 
-		//Regions inside focus maks are not ignored
+		//Regions inside focus masks are not ignored
 		for (cv::Rect2f rect : focusMasks) {
 			cv::Rect absRect(rect.x * width, rect.y * height,
 				rect.width * width, rect.height * height);

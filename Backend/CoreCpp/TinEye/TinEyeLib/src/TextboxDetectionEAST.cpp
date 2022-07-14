@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "TextboxDetectionEAST.h"
 #include <opencv2/dnn.hpp>
 #include <opencv2/highgui.hpp>
@@ -79,8 +81,6 @@ namespace tin {
 		}
 
 		BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << " boxes\n";
-
-		//Return smart pointer?
 
 		//Transform points to original image size
 		{

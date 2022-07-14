@@ -1,3 +1,5 @@
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+
 #include "Image.h"
 #include <boost/log/trivial.hpp>
 #include <fstream>
@@ -20,7 +22,7 @@ namespace tin {
 			Frame::highlightBox(box.x, box.y, box.x + box.width, box.y + box.height, color, highlights, 2);
 		}
 
-		//Add measurements after boxes so boxes don't cover the numbers
+		//Add measurements after outline so it doesn't cover the numbers
 		if (saveNumbers) {
 			for (ResultBox& box : results.back().results) {
 				Frame::putResultBoxValues(highlights, box, (path.stem() == "contrastChecks") ? 1 : 0); //Only add decimals with contrast checks
