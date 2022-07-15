@@ -1,8 +1,6 @@
 {
   "appSettings": {
     "detectionBackend": "EAST",
-    "resultsPath": "./results/",
-    "debugInfoPath": "./debug_info/",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
     "saveSeparateTexboxes": false,
@@ -112,7 +110,8 @@
         "width": 4,
         "height": 30
       }
-    }
+    },
+    "textSizeRatio": [1,3,1]
   },
   "sRGBLinearizationValues": [
     0,
