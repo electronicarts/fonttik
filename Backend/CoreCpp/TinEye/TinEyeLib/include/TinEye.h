@@ -6,11 +6,8 @@
 #include "Frame.h"
 #include "Textbox.h"
 #include <gtest/gtest.h>
-#include <boost/log/utility/setup/file.hpp>
 
 namespace fs = std::filesystem;
-namespace logging = boost::log;
-typedef logging::sinks::synchronous_sink<logging::sinks::text_file_backend> sink_t;
 
 namespace tin {
 	class Configuration;
@@ -20,7 +17,6 @@ namespace tin {
 	class Frame;
 
 	class TinEye {
-		boost::shared_ptr<sink_t> logSink;
 		Configuration* config = nullptr;
 		ITextboxDetection* textboxDetection = nullptr;
 		ITextboxRecognition* textboxRecognition = nullptr;

@@ -4,6 +4,7 @@
 #include "Media.h"
 #include "TinEye.h"
 #include "Configuration.h"
+#include "Log.h"
 
 namespace tin {
 	class LuminanceTests : public ::testing::Test {
@@ -11,6 +12,7 @@ namespace tin {
 		void SetUp() override {
 			tineye = TinEye();
 			config = Configuration("unit_test/config_resolution.json");
+			tin::Log::InitCoreLogger(false, false);
 			tineye.init(&config);
 
 			whiteMedia = Media::CreateMedia("unit_test/luminance/white.png");

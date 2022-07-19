@@ -4,11 +4,13 @@
 #include "Media.h"
 #include "TinEye.h"
 #include "Configuration.h"
+#include "Log.h"
 
 namespace tin {
 	class ResultsTests : public ::testing::Test {
 	protected:
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			tineye = TinEye();
 
 			media = Media::CreateMedia("unit_test/sizes/1080BoldPass.png");

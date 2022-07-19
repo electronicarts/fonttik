@@ -4,11 +4,10 @@
 #include "Configuration.h"
 #include "Media.h"
 #include "Instrumentor.h"
+#include "Log.h"
 
 #include <iostream>
 #include <algorithm>
-#include <boost/log/trivial.hpp>
-#include <boost/log/utility/setup/console.hpp>
 #include <filesystem>
 #include <regex>
 
@@ -37,8 +36,8 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 	if (media != nullptr) {
 		tin::Results* results = tineye.processMedia(*media);
 
-		std::cout << "SIZE: " << ((results->sizePass()) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((results->contrastPass()) ? "PASS" : "FAIL") << std::endl;
+		LOG_CORE_INFO("SIZE CHECK RESULT: {0}", (results->sizePass() ? "PASS" : "FAIL"));
+		LOG_CORE_INFO("CONTRAST CHECK RESULT: {0}", (results->contrastPass() ? "PASS" : "FAIL"));
 
 		//if specified in config, save outlines for both size and contrast
 		tin::AppSettings* appSettings = config.getAppSettings();
@@ -55,7 +54,7 @@ void processMedia(tin::TinEye& tineye, fs::path path, tin::Configuration& config
 	}
 	else
 	{
-		std::cerr << path.filename() << " format is not supported" << std::endl;
+		LOG_CORE_ERROR("{0} format is not supported", path.filename().string());
 	}
 }
 
@@ -69,7 +68,7 @@ void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& confi
 		else if (fs::is_directory(directoryEntry)) {
 			//Avoid endless recursion produced by analysing results and producing more results to analyse
 			if (std::regex_search(directoryEntry.path().string(), outputDir)) {
-				std::cout << directoryEntry << "is already a results folder" << std::endl;
+				LOG_CORE_TRACE("{0} is already a results folder", directoryEntry.path().string());
 			}
 			else {
 				processFolder(tineye, directoryEntry, config);
@@ -80,22 +79,25 @@ void processFolder(tin::TinEye& tineye, fs::path path, tin::Configuration& confi
 
 int main(int argc, char* argv[]) {
 	
-	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
-	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
+	tin::Log::InitCoreLogger(true, false, 0, nullptr, "%^[%l] %v%$");
+	
+	LOG_CORE_TRACE("Executing in {0}", std::filesystem::current_path().string());
 	Instrumentor::Get().BeginSession("Profile", "profiling.json");
 
 	fs::path path;
 
 	if (argc < 2) {
-		std::cout << "Usage: \"TinEyeApp.exe media_path/ \n" <<
-			"Please, add the path of the file or directory you want to analyse \n";
+		LOG_CORE_INFO("Usage: \"TinEyeApp.exe media_path/"); 
+		LOG_CORE_INFO("Please, add the path of the file or directory you want to analyse");
+		
 		std::string p;
 		std::cin >> p;
+		
 		try {
 			path = fs::path(p);
 		}
 		catch (...) {
-			BOOST_LOG_TRIVIAL(error) << p << " is not a valid path";
+			LOG_CORE_ERROR("{0} is not a valid path", p);
 			std::cin.get();
 			return 1;
 		}
@@ -109,9 +111,11 @@ int main(int argc, char* argv[]) {
 	char* configFilename = getCmdOption(argv, argv + argc, "-c");
 	std::string configPath((configFilename) ? configFilename : "config.json");
 	if (!fs::exists(configPath)) {
-		BOOST_LOG_TRIVIAL(error) << configPath << " configuration file was not found, using default file";
+		
+		LOG_CORE_ERROR("{0} configuration file was not found, using default file", configPath);
 		configPath = std::string("config.json");
 	}
+
  	tin::Configuration config = tin::Configuration(configPath);
 	tineye.init(&config);
 
@@ -125,7 +129,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	else {
-		std::cerr << "Path not found " << std::endl;
+		LOG_CORE_ERROR("Path \"{0}\" not found", path.string());
 	}
 
 	Instrumentor::Get().EndSession();

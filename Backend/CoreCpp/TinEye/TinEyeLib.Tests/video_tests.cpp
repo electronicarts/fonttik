@@ -4,11 +4,13 @@
 #include "Media.h"
 #include "Video.h"
 #include "Results.h"
+#include "Log.h"
 
 namespace tin {
 	class VideoTests : public ::testing::Test {
 	protected:
 		bool checkSimilarity(fs::path path) {
+			tin::Log::InitCoreLogger(false, false);
 			tin::Video* video = static_cast<tin::Video*>(tin::Media::CreateMedia(path));
 
 			cv::Mat nextFrame;
