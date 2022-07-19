@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include "Configuration.h"
 #include "Guideline.h"
+#include "Log.h"
 
 namespace tin {
 
@@ -12,6 +13,7 @@ namespace tin {
 		Configuration cfg;
 
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			cfg = Configuration("unit_test/config_resolution.json");
 		}
 	};
@@ -21,6 +23,7 @@ namespace tin {
 		Configuration cfg;
 
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			cfg = Configuration("unit_test/config_dpi.json");
 		}
 	};
@@ -30,6 +33,7 @@ namespace tin {
 		Configuration cfg;
 
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			cfg = Configuration("unit_test/config_malformed.json");
 		}
 	};
@@ -39,6 +43,7 @@ namespace tin {
 		Configuration cfg;
 
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			cfg = Configuration("non-existent-file");
 		}
 	};

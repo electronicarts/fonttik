@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include "TinEye.h"
 #include "Configuration.h"
+#include "Log.h"
 
 namespace tin {
 	class ContrastRatioChecks : public ::testing::Test {
@@ -10,6 +11,7 @@ namespace tin {
 		void SetUp() override {
 			tineye = TinEye();
 			config = Configuration("unit_test/config_resolution.json");
+			tin::Log::InitCoreLogger(false, false);
 			tineye.init(&config);
 		}
 

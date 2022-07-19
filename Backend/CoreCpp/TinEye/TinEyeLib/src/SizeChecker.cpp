@@ -4,6 +4,7 @@
 #include "Instrumentor.h"
 #include "Media.h"
 #include <regex>
+#include "Log.h"
 
 const std::regex ascenders("[bdfhkltA-Z0-9]"); //All characters with ascender
 const std::regex descenders("[gjpqy]"); //Characters with descenders
@@ -85,7 +86,7 @@ namespace tin {
 
 		//If new calculated height is smaller than textbox add a trace
 		if (height < boxRect.height) {
-			BOOST_LOG_TRIVIAL(trace) << "Removed vertical overhead " << boxRect.height - height << " px at " << boxRect.x << ", " << boxRect.y << std::endl;
+			LOG_CORE_TRACE("Removed vertical overhead {0} px at {1}, {2}", boxRect.height - height, boxRect.x, boxRect.y);
 		}
 
 		//If not using text recognition test height is chekced by accepting word as full-height
@@ -138,8 +139,7 @@ namespace tin {
 		if (measuredHeight < minimumHeight) {
 			pass = false;
 			type = ResultType::FAIL;
-			BOOST_LOG_TRIVIAL(info) << "Word at (" << boxRect.x << ", " << boxRect.y << ") doesn't comply with minimum height "
-				<< minimumHeight << ", detected height: " << height << std::endl;
+			LOG_CORE_INFO("Word at ({0}, {1}) doesn't comply with minimum height {2}, detected height: {3}", boxRect.x, boxRect.y, minimumHeight, height);
 		}
 		else if (measuredHeight < guideline->getHeightRecommendation() && pass) {
 			//Check for recommended guidelines

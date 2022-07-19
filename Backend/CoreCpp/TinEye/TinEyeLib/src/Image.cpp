@@ -1,7 +1,6 @@
 //Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
 
 #include "Image.h"
-#include <boost/log/trivial.hpp>
 #include <fstream>
 #include "Media.h"
 #include "Frame.h"
