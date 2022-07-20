@@ -5,10 +5,10 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 #include "Instrumentor.h"
+#include "Log.h"
 
 namespace tin {
 	
@@ -27,7 +27,7 @@ namespace tin {
 				if (boxIt != targetIt) {
 					auto overlap = Textbox::OverlapAxisPercentage(*boxIt, *targetIt);
 					if (overlap.first >= mergeThreshold.first && overlap.second >= mergeThreshold.second) {
-						BOOST_LOG_TRIVIAL(info) << boxIt->getRect() << "merges with " << targetIt->getRect() << std::endl;
+						//LOG_CORE_INFO("{0} merges with {1}", boxIt->getRect(), targetIt->getRect());
 						boxIt->mergeWith(*targetIt);
 						targetIt = boxes.erase(targetIt);
 					}

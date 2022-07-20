@@ -5,7 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
-#include <boost/log/trivial.hpp>
+#include "Log.h"
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 #include "Instrumentor.h"
@@ -20,8 +20,7 @@ namespace tin {
 
 		east = new cv::dnn::TextDetectionModel_EAST(eastParams->getDetectionModel());
 
-		BOOST_LOG_TRIVIAL(trace) << "Confidence set to "
-			<< detectionParams->getConfidenceThreshold() << std::endl;
+		LOG_CORE_TRACE("Confidence set to {0}", detectionParams->getConfidenceThreshold());
 		//Confidence on textbox threshold
 		east->setConfidenceThreshold(detectionParams->getConfidenceThreshold());
 		//Non Maximum supression
@@ -80,7 +79,7 @@ namespace tin {
 			east->detect(resizedImg, detResults);
 		}
 
-		BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << " boxes\n";
+		LOG_CORE_INFO("EAST found {0} boxes", detResults.size());
 
 		//Transform points to original image size
 		{
@@ -103,7 +102,7 @@ namespace tin {
 				boxes.emplace_back(points);
 			}
 			else {
-				BOOST_LOG_TRIVIAL(trace) << "Ignoring tilted text in " << points[1] << std::endl;
+				//LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
 			}
 		}
 

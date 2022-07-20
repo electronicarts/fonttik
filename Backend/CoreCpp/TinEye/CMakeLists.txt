@@ -8,11 +8,11 @@ file(GLOB_RECURSE cli_sources src_cli/*.cpp src_cli/*.h)
 
 find_package(OpenCV CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(Boost REQUIRED COMPONENTS log)
+find_package(spdlog CONFIG REQUIRED)
 
 set(TinEye_DEPS ${OpenCV_LIBS}
-nlohmann_json nlohmann_json::nlohmann_json
-${Boost_LIBRARIES})
+nlohmann_json nlohmann_json::nlohmann_json 
+spdlog::spdlog)
 
 add_subdirectory("east_prototype")
 add_subdirectory("TinEyeLib")

@@ -4,11 +4,9 @@
 #include "Configuration.h"
 #include "Media.h"
 #include "Instrumentor.h"
-
+#include "Log.h"
 #include <iostream>
 #include <algorithm>
-#include <boost/log/trivial.hpp>
-#include <boost/log/utility/setup/console.hpp>
 #include <filesystem>
 #include <regex>
 #include <thread>
@@ -49,8 +47,8 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 		}
 
 		tin::Results* results = media->getResultsPointer();
-		std::cout << "SIZE: " << ((results->sizePass()) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((results->contrastPass()) ? "PASS" : "FAIL") << std::endl;
+		LOG_CORE_INFO("SIZE CHECK RESULT: {0}", (results->sizePass() ? "PASS" : "FAIL"));
+		LOG_CORE_INFO("CONTRAST CHECK RESULT: {0}", (results->contrastPass() ? "PASS" : "FAIL"));
 
 		//if specified in config, save outlines for both size and contrast
 		tin::AppSettings* appSettings = config.getAppSettings();
@@ -67,7 +65,7 @@ void processMedia(const std::vector<tin::FrameProcessor*>& workers, fs::path pat
 	}
 	else
 	{
-		std::cerr << path.filename() << " format is not supported" << std::endl;
+		LOG_CORE_ERROR("{0} format is not supported", path.filename().string());
 	}
 }
 
@@ -80,7 +78,7 @@ void processFolder(const std::vector<tin::FrameProcessor*>& workers, fs::path pa
 		else if (fs::is_directory(directoryEntry)) {
 			//Avoid endless recursion produced by analysing results and producing more results to analyse
 			if (std::regex_search(directoryEntry.path().string(), outputDir)) {
-				std::cout << directoryEntry << "is already a results folder" << std::endl;
+				LOG_CORE_TRACE("{0} is already a results folder", directoryEntry.path().string());
 			}
 			else {
 				processFolder(workers, directoryEntry, config);
@@ -91,9 +89,9 @@ void processFolder(const std::vector<tin::FrameProcessor*>& workers, fs::path pa
 
 int main(int argc, char* argv[]) {
 	Instrumentor::Get().BeginSession("Profile", "profiling.json");
+	tin::Log::InitCoreLogger(true, false, 0, nullptr, "%^[T] [%l] %v%$");
 
-	BOOST_LOG_TRIVIAL(trace) << "Executing in " << std::filesystem::current_path() << std::endl;
-	boost::log::add_console_log(std::cout, boost::log::keywords::format = "[%Severity%] %Message%");
+	LOG_CORE_TRACE("Executing in {0}", std::filesystem::current_path().string());
 
 	fs::path path;
 
@@ -107,7 +105,7 @@ int main(int argc, char* argv[]) {
 			path = fs::path(p);
 		}
 		catch (...) {
-			BOOST_LOG_TRIVIAL(error) << p << " is not a valid path";
+			LOG_CORE_ERROR("{0} is not a valid path", p);
 			std::cin.get();
 			return 1;
 		}
@@ -120,7 +118,7 @@ int main(int argc, char* argv[]) {
 
 	std::string configPath((configFilename) ? configFilename : "config.json");
 	if (!fs::exists(configPath)) {
-		BOOST_LOG_TRIVIAL(error) << configPath << " configuration file was not found, using default file";
+		LOG_CORE_ERROR("{0} configuration file was not found, using default file", configPath);
 		configPath = std::string("config.json");
 	}
 	tin::Configuration config = tin::Configuration(configPath);
@@ -133,12 +131,12 @@ int main(int argc, char* argv[]) {
 	}
 	catch (std::exception const& e)
 	{
-		std::cerr << "Invalid thread number" << std::endl;
+		LOG_CORE_ERROR("Invalid thread number");
 		return 1;
 	}
 	int max_threads = std::thread::hardware_concurrency();
 	if (n_threads > max_threads) {
-		std::cout << "Too many threads, using system max of " << max_threads << std::endl;
+		LOG_CORE_WARNING("Too many threads, using system max of {0}", max_threads);
 		n_threads = max_threads;
 	}
 	
@@ -170,7 +168,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	else {
-		std::cerr << "Path not found " << std::endl;
+		LOG_CORE_ERROR("Path \"{0}\" not found", path.string());
 	}
 
 	for (auto it = workers.begin(); it != workers.end(); ++it) {

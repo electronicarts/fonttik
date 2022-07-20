@@ -1,6 +1,7 @@
 //Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
 
 #include "Guideline.h"
+#include "Log.h"
 
 namespace tin {
 	void Guideline::init(nlohmann::json guidelineJson) {
@@ -38,7 +39,7 @@ namespace tin {
 		if (foundRes == sizesInUse->end()) {
 			if (!usingDPI) {
 				//If not found, error and create default for 1080
-				BOOST_LOG_TRIVIAL(error) << "Specified resolution not found, using 1080p, 28x4px as baseline" << std::endl;
+				LOG_CORE_ERROR("Specified resolution not found, using 1080p, 28x4px as baseline");
 				resolutionGuidelines[1080] = SizeGuidelines(4, 28);
 				activeGuideline = &resolutionGuidelines.find(1080)->second;
 			}

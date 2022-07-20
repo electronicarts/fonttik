@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <filesystem>
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include <nlohmann/json.hpp>
 
 

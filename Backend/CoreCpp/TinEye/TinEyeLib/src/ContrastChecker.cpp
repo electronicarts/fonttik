@@ -3,6 +3,7 @@
 #include "ContrastChecker.h"
 #include "Instrumentor.h"
 #include "TinEye.h"
+#include "Log.h"
 
 namespace tin {
 
@@ -76,7 +77,7 @@ namespace tin {
 		if (config->getAppSettings()->saveLuminanceMasks()) {
 			//frame.saveOutputData(luminanceRegion, "lum.png");
 			image.saveOutputData(textMask, image.getMedia()->getOutputPath() / ("mask" + std::to_string(textbox.getRect().x) + ".png"));
-			//BOOST_LOG_TRIVIAL(info) << "Mask positive: " << cv::countNonZero(textMask) << " mask negative: " << textMask.rows * textMask.cols - cv::countNonZero(textMask) << std::endl;
+			//LOG_CORE_INFO("Mask positive: {0} mask negative: {1}", cv::countNonZero(textMask), textMask.rows * textMask.cols - cv::countNonZero(textMask));
 		}
 #endif // _DEBUG
 
@@ -87,8 +88,7 @@ namespace tin {
 
 		if (!boxPasses) {
 			type = ResultType::FAIL;
-			BOOST_LOG_TRIVIAL(info) << "Word: " << boxRect << " doesn't comply with minimum luminance contrast " << config->getGuideline()->getContrastRequirement()
-				<< ", detected contrast ratio is " << ratio << " at: " << boxRect << std::endl;
+			//LOG_CORE_INFO("Word: {0}  doesn't comply with minimum luminance contrast {1}, detected contrast ratio is {2} at: {3}", boxRect, config->getGuideline()->getContrastRequirement(), ratio, boxRect);
 		}
 		else if (ratio < config->getGuideline()->getContrastRecommendation()) {
 			type = ResultType::WARNING;

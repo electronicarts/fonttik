@@ -3,11 +3,13 @@
 #include <gtest/gtest.h>
 #include "TinEye.h"
 #include "Configuration.h"
+#include "Log.h"
 
 namespace tin {
 	class TinEyeTests : public ::testing::Test {
 	protected:
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			tineye = tin::TinEye();
 			config = tin::Configuration("unit_test/config_resolution.json");
 			tineye.init(&config);
