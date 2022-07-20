@@ -86,7 +86,7 @@ namespace tin {
 
 		//If new calculated height is smaller than textbox add a trace
 		if (height < boxRect.height) {
-			LOG_CORE_TRACE("Removed vertical overhead {0} px at {1}, {2}", boxRect.height - height, boxRect.x, boxRect.y);
+			LOG_CORE_TRACE("Removed vertical overhead {0} px at {1}", boxRect.height - height, boxRect);
 		}
 
 		//If not using text recognition test height is chekced by accepting word as full-height

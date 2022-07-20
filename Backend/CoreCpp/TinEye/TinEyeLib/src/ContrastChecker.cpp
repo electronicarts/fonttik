@@ -88,7 +88,7 @@ namespace tin {
 
 		if (!boxPasses) {
 			type = ResultType::FAIL;
-			//LOG_CORE_INFO("Word: {0}  doesn't comply with minimum luminance contrast {1}, detected contrast ratio is {2} at: {3}", boxRect, config->getGuideline()->getContrastRequirement(), ratio, boxRect);
+			LOG_CORE_INFO("Word: {0}  doesn't comply with minimum luminance contrast {1}, detected contrast ratio is {2} at: {0}", boxRect, config->getGuideline()->getContrastRequirement(), ratio);
 		}
 		else if (ratio < config->getGuideline()->getContrastRecommendation()) {
 			type = ResultType::WARNING;

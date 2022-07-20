@@ -102,7 +102,7 @@ namespace tin {
 				boxes.emplace_back(points);
 			}
 			else {
-				//LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
+				LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
 			}
 		}
 

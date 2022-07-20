@@ -3,8 +3,7 @@
 #include "TextDetectionParams.h"
 #include "AppSettings.h"
 #include "Instrumentor.h"
-#include <boost/log/trivial.hpp>
-
+#include "Log.h"
 
 namespace tin {
 	void TextboxDetectionDB::init(const TextDetectionParams* params, const AppSettings* appSettingsCfg) {
@@ -57,7 +56,7 @@ namespace tin {
 				boxes.emplace_back(points);
 			}
 			else {
-				BOOST_LOG_TRIVIAL(trace) << "Ignoring tilted text in " << points[1] << std::endl;
+				LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
 			}
 		}
 
