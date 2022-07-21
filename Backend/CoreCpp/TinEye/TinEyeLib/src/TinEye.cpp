@@ -5,9 +5,8 @@
 #include <string>
 #include "Configuration.h"
 #include "Image.h"
-#include "TextboxDetectionEAST.h"
+#include "TextboxDetectionFactory.h"
 #include "TextboxRecognitionOpenCV.h"
-#include "boost/log/trivial.hpp"
 #include "Guideline.h"
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
@@ -15,11 +14,7 @@
 #include "ContrastChecker.h"
 #include "SizeChecker.h"
 #include <limits>
-
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/utility/setup/file.hpp>
+#include "Log.h"
 
 namespace tin {
 	TinEye::TinEye() {	};
@@ -36,26 +31,15 @@ namespace tin {
 	Results* TinEye::processMedia(Media& media) {
 		//Save the logs or output through console
 		if (config->getAppSettings()->saveLogs()) {
-			if (logSink) {
-				logging::core::get()->remove_sink(logSink);
-			}
-			std::string logFile = media.getOutputPath().string();
-			logFile = logFile.substr(0, logFile.length() - 4);
-			logSink = boost::log::add_file_log(media.getOutputPath().string() + "/" + media.getPath().stem().string() + ".txt");
 
-			boost::log::core::get()->set_filter
-			(
-				boost::log::trivial::severity >= boost::log::trivial::info
-			);
-		}
-		else {
-			if (logSink) {
-				logging::core::get()->remove_sink(logSink);
-			}
+			tin::Log::RemoveFileLogger();
+			tin::Log::SetFileLogger(media.getOutputPath().string() + "/" + media.getPath().stem().string() + ".txt");
 		}
 
 		Results* mediaRes = media.getResultsPointer();
 		Frame* nextFrame = media.getFrame();
+
+		//Process each frame and add received frame's results to the media results
 		while (nextFrame != nullptr) {
 			std::pair<FrameResults, FrameResults> res = processFrame(nextFrame);
 			mediaRes->addSizeResults(res.first);
@@ -65,8 +49,8 @@ namespace tin {
 			nextFrame = media.getFrame();
 		}
 
-		BOOST_LOG_TRIVIAL(info) << "SIZE: " << ((media.getResultsPointer()->sizePass()) ? "PASS" : "FAIL") <<
-			"\tCONTRAST: " << ((media.getResultsPointer()->contrastPass()) ? "PASS" : "FAIL") << std::endl;
+		LOG_CORE_INFO("SIZE CHECK RESULT: {0}", (media.getResultsPointer()->sizePass() ? "PASS" : "FAIL"));
+		LOG_CORE_INFO("CONTRAST CHECK RESULT: {0}", (media.getResultsPointer()->contrastPass() ? "PASS" : "FAIL"));
 
 		return media.getResultsPointer();
 	}
@@ -82,7 +66,7 @@ namespace tin {
 		FrameResults contrastRes(-1);
 
 		if (textBoxes.empty()) {
-			BOOST_LOG_TRIVIAL(info) << "No words recognized in image" << std::endl;
+			LOG_CORE_INFO("No words recognized in image");
 		}
 		else {
 			sizeRes = fontSizeCheck(*frame, textBoxes);
@@ -101,9 +85,7 @@ namespace tin {
 		linearizationLUT = config->getRGBLookupTable();
 
 		//Initialize EAST detection
-		textboxDetection = new TextboxDetectionEAST();
-		textboxDetection->init(config->getTextDetectionParams(), config->getAppSettings());
-
+		textboxDetection = TextboxDetectionFactory::CreateTextboxDetection(config->getAppSettings(), config->getTextDetectionParams());
 
 		//Initialize text recognition only if text recognition is enabled in config
 
@@ -161,6 +143,7 @@ namespace tin {
 	double TinEye::linearize8bitRGB(const uchar& colorBits) {
 		//Profiling this function kills performance
 		//PROFILE_FUNCTION();
+		
 		//ref https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_Colors_and_Luminance
 		double color = colorBits / 255.0;
 

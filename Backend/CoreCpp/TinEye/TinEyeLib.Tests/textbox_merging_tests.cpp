@@ -5,6 +5,7 @@
 #include "TextboxDetectionEAST.h"
 #include "Configuration.h"
 #include "gmock/gmock.h"
+#include "Log.h"
 
 namespace tin {
 	TEST(OverlapTests, Non_Overlapping) {
@@ -84,6 +85,7 @@ namespace tin {
 		TextDetectionParams params;
 		int initalBoxes;
 		void SetUp() override {
+			tin::Log::InitCoreLogger(false, false);
 			//100% overlap both axes
 			boxes.push_back(Textbox({ 0,0,2,2 }));
 			boxes.push_back(Textbox({ 0,0,4,4 }));

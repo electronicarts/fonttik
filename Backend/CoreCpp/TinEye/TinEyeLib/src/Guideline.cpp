@@ -1,9 +1,11 @@
 //Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
 
 #include "Guideline.h"
+#include "Log.h"
 
 namespace tin {
 	void Guideline::init(nlohmann::json guidelineJson) {
+		//Load resolution guidelines and recommendations with the resolution as key and width & height as values
 		resolutionGuidelines = std::unordered_map<int, SizeGuidelines>();
 		for (auto it = guidelineJson["resolutions"].begin(); it != guidelineJson["resolutions"].end(); ++it)
 		{
@@ -22,6 +24,10 @@ namespace tin {
 		contrastRatio = guidelineJson["contrast"];
 		contrastRatioRecommendation = guidelineJson["recommendedContrast"];
 		textBackgroundRadius = guidelineJson["textBackgroundRadius"];
+
+		for (int i = 0; i < 3; i++) {
+			textSizeRatio[i] = guidelineJson["textSizeRatio"][i];
+		}
 	}
 
 	void Guideline::setActiveGuideline(int resolution) {
@@ -31,13 +37,14 @@ namespace tin {
 		auto foundRes = sizesInUse->find(resolution);
 		//Check if specified resolution was added during file load
 		if (foundRes == sizesInUse->end()) {
-			//If not found, error and create default for 1080
-			BOOST_LOG_TRIVIAL(error) << "Specified resolution not found, using 1080p, 28x4px as baseline" << std::endl;
 			if (!usingDPI) {
+				//If not found, error and create default for 1080
+				LOG_CORE_ERROR("Specified resolution not found, using 1080p, 28x4px as baseline");
 				resolutionGuidelines[1080] = SizeGuidelines(4, 28);
 				activeGuideline = &resolutionGuidelines.find(1080)->second;
 			}
 			else {
+				//If using DPI simply calculate linearly based on 100DPI baseline
 				dpiGuidelines[resolution] = SizeGuidelines(0, 
 					static_cast<int>(heightPer100DPI*(resolution/100.0f)));
 				activeGuideline = &dpiGuidelines.find(resolution)->second;

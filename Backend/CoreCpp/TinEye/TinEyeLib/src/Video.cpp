@@ -1,7 +1,7 @@
 //Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
 
 #include "Video.h"
-#include "boost/log/trivial.hpp"
+#include "Log.h"
 #include "Frame.h"
 
 namespace tin {
@@ -15,7 +15,7 @@ namespace tin {
 			videoCapture >> imageMatrix;
 			previousFrame = imageMatrix;
 
-			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << 0 << std::endl;
+			LOG_CORE_INFO("Processing video frame {0}", 0);
 		}
 	}
 
@@ -56,7 +56,7 @@ namespace tin {
 				frameCount++;
 			}
 
-			BOOST_LOG_TRIVIAL(info) << "Processing video frame " << ++frameCount << std::endl;
+			LOG_CORE_INFO("Processing video frame {0}", ++frameCount);
 
 			previousFrame = imageMatrix;
 			ret = !imageMatrix.empty();

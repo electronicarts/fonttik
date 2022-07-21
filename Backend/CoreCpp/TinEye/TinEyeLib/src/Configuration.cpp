@@ -4,6 +4,7 @@
 #include "AppSettings.h"
 #include "Guideline.h"
 #include "TextDetectionParams.h"
+#include "Log.h"
 
 namespace tin {
 	Configuration::Configuration() {
@@ -16,6 +17,8 @@ namespace tin {
 	Configuration::Configuration(fs::path configPath) : Configuration() {
 		std::ifstream configFile(configPath);
 
+		//If config file is opened correctly attempts to load each config category
+		//If any of them result in failure load their default values
 		if (configFile) {
 			json config;
 			configFile >> config;
@@ -62,13 +65,12 @@ namespace tin {
 			}
 		}
 		else {
-			BOOST_LOG_TRIVIAL(error) << "ATTENTION! Configuration file was not found. ALL configurable values will use DEFAULT configuration." << std::endl;
+			LOG_CORE_ERROR("ATTENTION! Configuration file was not found. ALL configurable values will use DEFAULT configuration.");
 		}
 	}
 
 	void Configuration::logLoadingError(std::string name) {
-		BOOST_LOG_TRIVIAL(error) << "ATTENTION! There was a problem loading: " << name
-			<< ", one or more of its value are possibly malformed or missing.\n" << std::endl;
-		BOOST_LOG_TRIVIAL(error) << name << " configuration values will be reverted to DEFAULT configuration during this execution." << std::endl;
+		LOG_CORE_ERROR("ATTENTION! There was a problem loading: {0}, one or more of its value are possibly malformed or missing.", name);
+		LOG_CORE_ERROR("{0} configuration values will be reverted to DEFAULT configuration during this execution.", name);
 	}
 }

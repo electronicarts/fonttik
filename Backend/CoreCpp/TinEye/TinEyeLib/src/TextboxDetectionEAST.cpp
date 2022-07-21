@@ -5,7 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
-#include <boost/log/trivial.hpp>
+#include "Log.h"
 #include "AppSettings.h"
 #include "TextDetectionParams.h"
 #include "Instrumentor.h"
@@ -16,19 +16,20 @@ namespace tin {
 		detectionParams = params;
 		appSettings = appSettingsCfg;
 
-		east = new cv::dnn::TextDetectionModel_EAST(detectionParams->getDetectionModel());
+		const EASTDetectionParams* eastParams = params->getEASTParams();
 
-		BOOST_LOG_TRIVIAL(trace) << "Confidence set to "
-			<< detectionParams->getConfidenceThreshold() << std::endl;
+		east = new cv::dnn::TextDetectionModel_EAST(eastParams->getDetectionModel());
+
+		LOG_CORE_TRACE("Confidence set to {0}", detectionParams->getConfidenceThreshold());
 		//Confidence on textbox threshold
 		east->setConfidenceThreshold(detectionParams->getConfidenceThreshold());
 		//Non Maximum supression
-		east->setNMSThreshold(detectionParams->getNMSThreshold());
+		east->setNMSThreshold(eastParams->getNMSThreshold());
 
-		east->setInputScale(detectionParams->getDetectionScale());
+		east->setInputScale(eastParams->getDetectionScale());
 
 		//Default values from documentation are (123.68, 116.78, 103.94);
-		auto mean = detectionParams->getDetectionMean();
+		auto mean = eastParams->getDetectionMean();
 		cv::Scalar detMean(mean[0], mean[1], mean[2]);
 		east->setInputMean(detMean);
 
@@ -78,9 +79,7 @@ namespace tin {
 			east->detect(resizedImg, detResults);
 		}
 
-		BOOST_LOG_TRIVIAL(info) << "EAST found " << detResults.size() << " boxes\n";
-
-		//Return smart pointer?
+		LOG_CORE_INFO("EAST found {0} boxes", detResults.size());
 
 		//Transform points to original image size
 		{
@@ -103,7 +102,7 @@ namespace tin {
 				boxes.emplace_back(points);
 			}
 			else {
-				BOOST_LOG_TRIVIAL(trace) << "Ignoring tilted text in " << points[1] << std::endl;
+				LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
 			}
 		}
 

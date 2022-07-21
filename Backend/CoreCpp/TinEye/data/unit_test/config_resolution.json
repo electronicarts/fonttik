@@ -1,7 +1,6 @@
 {
   "appSettings": {
-    "resultsPath": "./results/",
-    "debugInfoPath": "./debug_info/",
+    "detectionBackend": "EAST",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
     "textboxOutlineColors":{
@@ -14,7 +13,7 @@
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
-    "useTextRecognition": true,
+    "useTextRecognition": false,
     "useDPI":false,
     "targetResolution":0,
     "targetDPI":0,
@@ -51,19 +50,40 @@
     }
   },
   "textDetection": {
-    "detectionModel": "frozen_east_text_detection.pb",
     "confidence": 0.5,
-    "nmsThreshold": 0.4,
-    "detectionScale": 1.0,
-    "detectionMean": [
-      123.68,
-      116.78,
-      103.94
-    ],
     "rotationThresholdDegrees": 10,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
+    },
+    "EAST": {
+      "detectionModel": "frozen_east_text_detection.pb",
+      "nmsThreshold": 0.4,
+      "detectionScale": 1.0,
+      "detectionMean": [
+        123.68,
+        116.78,
+        103.94
+      ]
+    
+    
+    },
+    "DB" : {
+      "detectionModel":"DB_IC15_resnet50.onnx",
+      "binaryThreshold":0.3,
+      "polygonThreshold":0.5,
+      "maxCandidates":200,
+      "unclipRatio":2.0,
+      "scale":0.00392,
+      "detectionMean": [
+        123.68,
+        116.78,
+        103.94
+      ],
+      "inputSize":[
+        736,
+        736
+      ]
     }
   },
   "guideline": {
@@ -90,7 +110,8 @@
         "width": 4,
         "height": 30
       }
-    }
+    },
+    "textSizeRatio": [1,3,1]
   },
   "sRGBLinearizationValues": [
     0,

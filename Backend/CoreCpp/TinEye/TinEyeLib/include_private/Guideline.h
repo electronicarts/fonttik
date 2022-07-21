@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <filesystem>
 #include <iostream>
-#include <boost/log/trivial.hpp>
 #include <nlohmann/json.hpp>
 
 
@@ -25,17 +24,20 @@ namespace tin {
 		//Guidelines
 		float contrastRatio;
 		float contrastRatioRecommendation;
+		float textSizeRatio[3];
 		int textBackgroundRadius;
+		int heightPer100DPI;
 		std::unordered_map<int, SizeGuidelines> resolutionGuidelines;
 		std::unordered_map<int, SizeGuidelines> resolutionRecommendations;
 		std::unordered_map<int, SizeGuidelines> dpiGuidelines;
 		SizeGuidelines* activeGuideline = nullptr;
 		SizeGuidelines* activeRecommendation = nullptr;
 		bool usingDPI = false;
-		int heightPer100DPI;
 	public:
 		Guideline() : contrastRatio(4.5), contrastRatioRecommendation(4.5),
-		textBackgroundRadius(10), resolutionGuidelines({ {1080,{4,28}} }) {}
+			textBackgroundRadius(10), resolutionGuidelines({ {1080,{4,28}} }) {
+			textSizeRatio[0] = 1; textSizeRatio[1] = 3; textSizeRatio[2] = 1;
+		}
 
 		void init(nlohmann::json guidelineJson);
 
@@ -51,6 +53,7 @@ namespace tin {
 		float getContrastRecommendation() const { return contrastRatioRecommendation; }
 
 		int getTextBackgroundRadius() { return textBackgroundRadius; }
+		float* getTextSizeRatio() { return textSizeRatio; }
 	};
 
 }

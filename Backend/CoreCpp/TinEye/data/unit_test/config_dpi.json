@@ -1,7 +1,6 @@
 {
   "appSettings": {
-    "resultsPath": "./results/",
-    "debugInfoPath": "./debug_info/",
+    "detectionBackend": "EAST",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
     "textboxOutlineColors":{
@@ -51,19 +50,27 @@
     }
   },
   "textDetection": {
-    "detectionModel": "frozen_east_text_detection.pb",
     "confidence": 0.5,
-    "nmsThreshold": 0.4,
-    "detectionScale": 1.0,
-    "detectionMean": [
-      123.68,
-      116.78,
-      103.94
-    ],
     "rotationThresholdDegrees": 10,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
+    },
+    "EAST": {
+      "detectionModel": "frozen_east_text_detection.pb",
+      "nmsThreshold": 0.4,
+      "detectionScale": 1.0,
+      "detectionMean": [
+        123.68,
+        116.78,
+        103.94
+      ]
+    
+    
+    },
+    "DB" : {
+      "detectionModel":"DB_IC15_resnet50.onnx",
+      "PARAMS":"TODO"
     }
   },
   "guideline": {
@@ -90,7 +97,8 @@
         "width": 4,
         "height": 30
       }
-    }
+    },
+    "textSizeRatio": [1,3,1]
   },
   "sRGBLinearizationValues": [
     0,

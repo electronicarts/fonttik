@@ -6,9 +6,7 @@ namespace tin {
 
 	Textbox::Textbox(const std::vector<cv::Point >& points, int padding) : parentImage(nullptr) {
 		//Height takes into account possible box skewing when calculating due to letters going down (eg p's)
-		cv::Point topLeft(std::min(points[0].x, points[1].x), points[1].y);
-		//Top left height is directly points[1] because through our testing we've found EAST tends to consistently
-		//place points[2] a bit higher and that messes up measurement accuracy
+		cv::Point topLeft(std::min(points[0].x, points[1].x), std::min(points[1].y,points[2].y));
 		cv::Point bottomRight(std::max(points[2].x, points[3].x), std::max(points[0].y, points[3].y));
 		int boxHeight = bottomRight.y - topLeft.y;
 		int boxWidth = bottomRight.x - topLeft.x;

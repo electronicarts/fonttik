@@ -12,6 +12,13 @@ namespace fs = std::filesystem;
 
 namespace tin {
 	class AppSettings {
+	public:
+		enum DetectionBackend {EAST, DB};
+	private:
+		DetectionBackend detectionBackend = DetectionBackend::EAST; //Text detection can use EAST or DB
+
+		int targetDPI = 0,
+			targetResolution = 0;
 		bool dbgSaveLuminanceMap = false,
 			dbgSaveTexboxOutline = false,
 			dbgSaveSeparateTextboxes = false,
@@ -22,10 +29,8 @@ namespace tin {
 			dbgSaveLogs = false,
 			printResultValues = false,
 			useDPI = false;
-		int targetDPI = 0,
-			targetResolution = 0;
-		fs::path resultsPath = "./", debugInfoPath = "./debug/";
-		std::vector<cv::Scalar> outlineColors = std::vector<cv::Scalar>(ResultType::RESULTYPE_COUNT,cv::Scalar(1.0));
+
+		std::vector<cv::Scalar> outlineColors = std::vector<cv::Scalar>(ResultType::RESULTYPE_COUNT, cv::Scalar(1.0));
 
 
 		//All mask measurement range from 0 to 1, this will be scaled in functino of image size
@@ -44,17 +49,18 @@ namespace tin {
 		static cv::Scalar ColorFromJson(nlohmann::json data);
 	public:
 		AppSettings() :
+			detectionBackend(DetectionBackend::EAST),
 			dbgSaveLuminanceMap(true),
 			dbgSaveTexboxOutline(true), dbgSaveSeparateTextboxes(false),
 			dbgSaveHistograms(false), dbgSaveRawTextboxOutline(false),
 			dbgSaveLuminanceMasks(true), useTextRecognition(true),
 			printResultValues(true), dbgSaveLogs(false),
-			useDPI(false), targetDPI(0), targetResolution(0),
-			resultsPath("./"), debugInfoPath("./debugInfo") {}
+			useDPI(false), targetDPI(0), targetResolution(0) {}
 
 		void init(nlohmann::json settings);
 
 		//AppSettigs
+		DetectionBackend getDetectionBackend() const { return detectionBackend; }
 		bool saveLuminanceMasks() const { return dbgSaveLuminanceMasks; }
 		bool saveLuminanceMap() const { return dbgSaveLuminanceMap; }
 		bool saveTexboxOutline() const { return dbgSaveTexboxOutline; }
@@ -64,8 +70,6 @@ namespace tin {
 		bool textRecognitionActive() const { return useTextRecognition; }
 		bool saveLogs() const { return dbgSaveLogs; }
 		bool printValuesOnResults() const { return printResultValues; }
-		fs::path getResultsPath() const { return resultsPath; }
-		fs::path getDebugInfoPath() const { return debugInfoPath; }
 		int getSpecifiedSize() const;
 		bool usingDPI() const { return useDPI; }
 		const auto& getColors() { return outlineColors; }
