@@ -7,6 +7,7 @@ TinEye is a simple console application created by EA Compliance & Certification 
 TinEye can be configured by a .json file, default configuration provided under [Data](./Backend/CoreCpp/TinEye/data/config.json). Config is automatically copied over when building with CMake. You can also use a different configuration when running the application by using the `-c` option.
 
 - AppSettings configuration for how the tool should function:
+	- DetectionBackend: TinEye supports the EAST and DB (differential binarization) backends from OpenCV.
 	- SaveLuminanceMap: whether to save the luminance map generated when processing the image;
 	- SaveTextboxOutline: whether to save the resulting images with the textboxes indicating if each textbox passed the guidelines test.
 	- TextboxOutlineColors: Sets of RGB values (0 to 255) for the different results the tool can output.
@@ -31,14 +32,24 @@ TinEye can be configured by a .json file, default configuration provided under [
 	- VocabularyFile: Path of the file with the symbols that can be recognized by the program.
 	- Scale:  Multiplier for frame values. By default is 1/127.5.
 	- Mean: Scalar with mean values which are subtracted from channels. By default it's the same for all three color channels.
-- TextDetection configuration for EAST and extra parameters for pruning:
-	- DetectionModel: Name of the file for a trained neural network to be used for text detection.
-	- Confidence: Minimum confidence that the neural network has to have for text to be considered a textbox.
-	- NmsThreshold: Threshold for automatic merge algorithm. Increasing or decreasing this value might result in textboxes being cut off or various similar textboxes stacking on top of each other.
-	- DetectionScale: Values given by the OpenCV EAST documentation.
-	- DetectionMean:  Values given by the OpenCV EAST documentation.
+- TextDetection configuration for EAST, DB and extra parameters for pruning:
 	- RotationThersholdDegree: How many degrees can a textbox be rotated before being pruned. Useful to prune environmental text that you don't want recognized, since it usually isn't parallel to the screen.
 	- MergeThreshold: Percentage that two separate textboxes have to overlap in any direction (horizontal or vertical) before they are merged into one. This is worth changing if the tool is separating some words into two or more when recognizing due to special fonts or effects.
+	- Confidence: Minimum confidence that the neural network has to have for text to be considered a textbox.
+	- EAST specific configuration
+		- DetectionModel: Name of the file for a trained neural network to be used for text detection.
+		- NmsThreshold: Threshold for automatic merge algorithm. Increasing or decreasing this value might result in textboxes being cut off or various similar textboxes stacking on top of each other.
+		- DetectionScale: Values given by the OpenCV EAST documentation.
+		- DetectionMean:  Values given by the OpenCV EAST documentation.
+	- DB specific configuration
+		- DetectionModel: Name of the file for a trained neural network to be used for text detection.
+    	- BinaryThreshold: OpenCV post processing parameter. 
+    	- PolygonThreshold: OpenCV post processing parameter. 
+    	- MaxCandidates: maximum number of detected textboxes.
+		- UnclipRatio: Non-maximum suppression equivalent from EAST 
+		- Scale: OpenCV normalization parameter.
+		- DetectionMean: OpenCV normalization parameter.
+		- InputSize: OpenCV normalization parameter.
 - Guideline configuration for guidelines that are to be applied:
 	- Contrast: The minimum contrast ratio detected text has to have with its background. By default 4.5 according to WCAG 2 guidelines.
 	- RecommendedContrast: If set higher than Contrast, any measured value that falls between Contrast and RecommendedContrast will be a warning, but won't fail the analysis.

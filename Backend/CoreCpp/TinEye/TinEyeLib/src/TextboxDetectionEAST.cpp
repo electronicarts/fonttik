@@ -16,18 +16,20 @@ namespace tin {
 		detectionParams = params;
 		appSettings = appSettingsCfg;
 
-		east = new cv::dnn::TextDetectionModel_EAST(detectionParams->getDetectionModel());
+		const EASTDetectionParams* eastParams = params->getEASTParams();
+
+		east = new cv::dnn::TextDetectionModel_EAST(eastParams->getDetectionModel());
 
 		LOG_CORE_TRACE("Confidence set to {0}", detectionParams->getConfidenceThreshold());
 		//Confidence on textbox threshold
 		east->setConfidenceThreshold(detectionParams->getConfidenceThreshold());
 		//Non Maximum supression
-		east->setNMSThreshold(detectionParams->getNMSThreshold());
+		east->setNMSThreshold(eastParams->getNMSThreshold());
 
-		east->setInputScale(detectionParams->getDetectionScale());
+		east->setInputScale(eastParams->getDetectionScale());
 
 		//Default values from documentation are (123.68, 116.78, 103.94);
-		auto mean = detectionParams->getDetectionMean();
+		auto mean = eastParams->getDetectionMean();
 		cv::Scalar detMean(mean[0], mean[1], mean[2]);
 		east->setInputMean(detMean);
 
@@ -100,7 +102,7 @@ namespace tin {
 				boxes.emplace_back(points);
 			}
 			else {
-				//LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
+				LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
 			}
 		}
 

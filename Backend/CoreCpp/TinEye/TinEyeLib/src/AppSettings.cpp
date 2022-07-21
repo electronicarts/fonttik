@@ -7,6 +7,16 @@
 
 namespace tin {
 	void AppSettings::init(nlohmann::json settings) {
+
+		if (settings["detectionBackend"] == "DB") {
+			detectionBackend = DB;
+		}
+		else if (settings["detectionBackend"] == "EAST") {
+			detectionBackend = EAST;
+		}
+		else {
+			throw "Invalid Backend";
+		}
 		//Load all of the focus and ignore regions from config
 
 		std::vector<cv::Rect2f> focus;

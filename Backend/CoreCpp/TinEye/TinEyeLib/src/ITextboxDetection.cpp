@@ -27,7 +27,7 @@ namespace tin {
 				if (boxIt != targetIt) {
 					auto overlap = Textbox::OverlapAxisPercentage(*boxIt, *targetIt);
 					if (overlap.first >= mergeThreshold.first && overlap.second >= mergeThreshold.second) {
-						//LOG_CORE_INFO("{0} merges with {1}", boxIt->getRect(), targetIt->getRect());
+						LOG_CORE_INFO("{0} merges with {1}", boxIt->getRect(), targetIt->getRect());
 						boxIt->mergeWith(*targetIt);
 						targetIt = boxes.erase(targetIt);
 					}
