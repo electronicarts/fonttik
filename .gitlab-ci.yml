@@ -22,30 +22,31 @@ build-corecpp:
      #   refs:
       #      - development-migration@eacc-tech/iris # only trigger from the migration repo
     script:
-         #CUDA Toolkit
+        # CUDA Toolkit
+        - apt-get install --yes software-properties-common
         - wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
         - dpkg -i cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
         - cp /var/cuda-repo-debian11-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
         - add-apt-repository contrib
         - apt-get update
         - apt-get --yes install cuda
-        #Write deployment token to nuget.config
+        # Write deployment token to nuget.config
         - apt-get install -y sed
         - REP_ENVIRONMENT_EXP1='s/"token"/"'$DEPLOYMENT_TOKEN'"/g'
         - sed -e $REP_ENVIRONMENT_EXP1 $TINEYE_CPP_APP_PATH/nuget.config.template > $TINEYE_CPP_APP_PATH/nuget.config
         - more $TINEYE_CPP_APP_PATH/nuget.config
         - pwd
-        #donwload needed depencencies
+        # donwload needed depencencies
         - echo "Start installing dependencies for CoreCpp"
         - apt-get update 
         - apt-get install --yes ninja-build rsync zip 
         - apt-get install --yes pkg-config
         - apt-get install --yes python3
         - apt-get install --yes python3-distutils
-        #install latest CMake version
+        # install latest CMake version
         - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
         - sh cmake-3.22.2-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
-        #install needed packages to build OpenCV
+        # install needed packages to build OpenCV
         - apt-get install --yes libx11-dev libxft-dev 
         - apt-get install --yes bison 
         - apt-get install --yes gperf 
@@ -56,13 +57,13 @@ build-corecpp:
         - apt-get install --yes libxdamage-dev 
         - apt-get install --yes libxinerama-dev
         - apt-get install --yes nasm
-        #nuget 
+        # nuget 
         - apt-get install --yes mono-complete
-        #download vcpkg
+        # download vcpkg
         - git clone https://github.com/Microsoft/vcpkg.git
         - ./vcpkg/bootstrap-vcpkg.sh
         - export VCPKG_ROOT=`pwd`/vcpkg
-        #build project
+        # build project
         - echo "Start building CoreCpp"
         - cd $TINEYE_CPP_APP_PATH
         - cmake -DPROFILING=ON --preset linux-debug
