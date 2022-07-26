@@ -30,7 +30,7 @@ build-corecpp:
         - pwd
         # donwload needed depencencies
         - echo "Start installing dependencies for CoreCpp"
-        - apt-get update 
+        - apt-get update && DEBIAN_FRONTEND=noninteractive
         - apt-get install --yes ninja-build rsync zip 
         - apt-get install --yes pkg-config
         - apt-get install --yes python3
@@ -42,7 +42,7 @@ build-corecpp:
         - cp /var/cuda-repo-debian11-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
         - add-apt-repository contrib
         - apt-get update
-        - apt-get --yes install cuda
+        - apt-get --yes install cuda -silent
         # install latest CMake version
         - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
         - sh cmake-3.22.2-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
