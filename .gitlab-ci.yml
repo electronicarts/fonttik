@@ -16,6 +16,7 @@ build-corecpp:
     variables:
         VCPKG_BUILD_TYPE: "Release" #vcpkg will only build release for dependencies
         VCPKG_BINARY_SOURCES: "nugetconfig,/builds/eacc-tech/tineye/Backend/CoreCpp/nuget.config,readwrite"
+        DEBIAN_FRONTEND: noninteractive
     #only:
         #changes:
          #   - "Backend/CoreCpp/*" 
@@ -30,7 +31,7 @@ build-corecpp:
         - pwd
         # donwload needed depencencies
         - echo "Start installing dependencies for CoreCpp"
-        - apt-get update && DEBIAN_FRONTEND=noninteractive
+        - apt-get update
         - apt-get install --yes ninja-build rsync zip 
         - apt-get install --yes pkg-config
         - apt-get install --yes python3
