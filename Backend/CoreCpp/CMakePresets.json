@@ -23,7 +23,7 @@
       "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
       "inherits": [ "base" ],
       "environment": {
-        "VCPKG_ROOT": "/home/bmacazaga/vcpkg"
+        "VCPKG_ROOT": "/home/cmake-local/vcpkg"
       },
       "cacheVariables": {
         "CMAKE_C_COMPILER": "gcc",

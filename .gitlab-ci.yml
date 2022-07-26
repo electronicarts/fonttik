@@ -22,14 +22,6 @@ build-corecpp:
      #   refs:
       #      - development-migration@eacc-tech/iris # only trigger from the migration repo
     script:
-        # CUDA Toolkit
-        - apt-get install --yes software-properties-common
-        - wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
-        - dpkg -i cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
-        - cp /var/cuda-repo-debian11-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
-        - add-apt-repository contrib
-        - apt-get update
-        - apt-get --yes install cuda
         # Write deployment token to nuget.config
         - apt-get install -y sed
         - REP_ENVIRONMENT_EXP1='s/"token"/"'$DEPLOYMENT_TOKEN'"/g'
@@ -43,6 +35,14 @@ build-corecpp:
         - apt-get install --yes pkg-config
         - apt-get install --yes python3
         - apt-get install --yes python3-distutils
+         # CUDA Toolkit
+        - apt-get install --yes software-properties-common
+        - wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
+        - dpkg -i cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
+        - cp /var/cuda-repo-debian11-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
+        - add-apt-repository contrib
+        - apt-get update
+        - apt-get --yes install cuda
         # install latest CMake version
         - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
         - sh cmake-3.22.2-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
