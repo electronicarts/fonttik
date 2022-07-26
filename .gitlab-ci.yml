@@ -45,7 +45,7 @@ build-corecpp:
         - apt-get update
         - apt-get --yes install cuda
         # cuDNN 
-        - wget -O cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz "https://developer.download.nvidia.com/compute/cudnn/secure/8.4.1/local_installers/11.6/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz?rR0DV4iC5B8ddAjeR6xOCY9y3C6tVagttdRAeUAH2wKw49JzAS7De4RW6Gbqp5mUVYKX7yenWBu9ga_6yFZMvDbug3lAxGtiSBJyZD8CJ9lCYGjh1bBesA-d6JR8C-3ymNgnbP_cGKFwI9cbK3QNZmkrxVGbvFOq4v6rsyrEE-yZMJPZIMmkwxosdPWwwCHOeoTdq4DYnbVlBuR0bOR9m6ddDw&t=eyJscyI6InJlZiIsImxzZCI6IlJFRi1kb2NzLm52aWRpYS5jb21cLyJ9"
+        - wget -O cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz "https://developer.download.nvidia.com/compute/cudnn/secure/8.4.1/local_installers/11.6/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz?dDI8IDGKpeLrBqkado9vwbjrTNFbH_wauA6oqAMUBrLWsk3RpGWigEhPmxHmRlGZrpaWdzNy1L_wecagYZaE_PN39pnitSsCyh4vRCfWQXNsMKnTqA3cSMvPUyd50ypS5sksWWPoI-v631ikTwAetbeSiMvb_DRmnNLSj8UnuUAeS5CkdwZPcyaI76URtzevwPT8Y0eIhBHFrq4iLyLyTfUohA&t=eyJscyI6InJlZiIsImxzZCI6IlJFRi1kb2NzLm52aWRpYS5jb21cLyJ9"
         - tar -xvf cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz
         - cp cudnn-*-archive/include/cudnn*.h /usr/local/cuda/include
         - cp -P cudnn-*-archive/lib/libcudnn* /usr/local/cuda/lib64

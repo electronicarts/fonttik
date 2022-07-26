@@ -33,6 +33,9 @@ namespace tin {
 		cv::Size inputSize = cv::Size(736, 736);
 
 		db->setInputParams(scale, inputSize, detMean);
+
+		db->setPreferableBackend((cv::dnn::Backend) dbParams->getPreferredBackend());
+		db->setPreferableTarget((cv::dnn::Target) dbParams->getPreferredTarget());
 	}
 
 	TextboxDetectionDB::~TextboxDetectionDB() {

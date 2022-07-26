@@ -34,6 +34,9 @@ namespace tin {
 		east->setInputMean(detMean);
 
 		east->setInputSwapRB(true);
+
+		east->setPreferableBackend((cv::dnn::Backend)eastParams->getPreferredBackend());
+		east->setPreferableTarget((cv::dnn::Target)eastParams->getPreferredTarget());
 	}
 
 	TextboxDetectionEAST::~TextboxDetectionEAST() {

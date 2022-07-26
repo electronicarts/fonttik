@@ -8,11 +8,14 @@
 using json = nlohmann::json;
 
 namespace tin {
+
 	class EASTDetectionParams {
 		std::string detectionModel;
 		float nmsThreshold; //Non maximum supresison threshold
 		double detScale; //Scaes pixel individually after mean substraction
 		std::array<double, 3> detMean;//This values will be substracted from the corresponding channel
+		std::string preferrerdBackend = "DEFAULT";
+		std::string preferrerdTarget = "CPU";
 
 	public:
 		EASTDetectionParams() :
@@ -25,11 +28,15 @@ namespace tin {
 			detScale = eastConfig["detectionScale"];
 			json mean = eastConfig["detectionMean"];
 			detMean = { mean[0],mean[1] ,mean[2] };
+			preferrerdBackend = eastConfig["preferrerdBackend"];
+			preferrerdTarget = eastConfig["preferrerdTarget"];
 		}
 		float getNMSThreshold() const { return nmsThreshold; }
 		double getDetectionScale() const { return detScale; }
 		std::array<double, 3> getDetectionMean() const { return detMean; }
 		std::string getDetectionModel() const { return detectionModel; }
+		short getPreferredBackend() const { return preferrerdBackend == "CUDA" ? 5 : 0; } //cv::dnn::DNN_BACKEND_CUDA || cv::dnn::DNN_BACKEND_DEFAULT 
+		short getPreferredTarget() const { return preferrerdTarget == "CUDA" ? 6 : 0; } //cv::dnn::DNN_TARGET_CUDA || cv::dnn::DNN_TARGET_CPU
 	};
 
 	class DBDetectionParams {
@@ -41,6 +48,9 @@ namespace tin {
 		float scale = 1.0 / 255;
 		std::array<double, 3> mean = { 123.68, 116.78, 103.94 };//This values will be substracted from the corresponding channel
 		std::array<int, 2> inputSize = { 736,736 };//This values will be substracted from the corresponding channel
+		std::string preferrerdBackend = "DEFAULT";
+		std::string preferrerdTarget = "CPU";
+
 	public:
 		DBDetectionParams() {};
 		void init(json dbConfig) {
@@ -54,6 +64,8 @@ namespace tin {
 			mean = { m[0],m[1] ,m[2] };
 			json sz = dbConfig["inputSize"];
 			inputSize = { sz[0],sz[1]};
+			preferrerdBackend = dbConfig["preferrerdBackend"];
+			preferrerdTarget = dbConfig["preferrerdTarget"];
 		}
 		std::string getDetectionModel() const { return detectionModel; }
 		float getBinaryThreshold() const { return binThresh; }
@@ -63,6 +75,8 @@ namespace tin {
 		std::array<double, 3> getMean() const { return mean; }
 		std::array<int, 2> getInputSize() const { return inputSize; }
 		double getScale() const { return scale; }
+		short getPreferredBackend() const { return preferrerdBackend == "CUDA" ? 5 : 0; } //cv::dnn::DNN_BACKEND_CUDA || cv::dnn::DNN_BACKEND_DEFAULT 
+		short getPreferredTarget() const { return preferrerdTarget == "CUDA" ? 6 : 0; } //cv::dnn::DNN_TARGET_CUDA || cv::dnn::DNN_TARGET_CPU
 
 	};
 	class TextDetectionParams {
