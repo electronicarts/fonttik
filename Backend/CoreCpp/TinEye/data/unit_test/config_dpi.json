@@ -64,13 +64,16 @@
         123.68,
         116.78,
         103.94
-      ]
-    
-    
+      ],
+      "preferrerdBackend": "DEFAULT",
+      "preferrerdTarget": "CPU"
+
     },
-    "DB" : {
-      "detectionModel":"DB_IC15_resnet50.onnx",
-      "PARAMS":"TODO"
+    "DB": {
+      "detectionModel": "DB_IC15_resnet50.onnx",
+      "PARAMS": "TODO",
+      "preferrerdBackend": "DEFAULT",
+      "preferrerdTarget": "CPU"
     }
   },
   "guideline": {
