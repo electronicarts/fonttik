@@ -67,7 +67,6 @@
         116.78,
         103.94
       ]
-
     },
     "DB": {
       "detectionModel": "DB_IC15_resnet50.onnx",
@@ -85,6 +84,7 @@
         736,
         736
       ]
+    }
   },
   "guideline": {
     "contrast": 4.5,
