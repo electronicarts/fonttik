@@ -36,6 +36,8 @@ TinEye can be configured by a .json file, default configuration provided under [
 	- RotationThersholdDegree: How many degrees can a textbox be rotated before being pruned. Useful to prune environmental text that you don't want recognized, since it usually isn't parallel to the screen.
 	- MergeThreshold: Percentage that two separate textboxes have to overlap in any direction (horizontal or vertical) before they are merged into one. This is worth changing if the tool is separating some words into two or more when recognizing due to special fonts or effects.
 	- Confidence: Minimum confidence that the neural network has to have for text to be considered a textbox.
+	- PreferredBackend: DEFAULT. Text detection backend for EAST or DB.
+	- PreferredTarget: CPU or OPENCL. Text detection target for EAST or DB, if the machine where TinEye is running has a GPU, OPENCL option will turn on hardware accelaration.
 	- EAST specific configuration
 		- DetectionModel: Name of the file for a trained neural network to be used for text detection.
 		- NmsThreshold: Threshold for automatic merge algorithm. Increasing or decreasing this value might result in textboxes being cut off or various similar textboxes stacking on top of each other.
