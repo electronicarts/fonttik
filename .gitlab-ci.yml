@@ -17,11 +17,6 @@ build-corecpp:
         VCPKG_BUILD_TYPE: "Release" #vcpkg will only build release for dependencies
         VCPKG_BINARY_SOURCES: "nugetconfig,/builds/eacc-tech/tineye/Backend/CoreCpp/nuget.config,readwrite"
         DEBIAN_FRONTEND: noninteractive
-    #only:
-        #changes:
-         #   - "Backend/CoreCpp/*" 
-     #   refs:
-      #      - development-migration@eacc-tech/iris # only trigger from the migration repo
     script:
         # Write deployment token to nuget.config
         - apt-get install -y sed
@@ -36,20 +31,6 @@ build-corecpp:
         - apt-get install --yes pkg-config
         - apt-get install --yes python3
         - apt-get install --yes python3-distutils
-        # CUDA Toolkit
-        - apt-get install --yes software-properties-common
-        - wget https://developer.download.nvidia.com/compute/cuda/11.7.0/local_installers/cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
-        - dpkg -i cuda-repo-debian11-11-7-local_11.7.0-515.43.04-1_amd64.deb
-        - cp /var/cuda-repo-debian11-11-7-local/cuda-*-keyring.gpg /usr/share/keyrings/
-        - add-apt-repository contrib
-        - apt-get update
-        - apt-get --yes install cuda
-        # cuDNN 
-        - wget -O cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz "https://developer.download.nvidia.com/compute/cudnn/secure/8.4.1/local_installers/11.6/cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz?oDXYEr1x537PSyclLacTz3kc4TdNg3JBKNVv9HUDx8sTMRBqwvU8_n9ZO3gebuJTw-LMg29GzlkDtzF5KttE5FzHOXti-EGhkkVhkU7KvE7Al90fNLgsWDhtsUvqVsIrOOgPg74Z1jAtP94uG6nYHLaNYRlVoBExvaZAdHBbWVIt6RiFtjRJS7XtrFRUdL1BOybDbkSoYs_Q_f9QqEJ75Migeg&t=eyJscyI6ImdzZW8iLCJsc2QiOiJodHRwczpcL1wvd3d3Lmdvb2dsZS5jb21cLyIsIm5jaWQiOiJlbS1udXJ0LTMzMTI0NSJ9"
-        - tar -xvf cudnn-linux-x86_64-8.4.1.50_cuda11.6-archive.tar.xz
-        - cp cudnn-*-archive/include/cudnn*.h /usr/local/cuda/include
-        - cp -P cudnn-*-archive/lib/libcudnn* /usr/local/cuda/lib64
-        - chmod a+r /usr/local/cuda/include/cudnn*.h /usr/local/cuda/lib64/libcudnn*
         # install latest CMake version
         - wget https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh
         - sh cmake-3.22.2-linux-x86_64.sh --prefix=/usr/local --exclude-subdir

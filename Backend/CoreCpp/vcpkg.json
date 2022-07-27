@@ -4,14 +4,12 @@
   "dependencies": [
     {
       "name": "opencv",
-      "features": [ "ffmpeg", "cuda", "cudnn", "dnn" ]
+      "features": [ "ffmpeg" ]
     },
 
     "nlohmann-json",
     "gtest",
     "spdlog",
-    "benchmark",
-    "cuda",
-    "cudnn"
+    "benchmark"
   ]
 }

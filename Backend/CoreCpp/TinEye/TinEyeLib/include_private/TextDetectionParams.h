@@ -9,13 +9,29 @@ using json = nlohmann::json;
 
 namespace tin {
 
+	enum class PreferrerdBackend{ DEFAULT = 0/*, CUDA = 5*/}; // equal to cv::dnn::Backend
+	enum class PreferrerdTarget{ CPU = 0, OPENCL = 1/*, CUDA = 6 */}; // equal to cv::dnn::Target
+
 	class EASTDetectionParams {
 		std::string detectionModel;
 		float nmsThreshold; //Non maximum supresison threshold
 		double detScale; //Scaes pixel individually after mean substraction
 		std::array<double, 3> detMean;//This values will be substracted from the corresponding channel
-		std::string preferrerdBackend = "DEFAULT";
-		std::string preferrerdTarget = "CPU";
+		PreferrerdBackend preferrerdBackend = PreferrerdBackend::DEFAULT;
+		PreferrerdTarget preferrerdTarget = PreferrerdTarget::CPU;
+
+		PreferrerdBackend getBackendParam(std::string param)
+		{
+			//return param == "CUDA" ? PreferrerdBackend::CUDA : PreferrerdBackend::DEFAULT;
+			return PreferrerdBackend::DEFAULT;
+		}
+
+		PreferrerdTarget getTargetParam(std::string param)
+		{
+			//return param == "CUDA" ? PreferrerdTarget::CUDA : (param == "OPENCL" ? PreferrerdTarget::OPENCL : PreferrerdTarget::CPU);
+			return param == "OPENCL" ? PreferrerdTarget::OPENCL : PreferrerdTarget::CPU;
+		}
+
 
 	public:
 		EASTDetectionParams() :
@@ -28,15 +44,15 @@ namespace tin {
 			detScale = eastConfig["detectionScale"];
 			json mean = eastConfig["detectionMean"];
 			detMean = { mean[0],mean[1] ,mean[2] };
-			preferrerdBackend = eastConfig["preferrerdBackend"];
-			preferrerdTarget = eastConfig["preferrerdTarget"];
+			preferrerdBackend = getBackendParam(eastConfig["preferrerdBackend"]);
+			preferrerdTarget = getTargetParam(eastConfig["preferrerdTarget"]);
 		}
 		float getNMSThreshold() const { return nmsThreshold; }
 		double getDetectionScale() const { return detScale; }
 		std::array<double, 3> getDetectionMean() const { return detMean; }
 		std::string getDetectionModel() const { return detectionModel; }
-		short getPreferredBackend() const { return preferrerdBackend == "CUDA" ? 5 : 0; } //cv::dnn::DNN_BACKEND_CUDA || cv::dnn::DNN_BACKEND_DEFAULT 
-		short getPreferredTarget() const { return preferrerdTarget == "CUDA" ? 6 : 0; } //cv::dnn::DNN_TARGET_CUDA || cv::dnn::DNN_TARGET_CPU
+		short getPreferredBackend() const { return static_cast<short>(preferrerdBackend); }  
+		short getPreferredTarget() const { return static_cast<short>(preferrerdTarget); }
 	};
 
 	class DBDetectionParams {
@@ -48,8 +64,20 @@ namespace tin {
 		float scale = 1.0 / 255;
 		std::array<double, 3> mean = { 123.68, 116.78, 103.94 };//This values will be substracted from the corresponding channel
 		std::array<int, 2> inputSize = { 736,736 };//This values will be substracted from the corresponding channel
-		std::string preferrerdBackend = "DEFAULT";
-		std::string preferrerdTarget = "CPU";
+		PreferrerdBackend preferrerdBackend = PreferrerdBackend::DEFAULT;
+		PreferrerdTarget preferrerdTarget = PreferrerdTarget::CPU;
+
+		PreferrerdBackend getBackendParam(std::string param)
+		{
+			//return param == "CUDA" ? PreferrerdBackend::CUDA : PreferrerdBackend::DEFAULT;
+			return PreferrerdBackend::DEFAULT;
+		}
+
+		PreferrerdTarget getTargetParam(std::string param)
+		{
+			//return param == "CUDA" ? PreferrerdTarget::CUDA : (param == "OPENCL" ? PreferrerdTarget::OPENCL : PreferrerdTarget::CPU);
+			return param == "OPENCL" ? PreferrerdTarget::OPENCL : PreferrerdTarget::CPU;
+		}
 
 	public:
 		DBDetectionParams() {};
@@ -64,8 +92,8 @@ namespace tin {
 			mean = { m[0],m[1] ,m[2] };
 			json sz = dbConfig["inputSize"];
 			inputSize = { sz[0],sz[1]};
-			preferrerdBackend = dbConfig["preferrerdBackend"];
-			preferrerdTarget = dbConfig["preferrerdTarget"];
+			preferrerdBackend = getBackendParam(dbConfig["preferrerdBackend"]);
+			preferrerdTarget = getTargetParam(dbConfig["preferrerdTarget"]);
 		}
 		std::string getDetectionModel() const { return detectionModel; }
 		float getBinaryThreshold() const { return binThresh; }
@@ -75,8 +103,8 @@ namespace tin {
 		std::array<double, 3> getMean() const { return mean; }
 		std::array<int, 2> getInputSize() const { return inputSize; }
 		double getScale() const { return scale; }
-		short getPreferredBackend() const { return preferrerdBackend == "CUDA" ? 5 : 0; } //cv::dnn::DNN_BACKEND_CUDA || cv::dnn::DNN_BACKEND_DEFAULT 
-		short getPreferredTarget() const { return preferrerdTarget == "CUDA" ? 6 : 0; } //cv::dnn::DNN_TARGET_CUDA || cv::dnn::DNN_TARGET_CPU
+		short getPreferredBackend() const { return static_cast<short>(preferrerdBackend); }
+		short getPreferredTarget() const { return static_cast<short>(preferrerdTarget); }
 
 	};
 	class TextDetectionParams {
