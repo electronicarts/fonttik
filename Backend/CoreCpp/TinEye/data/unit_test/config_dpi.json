@@ -56,6 +56,9 @@
       "x": 0.3,
       "y": 0.75
     },
+    "preferredBackend": "DEFAULT",
+    "preferredTarget": "CPU",
+    
     "EAST": {
       "detectionModel": "frozen_east_text_detection.pb",
       "nmsThreshold": 0.4,
@@ -65,12 +68,23 @@
         116.78,
         103.94
       ]
-    
-    
     },
-    "DB" : {
-      "detectionModel":"DB_IC15_resnet50.onnx",
-      "PARAMS":"TODO"
+    "DB": {
+      "detectionModel": "DB_IC15_resnet50.onnx",
+      "binaryThreshold": 0.3,
+      "polygonThreshold": 0.5,
+      "maxCandidates": 200,
+      "unclipRatio": 2.0,
+      "scale": 0.00392,
+      "detectionMean": [
+        123.68,
+        116.78,
+        103.94
+      ],
+      "inputSize": [
+        736,
+        736
+      ]
     }
   },
   "guideline": {
