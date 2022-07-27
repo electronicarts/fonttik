@@ -34,8 +34,8 @@ namespace tin {
 
 		db->setInputParams(scale, inputSize, detMean);
 
-		db->setPreferableBackend((cv::dnn::Backend) dbParams->getPreferredBackend());
-		db->setPreferableTarget((cv::dnn::Target) dbParams->getPreferredTarget());
+		db->setPreferableBackend((cv::dnn::Backend)detectionParams->getPreferredBackend());
+		db->setPreferableTarget((cv::dnn::Target)detectionParams->getPreferredTarget());
 	}
 
 	TextboxDetectionDB::~TextboxDetectionDB() {

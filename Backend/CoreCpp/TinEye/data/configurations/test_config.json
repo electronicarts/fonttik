@@ -58,6 +58,8 @@
       "x": 0.3,
       "y": 0.75
     },
+    "preferredBackend": "DEFAULT",
+    "preferredTarget": "CPU",
     "EAST": {
       "detectionModel": "frozen_east_text_detection.pb",
       "nmsThreshold": 0.4,
@@ -66,9 +68,7 @@
         123.68,
         116.78,
         103.94
-      ],
-      "preferrerdBackend": "DEFAULT",
-      "preferrerdTarget":  "CPU"
+      ]
     },
     "DB": {
       "detectionModel": "DB_IC15_resnet50.onnx",
@@ -85,9 +85,7 @@
       "inputSize": [
         736,
         736
-      ],
-      "preferrerdBackend": "DEFAULT",
-      "preferrerdTarget": "CPU"
+      ]
     }
   },
   "guideline": {
