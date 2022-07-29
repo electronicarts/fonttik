@@ -1,6 +1,45 @@
 # TinEye
 
-TinEye is a simple console application created by EA Compliance & Certification that processes images and videos highlighting compliant and not compliant text according to a set of guidelines. The guidelines checked by Tin Eye ensure text has a minimum size relative to screen resolution or DPI and that it has sufficient luminance contrast against its background to be readable by color vision deficient people
+TinEye is a console application created by EA Compliance & Certification that processes images and videos highlighting compliant and not compliant text according to a set of guidelines. The guidelines checked by TinEye ensure text has a minimum size relative to screen resolution or DPI and that it has sufficient luminance contrast against its background to be readable by color vision deficient people.
+
+## Platforms
+ * Linux
+ * Windows
+ * MacOS
+
+## How to build
+
+TinEye has been created as a CMake project and can be compiled in any C++ compatible system. There are various subprojects, all of them compile their necessary inter-project dependencies as well:
+- TinEyeLib: Logical backend for TinEye, has everything needed for analysis.
+- TinEyeApp: Standard TinEye executable, connects to TinEyeLib.
+- TinEyeApp_MT: CPU multithreaded TinEye executable, it'll run on as many cores as available in the system by default. Number of threads can be configured with the `-t` parameter.
+- TinEyeLib.Benchmarks: Multithreading benchmarks for different TinEye operations
+- TinEyeLib.Tests: All of the acceptance, integration and unit tests for the TinEye code. Any change to the code must pass or update these tests.
+
+All of the dependencies for TinEye are specified in [vcpk.json](./Backend/CoreCpp/vcpkg.json). vcpkg is a cross-platform package manager for C++ developed by Microsoft. Installation instructions for vcpkg can be found in its [repository](https://github.com/Microsoft/vcpkg).  
+If you want CMake to automatically run vcpkg and compile all dependencies for you, you must set your VCPKG root folder as an environment variable called "VCPKG_ROOT" or add it as a variable in the CMakePresets.json.
+
+TinEye uses cmake presets to build with different configurations, e.g.
+
+`>cmake --preset windows-release`   
+`>cmake --build --preset windows-release`
+
+## Running the tool
+
+When executing TinEye you must input the path to where the media you want to analyze is. You can either specify a folder, in which case every piece of media in the folder and subfolders will be analyzed, or a file, in which case that specific image will be analyzed.
+
+Example of execution command when the terminal is running in TinEye's directory
+
+`>TinEyeApp.exe ./resources/bf2042/chat_window_closed.png`
+
+TinEye would proceed to analyze the file 'chat_window_closed.png' with the configuration you specified beforehand. The filepath can be relative to where you are executing TinEye or absolute (for example an absolute path pointing to your documents would be C:\Users\[YourUserName]\Documents)
+
+### Optional arguments
+
+When running TinEye the following optional arguments can be passed to alter the functionality of the tool:
+
+- `-c`: Specify configuration file. Given a path to a specific configuration file uses that one during this execution. By default TinEye looks for config.json in its own folder.
+- `-t`: Specify the number of threads for multithreading. Only available when running 'TinEyeApp_MT'.
 
 ## Configuration
 
@@ -36,6 +75,8 @@ TinEye can be configured by a .json file, default configuration provided under [
 	- RotationThersholdDegree: How many degrees can a textbox be rotated before being pruned. Useful to prune environmental text that you don't want recognized, since it usually isn't parallel to the screen.
 	- MergeThreshold: Percentage that two separate textboxes have to overlap in any direction (horizontal or vertical) before they are merged into one. This is worth changing if the tool is separating some words into two or more when recognizing due to special fonts or effects.
 	- Confidence: Minimum confidence that the neural network has to have for text to be considered a textbox.
+	- PreferredBackend: DEFAULT. Text detection backend for EAST or DB.
+	- PreferredTarget: CPU or OPENCL. Text detection target for EAST or DB, if the machine where TinEye is running has a GPU, OPENCL option will turn on hardware accelaration.
 	- EAST specific configuration
 		- DetectionModel: Name of the file for a trained neural network to be used for text detection.
 		- NmsThreshold: Threshold for automatic merge algorithm. Increasing or decreasing this value might result in textboxes being cut off or various similar textboxes stacking on top of each other.
@@ -60,35 +101,6 @@ TinEye can be configured by a .json file, default configuration provided under [
 	- ResolutionsRecommendations: Recommended sizes for resolutions, if set higher than Resolutions will raise a warning if a measured value falls between them but won't fail the 	analysis.
 	- HeightPer100DPI: Only used if UseDPI is activated. DPI measurements scale linearly, so you only have to set a baseline and all necessary calculations are done automatically. Default value is 18 based on Microsoft guidelines.
 - sRGBLinearizationValues: Precalculated values for sRGB linearization to prevent floating point errors when calculating them in real time.
-
-## Setup and compilation
-
-TinEye has been created as a CMake project and can be compiled in any C++ compatible system. There are various subprojects, all of them compile their necessary inter-project dependencies as well:
-- TinEyeLib: Logical backend for TinEye, has everything needed for analysis.
-- TinEyeApp: Standard TinEye executable, connects to TinEyeLib.
-- TinEyeApp_MT: CPU multithreaded TinEye executable, it'll run on as many cores as available in the system by default. Number of threads can be configured with the `-t` parameter.
-- TinEyeLib.Benchmarks: Multithreading benchmarks for different TinEye operations
-- TinEyeLib.Tests: All of the acceptance, integration and unit tests for the TinEye code. Any change to the code must pass or update these tests.
-
-All of the dependencies for TinEye are specified in [vcpk.json](./Backend/CoreCpp/vcpkg.json). vcpkg is a cross-platform package manager for C++ developed by Microsoft. Installation instructions for vcpkg can be found in its [repository](https://github.com/Microsoft/vcpkg).  
-If you want CMake to automatically run vcpkg and compile all dependencies for you, you must set your VCPKG root folder as an environment variable called "VCPKG_ROOT".
-
-## Running the tool
-
-When executing TinEye you must input the path to where the media you want to analyze is. You can either specify a folder, in which case every piece of media in the folder and subfolders will be analyzed, or a file, in which case that specific image will be analyzed.
-
-Example of execution command when the terminal is running in TinEye's directory
-
-`>TinEyeApp.exe ./resources/bf2042/chat_window_closed.png`
-
-TinEye would proceed to analyze the file 'chat_window_closed.png' with the configuration you specified beforehand. The filepath can be relative to where you are executing TinEye or absolute (for example an absolute path pointing to your documents would be C:\Users\[YourUserName]\Documents)
-
-### Optional arguments
-
-When running TinEye the following optional arguments can be passed to alter the functionality of the tool:
-
-- `-c`: Specify configuration file. Given a path to a specific configuration file uses that one during this execution. By default TinEye looks for config.json in its own folder.
-- `-t`: Specify the number of threads for multithreading. Only available when running 'TinEyeApp_MT'.
 
 ## LICENSE
 
