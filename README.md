@@ -1,6 +1,6 @@
 # TinEye
 
-TinEye is a console application created by EA Compliance & Certification that processes images and videos highlighting compliant and not compliant text according to a set of guidelines. The guidelines checked by TinEye ensure text has a minimum size relative to screen resolution or DPI and that it has sufficient luminance contrast against its background to be readable by color vision deficient people.
+TinEye is a console application and library created by EA Compliance & Certification that processes images and videos highlighting compliant and not compliant text according to a set of guidelines. The guidelines checked by TinEye ensure text has a minimum size relative to screen resolution or DPI and that it has sufficient luminance contrast against its background to be readable by color vision deficient people.
 
 ## Platforms
  * Linux
@@ -33,6 +33,15 @@ Example of execution command when the terminal is running in TinEye's directory
 `>TinEyeApp.exe ./resources/bf2042/chat_window_closed.png`
 
 TinEye would proceed to analyze the file 'chat_window_closed.png' with the configuration you specified beforehand. The filepath can be relative to where you are executing TinEye or absolute (for example an absolute path pointing to your documents would be C:\Users\[YourUserName]\Documents)
+
+
+While TinEye is analyzing an image it outputs the results it finds while operating through the console. If any text box doesn't pass the size or contrast checks it is notified and its position and detected values are output. At the end of the analysis an overall pass or fail result is decided for both size and contrast checks. These results are also written to a log file at the end.
+
+For a more human-friendly output, TinEye also outputs two images (one for contrast and another for size checks with all of the text boxes detected overlaid. These text boxes will be red if they fail or green if they pass by default. If the user has decided they want to use recommended values for checks, textboxes will be orange if they pass the minimum requirement but don't meet the recommended criteria. The colors can be customised by changing TextboxOutlineColors in the configuration file.
+
+If you have activated the printValuesOnResults option in the configuration, you'll see the detected value for each check next to its corresponding text box in the image.
+
+Results will be saved depending on the appsetting options enabled (explained in Configuration) and will be stored in the same location as the media analysed.
 
 ### Optional arguments
 
