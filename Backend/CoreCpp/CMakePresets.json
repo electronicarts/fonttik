@@ -1,0 +1,219 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "description": "sets build and install directory",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/bin/build/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/bin/install/${presetName}"
+      }
+    },
+    {
+      "name": "linux-local",
+      "displayName": "Linux Debug",
+      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+      "inherits": [ "base" ],
+      "environment": {
+        "VCPKG_ROOT": "/home/cmake-local/vcpkg"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+      "inherits": [ "base" ],
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
+      }
+    },
+    {
+      "name": "linux-debug-cuda",
+      "displayName": "Linux Debug with CUDA",
+      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+      "inherits": [ "linux-debug" ],
+      "cacheVariables": {
+        "CUDA": "ON"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+      "inherits": [ "linux-debug" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-release-cuda",
+      "displayName": "Linux Release with CUDA",
+      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+      "inherits": [ "linux-debug" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CUDA": "ON"
+      }
+    },
+    {
+      "name": "macos-default",
+      "displayName": "macOS Debug",
+      "description": "Target a remote macOS system with Ninja",
+      "inherits": [ "base" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "/usr/bin/clang",
+        "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "macOS" ] },
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
+      }
+    },
+    {
+      "name": "windows-debug",
+      "displayName": "Windows x64 Debug",
+      "description": "Target Windows with the Visual Studio development environment.",
+      "inherits": [ "base" ],
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows x64 Release",
+      "description": "Target Windows with the Visual Studio development environment.",
+      "inherits": [ "windows-debug" ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-debug-cuda",
+      "displayName": "Windows Debug Cuda",
+      "description": "Target Windows with the Visual Studio development environment and cuda enabled.",
+      "inherits": [ "windows-debug" ],
+      "cacheVariables": {
+        "CUDA": "ON"
+      }
+    },
+    {
+      "name": "windows-release-cuda",
+      "displayName": "Windows Release Cuda",
+      "description": "Target Windows with the Visual Studio development environment and cuda enabled.",
+      "inherits": [ "windows-release" ],
+      "cacheVariables": {
+        "CUDA": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "core-build",
+      "description": "Inherits environment from base configurePreset",
+      "configurePreset": "base",
+      "hidden": true,
+      "inheritConfigureEnvironment": true
+    },
+    {
+      "name": "windows-debug",
+      "description": "Windows debug build",
+      "inherits": "core-build",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "description": "Windows release build",
+      "inherits": "core-build",
+      "configurePreset": "windows-release",
+      "targets": "FonttikApp"
+    },
+    {
+      "name": "clean-build-debug",
+      "description": "Clean before build (--clean-first)",
+      "inherits": "windows-debug",
+      "cleanFirst": true
+    },
+    {
+      "name": "clean-build-release",
+      "description": "Clean before build (--clean-first)",
+      "inherits": "windows-release",
+      "cleanFirst": true
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug",
+      "inherits": "core-build"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release",
+      "inherits": "core-build"
+    },
+    {
+      "name": "linux-clean-build-debug",
+      "inherits": "linux-debug",
+      "cleanFirst": true
+    },
+    {
+      "name": "linux-clean-build-release",
+      "inherits": "linux-release",
+      "cleanFirst": true
+    },
+    {
+      "name": "macos-debug",
+      "description": "MacOS debug build",
+      "inherits": "core-build",
+      "configurePreset": "macos-default"
+    },
+    {
+      "name": "macos-clean-build-debug",
+      "inherits": "macos-debug",
+      "cleanFirst": true
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "Fonttiklib-linux",
+      "configurePreset": "linux-release",
+      "environment": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Fonttiklib-linux-debug",
+      "configurePreset": "linux-debug",
+      "environment": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}

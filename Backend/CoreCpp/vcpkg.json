@@ -1,0 +1,34 @@
+{
+  "name": "fonttik",
+  "description": [ "Needed" ],
+  "version-string": "1.0.3",
+  "default-features": [ "default-opencv" ],
+  "dependencies": [
+    "nlohmann-json",
+    "gtest",
+    "spdlog",
+    "benchmark"
+  ],
+  "features": {
+    "cuda-opencv": {
+      "description": "Uses opencv with CUDA capabilities",
+      "dependencies": [
+        {
+          "name": "opencv",
+          "features": [ "ffmpeg", "cuda", "cudnn", "dnn" ]
+        },
+        "cuda",
+        "cudnn"
+      ]
+    },
+    "default-opencv": {
+      "description": "Uses opencv with default features",
+      "dependencies": [
+        {
+          "name": "opencv",
+          "features": [ "ffmpeg" ]
+        }
+      ]
+    }
+  }
+}

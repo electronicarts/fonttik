@@ -1,0 +1,21 @@
+﻿# CMakeList.txt : Top-level CMake project file, do global configuration
+# and include sub-projects here.
+cmake_minimum_required (VERSION 3.8)
+
+#Source files for compilation
+#file(GLOB_RECURSE test_sources src_tests/*.cpp src_tests/*.h)
+#file(GLOB_RECURSE cli_sources src_cli/*.cpp src_cli/*.h)
+
+find_package(OpenCV CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
+set(Fonttik_DEPS ${OpenCV_LIBS}
+nlohmann_json nlohmann_json::nlohmann_json 
+spdlog::spdlog)
+
+add_subdirectory("east_prototype")
+add_subdirectory("FonttikLib")
+add_subdirectory("FonttikApp")
+add_subdirectory("FonttikApp_MT")
+add_subdirectory ("FonttikLib.Benchmarks")
