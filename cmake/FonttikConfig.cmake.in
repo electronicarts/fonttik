@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+
+set_and_check(FONTTIK_LIB_DIR "@PACKAGE_LIB_INSTALL_DIR@")
+include("${FONTTIK_LIB_DIR}/cmake/FonttikTargets.cmake")
+
+check_required_components(fonttik)
