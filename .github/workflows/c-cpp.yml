@@ -2,21 +2,10 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: "**"
   pull_request:
     branches: [ "main", "dev" ]
   workflow_dispatch:
-   inputs:
-    logLevel:
-      description: 'Log level'
-      required: false
-      default: 'warning'
-      type: choice
-      options:
-      - info
-      - warning
-      - debug
-
 jobs:
   build:
 
@@ -25,9 +14,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: update apt
-      run: sudo apt-get update -y 
-    - name: install ninja
-      run: sudo apt-get install -y ninja-build
+      run: |
+        sudo apt-get update -y \
+        apt-get install --yes ninja-build rsync zip \
+        apt-get install --yes pkg-config \
+        git clone https://github.com/Microsoft/vcpkg.git \
+        export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT \
+        
     - name: cmake configure
       run: cmake --preset linux-release
     - name: build
