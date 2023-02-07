@@ -16,8 +16,7 @@ jobs:
     - name: gather dependencies
       run: |
         sudo apt-get update
-        apt-get install --yes ninja-build rsync zip
-        apt-get install --yes pkg-config
+        sudo apt-get install --yes ninja-build rsync zip pkg-config
         git clone https://github.com/Microsoft/vcpkg.git
         export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT
         
