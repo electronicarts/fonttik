@@ -16,7 +16,7 @@ jobs:
     - name: gather dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install --yes ninja-build rsync zip pkg-config
+        sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev
         echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
         
     - name: cmake configure
