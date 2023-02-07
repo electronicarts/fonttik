@@ -13,6 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: update apt
+    - run: sudo apt-get update -y 
+    - name: install ninja
+      run: sudo apt-get install -y ninja-build
     - name: cmake configure
       run: cmake --preset linux-release
     - name: build
