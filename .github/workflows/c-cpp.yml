@@ -17,10 +17,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --yes ninja-build rsync zip pkg-config
-        export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT
-        echo $VCPKG_INSTALLATION_ROOT
+        echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
         
     - name: cmake configure
       run: cmake --preset linux-release
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
       run: cmake --build --preset linux-release
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
