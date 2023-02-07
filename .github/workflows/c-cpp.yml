@@ -5,6 +5,17 @@ on:
     branches: [ "main", "dev" ]
   pull_request:
     branches: [ "main", "dev" ]
+  workflow_dispatch:
+   inputs:
+    logLevel:
+      description: 'Log level'
+      required: false
+      default: 'warning'
+      type: choice
+      options:
+      - info
+      - warning
+      - debug
 
 jobs:
   build:
