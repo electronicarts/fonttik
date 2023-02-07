@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: update apt
       run: |
-        sudo apt-get update -y \
+        sudo apt-get update \
         apt-get install --yes ninja-build rsync zip \
         apt-get install --yes pkg-config \
         git clone https://github.com/Microsoft/vcpkg.git \
