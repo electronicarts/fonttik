@@ -8,9 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: gather dependencies
@@ -68,7 +66,7 @@ jobs:
         with: 
           name: build-fontikk-ctest
           path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/CTestTestfile.cmake
-    - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@master
         with: 
           name: build-fontikk
           path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/

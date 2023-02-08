@@ -1,4 +1,4 @@
-name: C/C++ CI debug
+name: C/C++ CI
 
 on:
   push:
@@ -8,9 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: gather dependencies
@@ -44,7 +42,7 @@ jobs:
       with: 
         name: build-fontikk-ctest
         path: /home/runner/work/fonttik/fonttik/bin/build/linux-debug/CTestTestfile.cmake
-          - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@master
       with: 
         name: build-fontikk
         path: /home/runner/work/fonttik/fonttik/bin/build/linux-debug/
