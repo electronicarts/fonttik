@@ -16,7 +16,18 @@ jobs:
         sudo apt-get update
         sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
         echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
-        
+     
+      - name: Restore vcpkg and its artifacts.
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.VCPKG_ROOT }}
+            !${{ env.VCPKG_ROOT }}/buildtrees
+            !${{ env.VCPKG_ROOT }}/packages
+            !${{ env.VCPKG_ROOT }}/downloads
+            !${{ env.VCPKG_ROOT }}/installed
+          key: ${{ hashFiles( 'vcpkg.json' ) }}
+    
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release
       env:
@@ -26,62 +37,7 @@ jobs:
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - run: ls
-    - uses: actions/upload-artifact@master
-      with: 
-        name: build-fontikk-app
-        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp
-    - uses: actions/upload-artifact@master
-      with: 
-        name: build-fontikk-app-mt
-        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp_MT
-    - uses: actions/upload-artifact@master
-      with: 
-        name: build-fontikk-tests
-        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/tests/Fonttik.Tests
-    - uses: actions/upload-artifact@master
-      with: 
-        name: build-fontikk-ctest
-        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/CTestTestfile.cmake
-    - uses: actions/upload-artifact@master
-      with: 
-        name: build-fontikk
-        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/download-artifact@master
-        with: 
-          name: build-fontikk-app
-          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp
-      - uses: actions/download-artifact@master
-        with: 
-          name: build-fontikk-app-mt
-          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp_MT
-      - uses: actions/download-artifact@master
-        with: 
-          name: build-fontikk-tests
-          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/tests/Fonttik.Tests
-      - uses: actions/download-artifact@master
-        with: 
-          name: build-fontikk-ctest
-          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/CTestTestfile.cmake
-      - uses: actions/download-artifact@master
-        with: 
-          name: build-fontikk
-          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/
-      - run: |
-          sudo apt-get update
-          sudo apt-get install --yes libx11-dev libxft-dev 
-          sudo apt-get install --yes libdbus-1-dev libxi-dev libxtst-dev
-          sudo apt-get install --yes bison 
-          sudo apt-get install --yes gperf 
-          sudo apt-get install --yes libgles2-mesa-dev 
-          sudo apt-get install --yes libxrandr-dev 
-          sudo apt-get install --yes libxi-dev 
-          sudo apt-get install --yes libxcursor-dev 
-          sudo apt-get install --yes libxdamage-dev 
-          sudo apt-get install --yes libxinerama-dev
-          sudo apt-get install --yes nasm
+    - name: test
+      run: |
           echo "Start testing Fonttik"
           ctest --preset Fonttiklib-linux
