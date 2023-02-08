@@ -27,23 +27,23 @@ jobs:
       run: cmake --build --preset linux-release
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
-
+    - run: ls
     - uses: actions/upload-artifact@master
       with: 
         name: build-fontikk-app
-        path: ./bin/build/linux-release/apps/FonttikApp
+        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp
     - uses: actions/upload-artifact@master
       with: 
         name: build-fontikk-app-mt
-        path: ./bin/build/linux-release/apps/FonttikApp_MT
+        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp_MT
     - uses: actions/upload-artifact@master
       with: 
         name: build-fontikk-tests
-        path: ./bin/build/linux-release/tests/Fonttik.Tests
+        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/tests/Fonttik.Tests
     - uses: actions/upload-artifact@master
       with: 
         name: build-fontikk-ctest
-        path: ./bin/build/linux-release/CTestTestfile.cmake
+        path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/CTestTestfile.cmake
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -51,19 +51,19 @@ jobs:
       - uses: actions/download-artifact@master
         with: 
           name: build-fontikk-app
-          path: ./bin/build/linux-release/apps/FonttikApp
+          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp
       - uses: actions/download-artifact@master
         with: 
           name: build-fontikk-app-mt
-          path: ./bin/build/linux-release/apps/FonttikApp_MT
+          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/apps/FonttikApp_MT
       - uses: actions/download-artifact@master
         with: 
           name: build-fontikk-tests
-          path: ./bin/build/linux-release/tests/Fonttik.Tests
+          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/tests/Fonttik.Tests
       - uses: actions/download-artifact@master
         with: 
           name: build-fontikk-ctest
-          path: ./bin/build/linux-release/CTestTestfile.cmake
+          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/CTestTestfile.cmake
       - run: |
           sudo apt-get update
           sudo apt-get install --yes libx11-dev libxft-dev 
