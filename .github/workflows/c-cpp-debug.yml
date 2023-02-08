@@ -44,6 +44,10 @@ jobs:
       with: 
         name: build-fontikk-ctest
         path: /home/runner/work/fonttik/fonttik/bin/build/linux-debug/CTestTestfile.cmake
+          - uses: actions/upload-artifact@master
+      with: 
+        name: build-fontikk
+        path: /home/runner/work/fonttik/fonttik/bin/build/linux-debug/
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -64,6 +68,10 @@ jobs:
         with: 
           name: build-fontikk-ctest
           path: /home/runner/work/fonttik/fonttik/bin/build/linux-debug/CTestTestfile.cmake
+      - uses: actions/download-artifact@master
+        with: 
+          name: build-fontikk
+          path: /home/runner/work/fonttik/fonttik/bin/build/linux-debug/
       - run: |
           sudo apt-get update
           sudo apt-get install --yes libx11-dev libxft-dev 
