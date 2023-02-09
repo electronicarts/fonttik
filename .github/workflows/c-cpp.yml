@@ -17,7 +17,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
-        echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+        
+        echo "Cloning Vcpkg"
+        git clone https://github.com/Microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        echo "Cloning done"
+        
+        echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
     - name: Restore vcpkg and its artifacts.
       uses: actions/cache@v3
       with:
