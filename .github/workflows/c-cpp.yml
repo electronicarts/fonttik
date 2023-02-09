@@ -10,6 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      VCPKG_BINARY_SOURCES: 'clear;GitHub,readwrite'
 
     steps:
     - uses: actions/checkout@v3
