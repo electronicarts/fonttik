@@ -1,4 +1,4 @@
-name: C/C++ CI debug
+name: C/C++ CI release
 
 on:
   push:
@@ -31,11 +31,11 @@ jobs:
             ${{ hashFiles( 'vcpkg.json' ) }}
 
     - name: cmake configure
-      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-debug
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
-      run: cmake --build --preset linux-debug
+      run: cmake --build --preset linux-release
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: test
