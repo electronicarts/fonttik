@@ -47,5 +47,5 @@ jobs:
     - name: test
       run: |
             ls
-            echo "Start testing Fonttik"
+            echo "Start testing"
             ctest --preset Fonttiklib-linux
