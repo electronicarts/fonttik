@@ -20,9 +20,9 @@ jobs:
         
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
-        .\vcpkg\bootstrap-vcpkg.bat
+        ./vcpkg/bootstrap-vcpkg.sh
         echo "Cloning done"
-        
+
         echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
     - name: Restore vcpkg and its artifacts.
       uses: actions/cache@v3
