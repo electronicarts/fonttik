@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: C/C++ CI debug
 
 on:
   push:
@@ -8,7 +8,9 @@ on:
   workflow_dispatch:
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
     - name: gather dependencies
@@ -16,28 +18,28 @@ jobs:
         sudo apt-get update
         sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
         echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
-     
-      - name: Restore vcpkg and its artifacts.
-        uses: actions/cache@v3
-        with:
+    - name: Restore vcpkg and its artifacts.
+      uses: actions/cache@v3
+      with:
           path: |
             ${{ env.VCPKG_ROOT }}
             !${{ env.VCPKG_ROOT }}/buildtrees
             !${{ env.VCPKG_ROOT }}/packages
             !${{ env.VCPKG_ROOT }}/downloads
             !${{ env.VCPKG_ROOT }}/installed
-          key: ${{ hashFiles( 'vcpkg.json' ) }}
-    
+          key: |
+            ${{ hashFiles( 'vcpkg.json' ) }}
+
     - name: cmake configure
-      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-debug
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
-      run: cmake --build --preset linux-release
+      run: cmake --build --preset linux-debug
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
-    - run: ls
     - name: test
       run: |
-          echo "Start testing Fonttik"
-          ctest --preset Fonttiklib-linux
+            ls
+            echo "Start testing Fonttik"
+            ctest --preset Fonttiklib-linux
