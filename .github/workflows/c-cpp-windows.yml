@@ -14,8 +14,6 @@ jobs:
     - name: gather dependencies
       run: |
         choco install ninja
-        echo "Deleting old vcpkg install"
-        rm /s /q C:\vcpkg
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
         ./vcpkg/bootstrap-vcpkg.sh
@@ -56,8 +54,6 @@ jobs:
     - name: gather dependencies
       run: |
         choco install ninja
-        echo "Deleting old vcpkg install"
-        rm /s /q C:\vcpkg
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
         ./vcpkg/bootstrap-vcpkg.sh
