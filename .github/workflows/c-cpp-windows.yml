@@ -16,7 +16,7 @@ jobs:
         choco install ninja
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
-        ./vcpkg/bootstrap-vcpkg.sh
+        ./vcpkg/bootstrap-vcpkg.ps1
         echo "Cloning done"
 
         chcp 65001 #set code page to utf-8
@@ -56,7 +56,7 @@ jobs:
         choco install ninja
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
-        ./vcpkg/bootstrap-vcpkg.sh
+        ./vcpkg/bootstrap-vcpkg.ps1
         echo "Cloning done"
 
         chcp 65001 #set code page to utf-8
