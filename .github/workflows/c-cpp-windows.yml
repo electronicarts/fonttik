@@ -15,7 +15,7 @@ jobs:
       run: |
         choco install ninja
         echo "Deleting old vcpkg install"
-        rm -rf "$VCPKG_INSTALLATION_ROOT"
+        rm "$VCPKG_INSTALLATION_ROOT"
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
         ./vcpkg/bootstrap-vcpkg.sh
@@ -57,7 +57,7 @@ jobs:
       run: |
         choco install ninja
         echo "Deleting old vcpkg install"
-        rm -rf "$VCPKG_INSTALLATION_ROOT"
+        rm "$VCPKG_INSTALLATION_ROOT"
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
         ./vcpkg/bootstrap-vcpkg.sh
