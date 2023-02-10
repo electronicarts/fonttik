@@ -1,4 +1,4 @@
-name: C/C++ CI Linux
+name: C/C++ CI Windows
 
 on:
   push:
@@ -8,21 +8,22 @@ on:
   workflow_dispatch:
 jobs:
   build-release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
     - name: gather dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
+        choco install ninja
         echo "Deleting old vcpkg install"
-        sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
+        rm -rf "$VCPKG_INSTALLATION_ROOT"
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
         ./vcpkg/bootstrap-vcpkg.sh
         echo "Cloning done"
 
-        echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
+        chcp 65001 #set code page to utf-8
+        echo ("VCPKG_ROOT=" + "./vcpkg") >> $env:GITHUB_ENV
+
     - name: Restore vcpkg and its artifacts.
       uses: actions/cache@v3
       with:
@@ -49,21 +50,22 @@ jobs:
             echo "Start testing"
             ctest --preset Fonttiklib-linux
   build-debug:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
     - name: gather dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
+        choco install ninja
         echo "Deleting old vcpkg install"
-        sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
+        rm -rf "$VCPKG_INSTALLATION_ROOT"
         echo "Cloning Vcpkg"
         git clone https://github.com/Microsoft/vcpkg.git
         ./vcpkg/bootstrap-vcpkg.sh
         echo "Cloning done"
 
-        echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
+        chcp 65001 #set code page to utf-8
+        echo ("VCPKG_ROOT=" + "./vcpkg") >> $env:GITHUB_ENV
+
     - name: Restore vcpkg and its artifacts.
       uses: actions/cache@v3
       with:
