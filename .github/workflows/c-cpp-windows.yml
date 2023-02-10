@@ -35,18 +35,18 @@ jobs:
             ${{ hashFiles( 'vcpkg.json' ) }}
 
     - name: cmake configure
-      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-release
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
-      run: cmake --build --preset linux-release
+      run: cmake --build --preset windows-release
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: test
       run: |
             ls
             echo "Start testing"
-            ctest --preset Fonttiklib-linux
+            ctest --preset Fonttiklib-windows
   build-debug:
     runs-on: windows-latest
     steps:
@@ -75,11 +75,11 @@ jobs:
             ${{ hashFiles( 'vcpkg.json' ) }}
 
     - name: cmake configure
-      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-debug
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-debug
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
-      run: cmake --build --preset linux-debug
+      run: cmake --build --preset windows-debug
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: test
