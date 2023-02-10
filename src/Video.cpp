@@ -21,7 +21,7 @@ namespace tik {
 			LOG_CORE_INFO("Starting processing with video frame {}, skipping every {} frames", frameCount, framesToSkip);
 		}
 		else {
-			LOG_CORE_ERROR("Video {} could not be opened", filePath.c_str());
+			LOG_CORE_ERROR("Video {} could not be opened", fmt::ptr(filePath.c_str()));
 		}
 	}
 
