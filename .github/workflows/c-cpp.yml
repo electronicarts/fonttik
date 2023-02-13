@@ -28,12 +28,8 @@ jobs:
       with:
           path: |
             ${{ env.VCPKG_ROOT }}
-            !${{ env.VCPKG_ROOT }}/buildtrees
-            !${{ env.VCPKG_ROOT }}/packages
-            !${{ env.VCPKG_ROOT }}/downloads
-            !${{ env.VCPKG_ROOT }}/installed
           key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}
+            ${{ hashFiles( 'vcpkg.json' ) }}-linux
 
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release

@@ -55,7 +55,7 @@ jobs:
     steps:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
-      
+
     - uses: actions/checkout@v3
     - name: gather dependencies
       run: |
@@ -73,12 +73,8 @@ jobs:
       with:
           path: |
             ${{ env.VCPKG_ROOT }}
-            !${{ env.VCPKG_ROOT }}/buildtrees
-            !${{ env.VCPKG_ROOT }}/packages
-            !${{ env.VCPKG_ROOT }}/downloads
-            !${{ env.VCPKG_ROOT }}/installed
           key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}
+            ${{ hashFiles( 'vcpkg.json' ) }}-windows
 
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-debug
