@@ -23,13 +23,6 @@ jobs:
         echo "Cloning done"
 
         echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
-    - name: Restore vcpkg and its artifacts.
-      uses: actions/cache@v3
-      with:
-          path: |
-            ${{ env.VCPKG_ROOT }}
-          key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-linux
 
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release
@@ -60,13 +53,6 @@ jobs:
         echo "Cloning done"
 
         echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
-    - name: Restore vcpkg and its artifacts.
-      uses: actions/cache@v3
-      with:
-          path: |
-            ${{ env.VCPKG_ROOT }}
-          key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-inux-debug
 
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-debug

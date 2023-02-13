@@ -27,14 +27,6 @@ jobs:
         chcp 65001 #set code page to utf-8
         echo ("VCPKG_ROOT=" + "./vcpkg") >> $env:GITHUB_ENV
 
-    - name: Restore vcpkg and its artifacts.
-      uses: actions/cache@v3
-      with:
-          path: |
-            ${{ env.VCPKG_ROOT }}
-          key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-windows
-
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-release
       env:
@@ -63,14 +55,6 @@ jobs:
 
         chcp 65001 #set code page to utf-8
         echo ("VCPKG_ROOT=" + "./vcpkg") >> $env:GITHUB_ENV
-
-    - name: Restore vcpkg and its artifacts.
-      uses: actions/cache@v3
-      with:
-          path: |
-            ${{ env.VCPKG_ROOT }}
-          key: |
-            ${{ hashFiles( 'vcpkg.json' ) }}-windows-debug
 
     - name: cmake configure
       run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-debug
