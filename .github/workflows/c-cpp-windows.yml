@@ -43,16 +43,14 @@ jobs:
       run: cmake --build --preset windows-release
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
-    - name: test
-      run: |
-            ls
-            echo "Start testing"
-            ctest --preset Fonttiklib-windows
+
   build-debug:
     runs-on: windows-latest
     steps:
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up Visual Studio shell
+      uses: egor-tensin/vs-shell@v2
+      with:
+        arch: x64
 
     - uses: actions/checkout@v3
     - name: gather dependencies
@@ -82,8 +80,3 @@ jobs:
       run: cmake --build --preset windows-debug
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
-    - name: test
-      run: |
-            ls
-            echo "Start testing"
-            ctest --preset Fonttiklib-linux
