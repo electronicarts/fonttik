@@ -10,6 +10,9 @@ jobs:
   build-release:
     runs-on: windows-latest
     steps:
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
     - uses: actions/checkout@v3
     - name: gather dependencies
       run: |
@@ -50,6 +53,9 @@ jobs:
   build-debug:
     runs-on: windows-latest
     steps:
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+      
     - uses: actions/checkout@v3
     - name: gather dependencies
       run: |
