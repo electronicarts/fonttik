@@ -10,8 +10,10 @@ jobs:
   build-release:
     runs-on: windows-latest
     steps:
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up Visual Studio shell
+      uses: egor-tensin/vs-shell@v2
+      with:
+        arch: x64
 
     - uses: actions/checkout@v3
     - name: gather dependencies
@@ -24,9 +26,6 @@ jobs:
 
         chcp 65001 #set code page to utf-8
         echo ("VCPKG_ROOT=" + "./vcpkg") >> $env:GITHUB_ENV
-        echo "runing vcvarsall"
-        vcvarsall.bat x86_amd64
-
 
     - name: Restore vcpkg and its artifacts.
       uses: actions/cache@v3
