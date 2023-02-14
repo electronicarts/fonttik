@@ -13,7 +13,9 @@ jobs:
       #-uses: actions/cache@v1   <===== YOU DO NOT NEED THIS!
       - name: gather dependencies
         run: |
+             sudo apt-get update
              sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
+             sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
 
       # Install latest CMake.
       - uses: lukka/get-cmake@latest
