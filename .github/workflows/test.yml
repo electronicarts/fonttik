@@ -77,4 +77,4 @@ jobs:
             configurePreset: 'linux-release-cuda'
 
             # This is the name of the CMakePresets.json's configuration to build the project.
-            buildPreset: 'linux-release'
+            buildPreset: 'linux-release-cuda'
