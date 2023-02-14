@@ -69,7 +69,7 @@ jobs:
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
-      run: cmake --build
+      run: cmake --build .
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: test
