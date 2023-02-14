@@ -1,6 +1,4 @@
 on:
-  push:
-    branches: "**"
   pull_request:
     branches: [ "main", "dev" ]
   workflow_dispatch:
@@ -9,6 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       #-uses: actions/cache@v1   <===== YOU DO NOT NEED THIS!
 
       # Install latest CMake.
