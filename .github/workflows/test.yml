@@ -30,7 +30,7 @@ jobs:
           # If not using a submodule for vcpkg sources, this specifies which commit
           # id must be checkout from a Git repo. It must not set if using a submodule
           # for vcpkg.
-          # vcpkgGitCommitId: '${{ matrix.vcpkgCommitId }}'
+          vcpkgGitCommitId: f14984af3738e69f197bf0e647a8dca12de92996
 
           # This is the glob expression used to locate the vcpkg.json and add its
           # hash to the cache key. Change it to match a single manifest file you want
