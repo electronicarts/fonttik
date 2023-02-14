@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       #-uses: actions/cache@v1   <===== YOU DO NOT NEED THIS!
+      - name: gather dependencies
+        run: |
+             sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
 
       # Install latest CMake.
       - uses: lukka/get-cmake@latest
