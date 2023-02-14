@@ -1,0 +1,71 @@
+name: C/C++ CI Linux CUDA
+
+on:
+  push:
+    branches: "**"
+  pull_request:
+    branches: [ "main", "dev" ]
+  workflow_dispatch:
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup CUDA
+      uses: ptheywood/cuda-cmake-github-actions@e1006ff
+    - uses: actions/checkout@v3
+    - name: gather dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
+        echo "Deleting old vcpkg install"
+        sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
+        echo "Cloning Vcpkg"
+        git clone https://github.com/Microsoft/vcpkg.git
+        ./vcpkg/bootstrap-vcpkg.sh
+        echo "Cloning done"
+
+        echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
+
+    - name: cmake configure
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-release-cuda
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+    - name: build
+      run: cmake --build --preset linux-release-cuda
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+    - name: test
+      run: |
+            ls
+            echo "Start testing"
+            ctest --preset Fonttiklib-linux
+  build-debug:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: gather dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
+        echo "Deleting old vcpkg install"
+        sudo rm -rf "$VCPKG_INSTALLATION_ROOT"
+        echo "Cloning Vcpkg"
+        git clone https://github.com/Microsoft/vcpkg.git
+        ./vcpkg/bootstrap-vcpkg.sh
+        echo "Cloning done"
+
+        echo "VCPKG_ROOT=./vcpkg" >> $GITHUB_ENV
+
+    - name: cmake configure
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset linux-debug-cuda
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+    - name: build
+      run: cmake --build --preset linux-debug-cuda
+      env:
+        VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+    - name: test
+      run: |
+            ls
+            echo "Start testing"
+            ctest --preset Fonttiklib-linux

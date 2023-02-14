@@ -10,6 +10,8 @@ jobs:
   build-release:
     runs-on: windows-latest
     steps:
+    - name: Setup CUDA
+      uses: ptheywood/cuda-cmake-github-actions@e1006ff
     - name: Set up Visual Studio shell
       uses: egor-tensin/vs-shell@v2
       with:
@@ -28,10 +30,10 @@ jobs:
         echo ("VCPKG_ROOT=" + "./vcpkg") >> $env:GITHUB_ENV
 
     - name: cmake configure
-      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-release
+      run:  cmake -DBUILD_APPS=ON -DBUILD_TESTS=ON --preset windows-release-cuda
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
     - name: build
-      run: cmake --build --preset windows-release
+      run: cmake --build --preset windows-release-cuda
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
