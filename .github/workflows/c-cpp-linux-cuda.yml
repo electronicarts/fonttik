@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Setup CUDA
-      uses: ptheywood/cuda-cmake-github-actions@e1006ff
+      uses: ptheywood/cuda-cmake-github-actions@e1006ffb0f811ddeba2878f1cc9e0cbb187b424c
     - uses: actions/checkout@v3
     - name: gather dependencies
       run: |

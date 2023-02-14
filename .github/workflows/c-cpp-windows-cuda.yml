@@ -1,4 +1,4 @@
-name: C/C++ CI Windows
+name: C/C++ CI Windows CUDA
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Setup CUDA
-      uses: ptheywood/cuda-cmake-github-actions@e1006ff
+      uses: ptheywood/cuda-cmake-github-actions@e1006ffb0f811ddeba2878f1cc9e0cbb187b424c
     - name: Set up Visual Studio shell
       uses: egor-tensin/vs-shell@v2
       with:
