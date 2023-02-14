@@ -174,8 +174,18 @@
       "inherits": "core-build"
     },
     {
+      "name": "linux-debug-cuda",
+      "configurePreset": "linux-debug-cuda",
+      "inherits": "core-build"
+    },
+    {
       "name": "linux-release",
       "configurePreset": "linux-release",
+      "inherits": "core-build"
+    },
+    {
+      "name": "linux-release-cuda",
+      "configurePreset": "linux-release-cuda",
       "inherits": "core-build"
     },
     {
