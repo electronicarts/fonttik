@@ -1,0 +1,59 @@
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [ "main", "dev" ]
+  workflow_dispatch:
+  
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: gather dependencies
+        run: |
+            choco install ninja
+
+      # Install latest CMake.
+      - uses: lukka/get-cmake@latest
+
+      - name: Restore artifacts, or setup vcpkg (do not install any package)
+        uses: lukka/run-vcpkg@v10
+        with:
+          vcpkgGitCommitId: f14984af3738e69f197bf0e647a8dca12de92996
+
+      - name: Run CMake consuming CMakePreset.json and vcpkg.json by mean of vcpkg.
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'windows-release'
+
+          buildPreset: 'windows-release'
+
+  build-windows-cuda:
+      runs-on: windows-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Setup CUDA
+          uses: Jimver/cuda-toolkit@v0.2.8
+          id: cuda-toolkit
+          with:
+            cuda: '11.7.0'
+        - name: gather dependencies
+          run: |
+                sudo apt-get update
+                sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
+                sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
+
+        # Install latest CMake.
+        - uses: lukka/get-cmake@latest
+
+        - name: Restore artifacts, or setup vcpkg (do not install any package)
+          uses: lukka/run-vcpkg@v10
+          with:
+            vcpkgGitCommitId: f14984af3738e69f197bf0e647a8dca12de92996
+
+        - name: Run CMake consuming CMakePreset.json and vcpkg.json by mean of vcpkg.
+          uses: lukka/run-cmake@v10
+          with:
+            configurePreset: 'windows-release-cuda'
+            buildPreset: 'windows-release-cuda'

@@ -157,6 +157,19 @@
       "targets": "FonttikApp"
     },
     {
+      "name": "windows-debug-cuda",
+      "description": "Windows debug build",
+      "inherits": "core-build",
+      "configurePreset": "windows-debug-cuda"
+    },
+    {
+      "name": "windows-release-cuda",
+      "description": "Windows release build",
+      "inherits": "core-build",
+      "configurePreset": "windows-release-cuda",
+      "targets": "FonttikApp"
+    },
+    {
       "name": "clean-build-debug",
       "description": "Clean before build (--clean-first)",
       "inherits": "windows-debug",
