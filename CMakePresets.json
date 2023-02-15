@@ -153,8 +153,7 @@
       "name": "windows-release",
       "description": "Windows release build",
       "inherits": "core-build",
-      "configurePreset": "windows-release",
-      "targets": "FonttikApp"
+      "configurePreset": "windows-release"
     },
     {
       "name": "windows-debug-cuda",
@@ -166,8 +165,7 @@
       "name": "windows-release-cuda",
       "description": "Windows release build",
       "inherits": "core-build",
-      "configurePreset": "windows-release-cuda",
-      "targets": "FonttikApp"
+      "configurePreset": "windows-release-cuda"
     },
     {
       "name": "clean-build-debug",
