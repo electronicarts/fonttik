@@ -1,3 +1,6 @@
+name: C++ CI Windows
+
+
 on:
   push:
     branches: ["**"]
@@ -40,10 +43,7 @@ jobs:
             cuda: '11.7.0'
         - name: gather dependencies
           run: |
-                sudo apt-get update
-                sudo apt-get install libdbus-1-dev libxi-dev libxtst-dev
-                sudo apt-get install --yes ninja-build rsync zip pkg-config libdbus-1-dev libxi-dev libxtst-dev libx11-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm gperf bison  
-
+              choco install ninja
         # Install latest CMake.
         - uses: lukka/get-cmake@latest
 
