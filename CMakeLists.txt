@@ -23,6 +23,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # ---------------------------------------------------------------------------------------
 if($CACHE{CUDA})
 	list(APPEND VCPKG_MANIFEST_FEATURES "cuda-opencv")
+	set(VCPKG_MANIFEST_NO_DEFAULT_FEATURES ON)
+	message("CUDA Feature activated")
+
 endif()
 
 # ---------------------------------------------------------------------------------------

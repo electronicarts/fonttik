@@ -153,8 +153,19 @@
       "name": "windows-release",
       "description": "Windows release build",
       "inherits": "core-build",
-      "configurePreset": "windows-release",
-      "targets": "FonttikApp"
+      "configurePreset": "windows-release"
+    },
+    {
+      "name": "windows-debug-cuda",
+      "description": "Windows debug build",
+      "inherits": "core-build",
+      "configurePreset": "windows-debug-cuda"
+    },
+    {
+      "name": "windows-release-cuda",
+      "description": "Windows release build",
+      "inherits": "core-build",
+      "configurePreset": "windows-release-cuda"
     },
     {
       "name": "clean-build-debug",
@@ -174,8 +185,18 @@
       "inherits": "core-build"
     },
     {
+      "name": "linux-debug-cuda",
+      "configurePreset": "linux-debug-cuda",
+      "inherits": "core-build"
+    },
+    {
       "name": "linux-release",
       "configurePreset": "linux-release",
+      "inherits": "core-build"
+    },
+    {
+      "name": "linux-release-cuda",
+      "configurePreset": "linux-release-cuda",
       "inherits": "core-build"
     },
     {
