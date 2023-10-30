@@ -1,6 +1,6 @@
 # Fonttik
 
-Fonttik is a console application and library created by EA that processes images and videos highlighting text that meets and does not meet desired criteria. The guidelines checked by Fonttik ensure text has a minimum size relative to screen resolution or DPI and that it has sufficient luminance contrast against its background, according to desired criteria, to be readable or more likely to be readeable by color vision deficient people. Fonttik is not intended to guarantee, certify or otherwise validate an image or video's complance with legal, regulatory or other requirements.
+Fonttik is a console application and library created by EA that processes images and videos highlighting text that meets and does not meet desired criteria. The guidelines checked by Fonttik ensure text has a minimum size relative to screen resolution or DPI and that it has sufficient luminance contrast against its background, according to desired criteria, to be readable or more likely to be readeable by color vision deficient people. Fonttik is not intended to guarantee, certify or otherwise validate an image or video's compliance with legal, regulatory or other requirements.
 
 ## Platforms
  * Linux
