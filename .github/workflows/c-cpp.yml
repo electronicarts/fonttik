@@ -21,8 +21,5 @@ jobs:
         sudo apt-get install --yes pkg-config
         git clone https://github.com/Microsoft/vcpkg.git
         export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT
-        
-    - name: cmake configure
-      run: cmake --preset linux-release
-    - name: build
-      run: cmake --build --preset linux-release
+        cmake --preset linux-release
+        cmake --build --preset linux-release
