@@ -24,3 +24,7 @@ jobs:
         export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT
         cmake --preset linux-release
         cmake --build --preset linux-release
+    - uses: actions/upload-artifact@v3
+      with:
+        name: linux-build
+        path: ./bin/build/linux-release # or path/to/artifact
