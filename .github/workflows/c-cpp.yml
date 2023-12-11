@@ -20,7 +20,7 @@ jobs:
         sudo apt-get install --yes ninja-build rsync zip
         sudo apt-get install --yes pkg-config
         git clone https://github.com/Microsoft/vcpkg.git
-        sudo apt-get install --yes libxtst-dev libxi-dev libdbus-1-dev
+        sudo apt-get install --yes sudo apt install build-essential gcc g++ python3-distutils pkg-config cmake ninja-build bison gperf nasm libx11-dev libxft-dev libxext-dev libdbus-1-dev libxi-dev libxtst-dev libgl1-mesa-dev libgles2-mesa-dev libglu1-mesa-dev libtool libudev-dev libx11-xcb-dev libxcursor-dev libxdamage-dev libxinerama-dev libxrandr-devzs
         export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT
         cmake --preset linux-release
         cmake --build --preset linux-release
