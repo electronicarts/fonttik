@@ -14,12 +14,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: update apt
+    - name: build
       run: |
         sudo apt-get update
         sudo apt-get install --yes ninja-build rsync zip
         sudo apt-get install --yes pkg-config
         git clone https://github.com/Microsoft/vcpkg.git
+        sudo apt-get install --yes libxtst-dev libxi-dev libdbus-1-dev
         export VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT
         cmake --preset linux-release
         cmake --build --preset linux-release
