@@ -89,7 +89,7 @@ jobs:
           cmake --build --preset ${{ env.CURRENT_OS }}-release
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ env.CURRENT_OS }}
           path: |
