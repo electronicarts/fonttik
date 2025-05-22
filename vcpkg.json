@@ -5,6 +5,7 @@
   "default-features": [ "default-opencv" ],
   "dependencies": [
     "nlohmann-json",
+    "spscqueue",
     "gtest",
     "spdlog",
     "benchmark"

@@ -1,24 +1,25 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #pragma once
 #include <vector>
-#include "fonttik/Textbox.h"
+#include <string>
 
 namespace tik {
 	
 class TextRecognitionParams;
+class TextBox;
 
-class ITextboxRecognition {
+class ITextBoxRecognition {
 
 public:
-	virtual ~ITextboxRecognition() {};
+	virtual ~ITextBoxRecognition() {};
 
-	virtual void init(const TextRecognitionParams* params) = 0;
+	virtual void init(const TextRecognitionParams& params) = 0;
 
-	virtual std::string recognizeBox(Textbox& box) = 0;
+	virtual std::string recognizeBox(TextBox& box) = 0;
 
 protected:
-	ITextboxRecognition() {};
+	ITextBoxRecognition() {};
 };
 
 }

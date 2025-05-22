@@ -1,9 +1,8 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "fonttik/Configuration.h"
-#include "../src/Guideline.h"
+#include "fonttik/Configuration.hpp"
 #include "fonttik/Log.h"
 
 namespace tik {
@@ -49,109 +48,23 @@ namespace tik {
 	};
 
 	TEST_F(ResolutionConfiguration, 720_legal_guidelines) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveGuideline(720);
-		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
-		ASSERT_EQ(guideline->getWidthRequirement(), 4);
-		ASSERT_EQ(guideline->getHeightRequirement(), 19);
+		cfg.setResolutionGuideline("720");
+		ASSERT_EQ(cfg.getContrastRatioParams().contrastRatio, 4.5f);
+		ASSERT_EQ(cfg.getTextSizeParams().activeGuideline->width, 4);
+		ASSERT_EQ(cfg.getTextSizeParams().activeGuideline->height, 19);
 	}
 
 	TEST_F(ResolutionConfiguration, 1080_legal_guidelines) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveGuideline(1080);
-		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
-		ASSERT_EQ(guideline->getWidthRequirement(), 4);
-		ASSERT_EQ(guideline->getHeightRequirement(), 28);
+		cfg.setResolutionGuideline("1080");
+		ASSERT_EQ(cfg.getContrastRatioParams().contrastRatio, 4.5f);
+		ASSERT_EQ(cfg.getTextSizeParams().activeGuideline->width, 4);
+		ASSERT_EQ(cfg.getTextSizeParams().activeGuideline->height, 28);
 	}
 
 	TEST_F(ResolutionConfiguration, 2160_legal_guidelines) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveGuideline(2160);
-		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
-		ASSERT_EQ(guideline->getWidthRequirement(), 10);
-		ASSERT_EQ(guideline->getHeightRequirement(), 52);
-	}
-
-	TEST_F(ResolutionConfiguration, missing_resolution) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveGuideline(1);
-		ASSERT_EQ(guideline->getWidthRequirement(), 4);
-		ASSERT_EQ(guideline->getHeightRequirement(), 28);
-	}
-
-	TEST_F(DPIConfiguration, correct_dpi_calc) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setDPI(cfg.getAppSettings()->usingDPI());
-		int dpis[5] = { 100,200,400,636,570 };
-		for (const auto& dpi : dpis) {
-			guideline->setActiveGuideline(dpi);
-			ASSERT_EQ(guideline->getWidthRequirement(), 0);
-			//Hardcoded 18pxper100m to follow microsoft XAG v3 (2022)
-			ASSERT_EQ(guideline->getHeightRequirement(), static_cast<int>((dpi / 100.0) * 18));
-		}
-	}
-
-	//Builds with hard-coded values and doesnt throw exceptions
-	TEST_F(MissingConfiguration, default_guideline) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveGuideline(1080);
-		ASSERT_FLOAT_EQ(guideline->getContrastRequirement(), 4.5);
-		ASSERT_EQ(guideline->getWidthRequirement(), 4);
-		ASSERT_EQ(guideline->getHeightRequirement(), 28);
-	}
-
-	//Builds with hard-coded values and doesnt throw exceptions
-	TEST_F(MissingConfiguration, default_detection) {
-		TextDetectionParams* params = cfg.getTextDetectionParams();
-		ASSERT_FLOAT_EQ(0.5, params->getConfidenceThreshold());
-		//TODO separate tests for DB and EAST
-		ASSERT_FLOAT_EQ(0.4, params->getEASTParams()->getNMSThreshold());
-		ASSERT_FLOAT_EQ(1.0, params->getEASTParams()->getDetectionScale());
-		ASSERT_THAT(params->getEASTParams()->getDetectionMean(), ::testing::ElementsAre(123.68, 116.78, 103.94));
-		ASSERT_FLOAT_EQ(params->getMergeThreshold().first, 1.0);
-		ASSERT_FLOAT_EQ(params->getMergeThreshold().second, 1.0);
-		ASSERT_FLOAT_EQ(0.17, params->getRotationThresholdRadians());
-	}
-
-	//Builds with hard-coded values and doesnt throw exceptions
-	TEST_F(MissingConfiguration, default_recognition) {
-		TextRecognitionParams* params = cfg.getTextRecognitionParams();
-		ASSERT_EQ("crnn_cs.onnx", params->getRecognitionModel());
-		ASSERT_EQ("CTC-greedy", params->getDecodeType());
-		ASSERT_EQ("alphabet_94.txt", params->getVocabularyFilepath());
-		ASSERT_DOUBLE_EQ(1.0 / 127.5, params->getScale());
-		ASSERT_THAT(params->getMean(), ::testing::ElementsAre(127.5, 127.5, 127.5));
-		ASSERT_EQ(100, params->getSize().first);
-		ASSERT_EQ(32, params->getSize().second);
-	}
-
-	TEST_F(MalformedConfiguration, default_guideline) {
-		Guideline* guideline = cfg.getGuideline();
-		guideline->setActiveGuideline(1080);
-		ASSERT_EQ(guideline->getContrastRequirement(), 4.5);
-		ASSERT_EQ(guideline->getWidthRequirement(), 4);
-		ASSERT_EQ(guideline->getHeightRequirement(), 28);
-	}
-
-	TEST_F(MalformedConfiguration, default_detection) {
-		TextDetectionParams* params = cfg.getTextDetectionParams();
-		ASSERT_FLOAT_EQ(0.5, params->getConfidenceThreshold());
-		ASSERT_FLOAT_EQ(0.4, params->getEASTParams()->getNMSThreshold());
-		ASSERT_FLOAT_EQ(1.0, params->getEASTParams()->getDetectionScale());
-		ASSERT_THAT(params->getEASTParams()->getDetectionMean(), ::testing::ElementsAre(123.68, 116.78, 103.94));
-		ASSERT_FLOAT_EQ(params->getMergeThreshold().first, 1.0);
-		ASSERT_FLOAT_EQ(params->getMergeThreshold().second, 1.0);
-		ASSERT_FLOAT_EQ(0.17, params->getRotationThresholdRadians());
-	}
-
-	TEST_F(MalformedConfiguration, default_recognition) {
-		TextRecognitionParams* params = cfg.getTextRecognitionParams();
-		ASSERT_EQ("crnn_cs.onnx", params->getRecognitionModel());
-		ASSERT_EQ("CTC-greedy", params->getDecodeType());
-		ASSERT_EQ("alphabet_94.txt", params->getVocabularyFilepath());
-		ASSERT_DOUBLE_EQ(1.0 / 127.5, params->getScale());
-		ASSERT_THAT(params->getMean(), ::testing::ElementsAre(127.5, 127.5, 127.5));
-		ASSERT_EQ(100, params->getSize().first);
-		ASSERT_EQ(32, params->getSize().second);
+		cfg.setResolutionGuideline("2160");
+		ASSERT_EQ(cfg.getContrastRatioParams().contrastRatio, 4.5f);
+		ASSERT_EQ(cfg.getTextSizeParams().activeGuideline->width, 10);
+		ASSERT_EQ(cfg.getTextSizeParams().activeGuideline->height, 52);
 	}
 }

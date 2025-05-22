@@ -3,24 +3,27 @@
     "detectionBackend": "DB",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
-    "textboxOutlineColors":{
-      "pass": [0,255,0],
-      "warning": [255,170,0],
-      "fail": [255,0,0],
-      "unrecognized":[25,25,25]
+    "textboxOutlineColors": {
+      "pass": [ 0, 255, 0 ],
+      "warning": [ 255, 170, 0 ],
+      "fail": [ 255, 0, 0 ],
+      "unrecognized": [ 25, 25, 25 ]
     },
     "saveSeparateTexboxes": false,
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
-    "useTextRecognition": false,
-    "useDPI":false,
-    "targetResolution":0,
-    "targetDPI":0,
-    "saveLogs":true,
-    "printValuesOnResults": false,
-    "videoFramesToSkip": 5,
-    "videoImageOutputInterval" : 0,
+    "useTextRecognition": true,
+    "useDPI": false,
+    "targetResolution": "0",
+    "targetDPI": 0,
+    "saveLogs": true,
+    "printResultValues": false,
+    "sizeByLine": true,
+    "failsAsWarnings": false,
+    "detectResolution": true,
+    "analysisWaitSeconds": 5,
+    "videoImageOutputInterval": 0,
     "focusMask": [
       {
         "x": 0,
@@ -52,6 +55,7 @@
   "textDetection": {
     "confidence": 0.5,
     "rotationThresholdDegrees": 10,
+    "groupByCharacters": false,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
@@ -105,14 +109,14 @@
         "height": 52
       }
     },
-    "heightPer100DPI":18,
-    "resolutionsRecommendations":{
+    "heightPer100DPI": 18,
+    "resolutionsRecommendations": {
       "1080": {
         "width": 4,
         "height": 30
       }
     },
-    "textSizeRatio": [1,3,1]
+    "textSizeRatio": [ 1, 3, 1 ]
   },
   "sRGBLinearizationValues": [
     0,

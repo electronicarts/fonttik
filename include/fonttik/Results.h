@@ -1,4 +1,4 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #pragma once
 #include <vector>
@@ -17,16 +17,22 @@ enum ResultType
 	RESULTYPE_COUNT
 };
 
+std::string ResultTypeAsString(ResultType t);
+
 struct ResultBox {
 	ResultBox(ResultType type, int x, int y, int w, int h, double value) :
-		type(type), x(x), y(y), width(w), height(h), value(value) {}
+		type(type), x(x), y(y), width(w), height(h), value(value), text("") {};
+	ResultBox(ResultType type, int x, int y, int w, int h, double value, const std::string& text) :
+		type(type), x(x), y(y), width(w), height(h), value(value), text(text) {};
 	
 	ResultType type;
 	int x, y, width, height;
 	double value;
+	std::string text;
 };
 
-struct FrameResults {
+struct FrameResults 
+{
 	FrameResults(int frameID) :frame(frameID) {};
 	
 	constexpr bool operator <(const FrameResults& b) const {
@@ -63,24 +69,16 @@ public:
 		
 	//Ads an already filled contrast results
 	void addContrastResults(FrameResults res) {
-		contrast_mtx.lock();
-			
 		contrastResults.push_back(res);
 		sortedContrast = false;
 		overallContrastPass = overallContrastPass && res.overallPass;
-
-		contrast_mtx.unlock();
 	}
 
 	//Ads an already filled contrast results
 	void addSizeResults(FrameResults res) {
-		size_mtx.lock();
-			
 		sizeResults.push_back(res);
 		sortedSize = false;
 		overallSizePass = overallSizePass && res.overallPass;
-			
-		size_mtx.unlock();
 	}
 
 	/// <summary>
@@ -88,15 +86,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::vector<FrameResults>& getContrastResults() {
-		contrast_mtx.lock();
 		//Data is only sorted upon retrieval
 		if (!sortedContrast) {
 			std::sort(contrastResults.begin(), contrastResults.end());
 			sortedContrast = true;
 		}
 		std::vector<FrameResults>& res = contrastResults;
-			
-		contrast_mtx.unlock();
 		return res;
 	}
 		
@@ -105,15 +100,12 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::vector<FrameResults>& getSizeResults() {
-		size_mtx.lock();
 		//Data is only sorted upon retrieval
 		if (!sortedSize) {
 			std::sort(sizeResults.begin(), sizeResults.end());
 			sortedSize= true;
 		}
 		std::vector<FrameResults>& res = sizeResults;
-			
-		size_mtx.unlock();
 		return sizeResults;
 	}
 
@@ -134,10 +126,7 @@ private:
 	//both mutex allow for different threads saving their results in any order
 
 	std::vector<FrameResults> contrastResults;
-	std::mutex contrast_mtx;
 	std::vector<FrameResults> sizeResults;
-	std::mutex size_mtx;
-
 };
 
 }
