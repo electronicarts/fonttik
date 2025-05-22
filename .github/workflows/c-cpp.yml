@@ -97,7 +97,13 @@ jobs:
             bin/build/${{ env.CURRENT_OS }}-release/test/Iris.Tests
             bin/build/${{ env.CURRENT_OS }}-release/test/AddressSanitizer.Tests
             bin/build/${{ env.CURRENT_OS }}-release/CTestTestfile.cmake
-       
+      - name: Upload vcpkg logs on fail
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vckpg-fail-logs
+          path: /home/runner/work/fonttik/fonttik/bin/build/linux-release/vcpkg-manifest-install.log
+          retention-days: 1
   test:
     needs: build
     runs-on: ${{ matrix.os }}
