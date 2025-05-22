@@ -25,6 +25,7 @@ jobs:
         
     env:
       VCPKG_BINARY_SOURCES: 'clear;x-gha,readwrite'
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
     
     steps:
       - name: Set OS environment variable in lowercase letters
