@@ -105,6 +105,7 @@ jobs:
           name: vckpg-fail-logs
           path: |
               bin/build/*/vcpkg-manifest-install.log
+              bin/build/*/vcpkg_installed/vcpkg/**/*.log
               vcpkg/buildtrees/libuuid/config-x64-linux-dbg-CMakeCache.txt.log
               vcpkg/buildtrees/libuuid/config-x64-linux-rel-CMakeCache.txt.log
               vcpkg/buildtrees/libuuid/config-x64-linux-out.log
