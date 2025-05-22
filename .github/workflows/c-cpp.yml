@@ -104,11 +104,11 @@ jobs:
         with:
           name: vckpg-fail-logs
           path: |
-              /home/runner/work/fonttik/fonttik/bin/build/linux-release/vcpkg-manifest-install.log
-              /home/runner/work/fonttik/fonttik/vcpkg/buildtrees/libuuid/config-x64-linux-dbg-CMakeCache.txt.log
-              /home/runner/work/fonttik/fonttik/vcpkg/buildtrees/libuuid/config-x64-linux-rel-CMakeCache.txt.log
-              /home/runner/work/fonttik/fonttik/vcpkg/buildtrees/libuuid/config-x64-linux-out.log
-              /home/runner/work/fonttik/fonttik/vcpkg/buildtrees/*/*.log
+              bin/build/*/vcpkg-manifest-install.log
+              vcpkg/buildtrees/libuuid/config-x64-linux-dbg-CMakeCache.txt.log
+              vcpkg/buildtrees/libuuid/config-x64-linux-rel-CMakeCache.txt.log
+              vcpkg/buildtrees/libuuid/config-x64-linux-out.log
+              vcpkg/buildtrees/*/*.log
           retention-days: 1
   test:
     needs: build
@@ -143,9 +143,9 @@ jobs:
           path: bin/build/${{ env.CURRENT_OS }}-release
           
       - name: Set permissions
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+        if: runner.os == 'linux' || runner.os == 'macOS'
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
+          if [ "$RUNNER_OS" == "linux" ]; then
               sudo apt-get update &&  sudo apt-get install -y libegl1-mesa &&  sudo chmod +x bin/build/linux-release/test/Iris.Tests/iris_tests
           elif [ "$RUNNER_OS" == "macOS" ]; then
             chmod 755 bin/build/macos-release/test/Iris.Tests/iris_tests
