@@ -106,10 +106,7 @@ jobs:
           path: |
               bin/build/*/vcpkg-manifest-install.log
               bin/build/*/vcpkg_installed/vcpkg/**/*.log
-              vcpkg/buildtrees/libuuid/config-x64-linux-dbg-CMakeCache.txt.log
-              vcpkg/buildtrees/libuuid/config-x64-linux-rel-CMakeCache.txt.log
-              vcpkg/buildtrees/libuuid/config-x64-linux-out.log
-              vcpkg/buildtrees/*/*.log
+              vcpkg/buildtrees/windows-release/vcpkg_installed/vcpkg/blds/opencv4/*.log
           retention-days: 1
   test:
     needs: build
