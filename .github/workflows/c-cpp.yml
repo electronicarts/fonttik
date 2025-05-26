@@ -25,7 +25,6 @@ jobs:
         
     env:
       VCPKG_BINARY_SOURCES: 'clear;x-gha,readwrite'
-      CMAKE_POLICY_VERSION_MINIMUM: 3.5
     
     steps:
       - name: Set OS environment variable in lowercase letters
@@ -57,7 +56,7 @@ jobs:
       - if: runner.os == 'macOS'
         run: brew install nasm
           
-      - uses: lukka/get-cmake@latest
+      - uses: lukka/get-cmake@v3.26.0
 
       - name: Set up vcpkg
         uses: lukka/run-vcpkg@v4
@@ -83,7 +82,7 @@ jobs:
 
       - name: Restore from cache the dependencies and generate project files
         run: |
-          cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_EXAMPLE_APP=ON -DBUILD_TESTS=ON --preset ${{ env.CURRENT_OS }}-release 
+          cmake -DBUILD_EXAMPLE_APP=ON -DBUILD_TESTS=ON --preset ${{ env.CURRENT_OS }}-release
 
       - name: Build (Release configuration)
         run: |
