@@ -104,7 +104,7 @@ jobs:
         with:
           name: vckpg-fail-logs
           path: |
-              vcpkg/buildtrees/windows-release/vcpkg_installed/vcpkg/blds/opencv4/*.log
+              D:\a\fonttik\fonttik\bin\build\windows-release\vcpkg_installed\vcpkg\blds\opencv4\*.log
           retention-days: 1
   test:
     needs: build
