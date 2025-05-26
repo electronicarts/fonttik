@@ -83,7 +83,7 @@ jobs:
 
       - name: Restore from cache the dependencies and generate project files
         run: |
-          cmake -DBUILD_EXAMPLE_APP=ON -DBUILD_TESTS=ON --preset ${{ env.CURRENT_OS }}-release
+          cmake -DBUILD_EXAMPLE_APP=ON -DBUILD_TESTS=ON --preset ${{ env.CURRENT_OS }}-release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
       - name: Build (Release configuration)
         run: |
