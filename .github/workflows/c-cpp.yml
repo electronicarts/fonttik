@@ -104,9 +104,9 @@ jobs:
         with:
           name: vckpg-fail-logs
           path: |
+              vcpkg/buildtrees/windows-release/vcpkg_installed/vcpkg/blds/opencv4/*.log
               bin/build/*/vcpkg-manifest-install.log
               bin/build/*/vcpkg_installed/vcpkg/**/*.log
-              vcpkg/buildtrees/windows-release/vcpkg_installed/vcpkg/blds/opencv4/*.log
           retention-days: 1
   test:
     needs: build
