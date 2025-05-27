@@ -197,15 +197,33 @@
   ],
   "testPresets": [
     {
-      "name": "Fonttiklib-linux",
+      "name": "test-linux",
       "configurePreset": "linux-release",
+      "output": { "outputOnFailure": true },
       "environment": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     {
-      "name": "Fonttiklib-linux-debug",
+      "name": "test-linux-debug",
       "configurePreset": "linux-debug",
+      "output": { "outputOnFailure": true },
+      "environment": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "test-windows",
+      "configurePreset": "windows-release",
+      "output": { "outputOnFailure": true },
+      "environment": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "test-windows-debug",
+      "configurePreset": "windows-debug",
+      "output": { "outputOnFailure": true },
       "environment": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
