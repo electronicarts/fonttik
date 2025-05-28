@@ -75,6 +75,8 @@ Fonttik can be configured by a .json file, default configuration provided under 
 	- PrintResultValues: Whether to print the obtained measurements to the side of detected text boxes in the image output to facilitate reviewing.
 	- FocusMask: Start and finish width and height in a range of 0 to 1 of the part of the image that is to be recognized. By default the whole image is processed.
 	- IgnoreMask: Regions to be ignored when processing the image. Format is the same as FocusMask.
+	- SizeByLine: Try to infer textlines and calculate the text size based in lines and not single words. (WIP)
+	- AnalysisWaitSeconds: Seconds to wait between each frame analysis in video mode. Defaults to 0 (analysing everyframe).
 - TextRecognition configuration for the models used for text recognition:
 	- RecognitionModel: Name of the file for a trained neural network to be used for text recognition.
 	- DecodeType: Sets the decoding method of translating the network output into string, can be 'CTC-greedy' or 'CTC-prefix-beam-search'.

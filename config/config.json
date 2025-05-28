@@ -31,7 +31,7 @@
     "saveLogs": true,
     "failsAsWarnings": false,
     "printResultValues": true,
-    "analysisWaitSeconds": 1,
+    "analysisWaitSeconds": 0,
     "videoImageOutputInterval": 0,
     "detectResolution": true,
     "sizeByLine": true,
