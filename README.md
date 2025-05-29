@@ -14,7 +14,7 @@ Fonttik has been created as a CMake project and can be compiled in any C++ compa
 - FonttikApp: Standard Fonttik example executable, links to FonttikLib.
 - Fonttik.Tests: All of the acceptance, integration and unit tests for the Fonttik code. Any change to the code must pass or update these tests.
 
-All of the dependencies for Fonttik are specified in [vcpk.json](./Backend/CoreCpp/vcpkg.json). vcpkg is a cross-platform package manager for C++ developed by Microsoft. Installation instructions for vcpkg can be found in its [repository](https://github.com/Microsoft/vcpkg).  
+All of the dependencies for Fonttik are specified in [vcpk.json](./vcpkg.json). vcpkg is a cross-platform package manager for C++ developed by Microsoft. Installation instructions for vcpkg can be found in its [repository](https://github.com/Microsoft/vcpkg).  
 If you want CMake to automatically run vcpkg and compile all dependencies for you, you must set your VCPKG root folder as an environment variable called "VCPKG_ROOT" or add it as a variable in the CMakePresets.json.
 
 Fonttik uses cmake presets to build with different configurations, e.g.
