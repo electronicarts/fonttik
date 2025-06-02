@@ -1,6 +1,8 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #include "fonttik/Log.h"
+// First, add this necessary using
+#include <opencv2/core/utils/logger.hpp>
 
 namespace tik
 {
@@ -8,8 +10,11 @@ namespace tik
 
 	void Log::InitCoreLogger(bool console, bool file, int level, RotatingFileSinkParams params, const char* pattern)
 	{
-		//Init Core Logger
+		//init Core Logger
 		m_CoreLogger = std::make_shared<spdlog::logger>("CoreLogger");
+
+		// Then the logging level can be set with the following function
+		cv::utils::logging::setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
 
 		//add sinks to logger
 		if (console)

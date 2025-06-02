@@ -1,34 +1,44 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
-#include "TextboxRecognitionOpenCV.h"
-#include "TextRecognitionParams.h"
+#include "TextBoxRecognitionOpenCV.hpp"
+#include "fonttik/TextBox.hpp"
 #include <fstream>
 
-namespace tik {
-	void TextboxRecognitionOpenCV::init(const TextRecognitionParams* params) {
-		textRecognition = cv::dnn::TextRecognitionModel(params->getRecognitionModel());
-		textRecognition.setDecodeType(params->getDecodeType());
-		std::ifstream vocFile;
-		vocFile.open(params->getVocabularyFilepath());
-		CV_Assert(vocFile.is_open());
-		std::string vocLine;
-		std::vector<std::string> vocabulary;
-		while (std::getline(vocFile, vocLine)) {
-			vocabulary.push_back(vocLine);
-		}
-		textRecognition.setVocabulary(vocabulary);
 
-		// Normalization parameters
-		auto mean = params->getMean();
-		// The input shape
-		std::pair<int, int> size = params->getSize();
-		textRecognition.setInputParams(params->getScale(), cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
+namespace tik 
+{
 
-		textRecognition.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
-		textRecognition.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
+void TextBoxRecognitionOpenCV::init(const TextRecognitionParams& params) 
+{
+	textRecognition = cv::dnn::TextRecognitionModel(params.recognitionModel);
+	textRecognition.setDecodeType(params.decodeType);
+
+	std::ifstream vocFile;
+	vocFile.open(params.vocabularyFilePath);
+	CV_Assert(vocFile.is_open());
+	std::string vocLine;
+	std::vector<std::string> vocabulary;
+	
+	while (std::getline(vocFile, vocLine)) 
+	{
+		vocabulary.push_back(vocLine);
 	}
+	
+	textRecognition.setVocabulary(vocabulary);
 
-	std::string TextboxRecognitionOpenCV::recognizeBox(Textbox& box) {
-		return textRecognition.recognize(box.getSubmatrix());
-	}
+	// Normalization parameters
+	auto mean = params.mean;
+	// The input shape
+	std::pair<int, int> size = params.size;
+	textRecognition.setInputParams(params.scale, cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
+
+	textRecognition.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
+	textRecognition.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
+}
+
+std::string TextBoxRecognitionOpenCV::recognizeBox(TextBox& box) 
+{
+	return textRecognition.recognize(box.getSubMatrix());
+}
+
 }

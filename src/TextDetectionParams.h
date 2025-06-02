@@ -1,4 +1,4 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #pragma once
 #include <array>
@@ -78,7 +78,7 @@ private:
 class TextDetectionParams {
 
 public:
-	TextDetectionParams() : confThreshold(0.5), mergeThreshold({ 1.0,1.0 }), rotationThresholdRadians(0.17) {}
+	TextDetectionParams() : confThreshold(0.5), mergeThreshold({ 1.0,1.0 }), rotationThresholdRadians(0.17), groupBySizeSimilarity(false) {}
 
 	virtual void init(json textDetection) {
 		json merge = textDetection["mergeThreshold"];
@@ -91,8 +91,10 @@ public:
 		preferredBackend = getBackendParam(textDetection["preferredBackend"]);
 		preferredTarget = getTargetParam(textDetection["preferredTarget"]);
 
-		eastCfg.init(textDetection["EAST"]);
-		dbCfg.init(textDetection["DB"]);
+		groupBySizeSimilarity = textDetection["groupBySizeSimilarity"];
+
+		eastCfg.init(textDetection["DB_EAST"]);
+		dbCfg.init(textDetection["DB_DiffBinarization"]);
 	}
 		
 	float getConfidenceThreshold() const { return confThreshold; }
@@ -103,12 +105,14 @@ public:
 	const DBDetectionParams* getDBParams() const { return &dbCfg; }
 	short getPreferredBackend() const { return static_cast<short>(preferredBackend); }
 	short getPreferredTarget() const { return static_cast<short>(preferredTarget); }
-
+	bool getGroupBySizeSimilarity () const {return groupBySizeSimilarity;}
+	
 private:
 	std::string activeBackground;
 	float confThreshold; //Confidence threshold	
 	std::pair<float, float> mergeThreshold; //If overlap in both axes surpasses this value, textboxes will be merged
 	float rotationThresholdRadians; //Text that excedes this inclination will be ignored (not part of the HUD)
+	bool groupBySizeSimilarity;
 	EASTDetectionParams eastCfg;
 	DBDetectionParams dbCfg;
 

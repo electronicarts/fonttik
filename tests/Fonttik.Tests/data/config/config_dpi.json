@@ -3,24 +3,26 @@
     "detectionBackend": "EAST",
     "saveLuminanceMap": true,
     "saveTextboxOutline": true,
-    "textboxOutlineColors":{
-      "pass": [0,136,255],
-      "warning": [255,193,7],
-      "fail": [255,0,93],
-      "unrecognized":[25,25,25]
+    "textboxOutlineColors": {
+      "pass": [ 0, 136, 255 ],
+      "warning": [ 255, 193, 7 ],
+      "fail": [ 255, 0, 93 ],
+      "unrecognized": [ 25, 25, 25 ]
     },
     "saveSeparateTexboxes": false,
     "saveHistograms": false,
     "saveRawTextboxOutline": false,
     "saveLuminanceMasks": false,
     "useTextRecognition": true,
-    "useDPI":true,
-    "targetResolution":0,
-    "targetDPI":570,
-    "saveLogs":true,
-    "printValuesOnResults": false,
-    "videoFramesToSkip": 5,
-    "videoImageOutputInterval" : 0,
+    "useDPI": true,
+    "targetResolution": "0",
+    "targetDPI": 570,
+    "saveLogs": true,
+    "printResultValues": false,
+    "failsAsWarnings": false,
+    "detectResolution": true,
+    "analysisWaitSeconds": 5,
+    "videoImageOutputInterval": 0,
     "focusMask": [
       {
         "x": 0,
@@ -52,13 +54,13 @@
   "textDetection": {
     "confidence": 0.5,
     "rotationThresholdDegrees": 10,
+    "groupByCharacters": false,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
     },
     "preferredBackend": "DEFAULT",
     "preferredTarget": "CPU",
-    
     "EAST": {
       "detectionModel": "frozen_east_text_detection.pb",
       "nmsThreshold": 0.4,
@@ -105,14 +107,14 @@
         "height": 52
       }
     },
-    "heightPer100DPI":18,
-    "resolutionsRecommendations":{
+    "heightPer100DPI": 18,
+    "resolutionsRecommendations": {
       "1080": {
         "width": 4,
         "height": 30
       }
     },
-    "textSizeRatio": [1,3,1]
+    "textSizeRatio": [ 1, 3, 1 ]
   },
   "sRGBLinearizationValues": [
     0,

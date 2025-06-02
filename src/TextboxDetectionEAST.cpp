@@ -1,4 +1,4 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #include "TextboxDetectionEAST.h"
 #include <opencv2/dnn.hpp>
@@ -6,37 +6,36 @@
 #include <opencv2/imgproc.hpp>
 #include <iostream>
 #include "fonttik/Log.h"
+#include "fonttik/ConfigurationParams.hpp"
 
-#include "AppSettings.h"
-#include "TextDetectionParams.h"
+#include <random>
+
 
 namespace tik {
-	void TextboxDetectionEAST::init(const TextDetectionParams* params, const AppSettings* appSettingsCfg)
+	void TextboxDetectionEAST::init(const std::vector<double>& sRGB_LUT)
 	{
-		detectionParams = params;
-		appSettings = appSettingsCfg;
+		//Store sRGB Look up table
+		this->sRGB_LUT = sRGB_LUT;
 
-		const EASTDetectionParams* eastParams = params->getEASTParams();
+		east = new cv::dnn::TextDetectionModel_EAST(detectionParams->eastParams.detectionModel);
 
-		east = new cv::dnn::TextDetectionModel_EAST(eastParams->getDetectionModel());
-
-		LOG_CORE_TRACE("Confidence set to {0}", detectionParams->getConfidenceThreshold());
+		LOG_CORE_TRACE("Confidence set to {0}", detectionParams->confidenceThreshold);
 		//Confidence on textbox threshold
-		east->setConfidenceThreshold(detectionParams->getConfidenceThreshold());
+		east->setConfidenceThreshold(detectionParams->confidenceThreshold);
 		//Non Maximum supression
-		east->setNMSThreshold(eastParams->getNMSThreshold());
+		east->setNMSThreshold(detectionParams->eastParams.nonMaxSuprresionThreshold);
 
-		east->setInputScale(eastParams->getDetectionScale());
+		east->setInputScale(detectionParams->eastParams.detectionScale);
 
 		//Default values from documentation are (123.68, 116.78, 103.94);
-		auto mean = eastParams->getDetectionMean();
+		auto mean = detectionParams->eastParams.detectionMean;
 		cv::Scalar detMean(mean[0], mean[1], mean[2]);
 		east->setInputMean(detMean);
 
 		east->setInputSwapRB(true);
 
-		east->setPreferableBackend((cv::dnn::Backend)detectionParams->getPreferredBackend());
-		east->setPreferableTarget((cv::dnn::Target)detectionParams->getPreferredTarget());
+		east->setPreferableBackend((cv::dnn::Backend)detectionParams->preferredBackend);
+		east->setPreferableTarget((cv::dnn::Target)detectionParams->preferredTarget);
 	}
 
 	TextboxDetectionEAST::~TextboxDetectionEAST() {
@@ -59,7 +58,7 @@ namespace tik {
 		warpPerspective(frame, result, rotationMatrix, outputSize);
 	}
 
-	std::vector<Textbox> TextboxDetectionEAST::detectBoxes(const cv::Mat& img)
+	std::vector<TextBox> TextboxDetectionEAST::detectBoxes(const cv::Mat& img)
 	{
 		//Calculate needed conversion for new width and height to be multiples of 32
 		////This needs to be multiple of 32
@@ -81,7 +80,7 @@ namespace tik {
 			east->detect(resizedImg, detResults);
 		}
 
-		LOG_CORE_INFO("EAST found {0} boxes", detResults.size());
+		LOG_CORE_TRACE("DB_EAST found {0} boxes", detResults.size());
 
 		//Transform points to original image size
 		{
@@ -97,53 +96,96 @@ namespace tik {
 			}
 		}
 
-		std::vector<Textbox> boxes;
-		for (std::vector<cv::Point > points : detResults) {
-			if (HorizontalTiltAngle(points[1], points[2]) < detectionParams->getRotationThresholdRadians()) {
-				boxes.emplace_back(points);
+		std::vector<TextBox> boxes;
+
+		for (std::vector<cv::Point > points : detResults) 
+		{
+			if (HorizontalTiltAngle(points[1], points[2]) < detectionParams->rotationThresholdRadians) 
+			{
+				boxes.emplace_back(TextBox{ points, img });
 			}
-			else {
+			else 
+			{
 				LOG_CORE_TRACE("Ignoring tilted text in {0}", points[1]);
 			}
 		}
 
-		//Points are
-		/*
-		[1]---------[2]
-		|            |
-		|            |
-		[0]---------[3]
-		*/
+		return boxes;
+	}
 
-#ifdef _DEBUG
+	LinesAndWords TextboxDetectionEAST::detectLinesAndWords(const cv::Mat& img)
+	{
+		auto boxes = detectBoxes(img);
 
-		if (appSettings->saveRawTexboxOutline()) {
-			// Text Recognition
-			cv::Mat recInput = img.clone();
-			if (detResults.size() > 0) {
-				std::vector< std::vector<cv::Point> > contours;
-				for (uint i = 0; i < detResults.size(); i++)
-				{
-					const auto& quadrangle = detResults[i];
-					CV_CheckEQ(quadrangle.size(), (size_t)4, "");
+		//merge lines
+		const int MAX_Y_DIFF = 5;
+		const int MAX_X_DIFF = 50;
 
-					contours.emplace_back(quadrangle);
+		std::vector<TextBox> mergedLines;
+		if (boxes.empty()) return { mergedLines, boxes };
 
-					std::vector<cv::Point2f> quadrangle_2f;
-					for (int j = 0; j < 4; j++) {
-						quadrangle_2f.emplace_back(quadrangle[j]);
-					}
+		// Sort boxes by the top y-coordinate
+		auto sortedBoxes = boxes;
+		for (auto& textBox : sortedBoxes)
+		{
+			textBox.calculateTextBoxLuminance(sRGB_LUT);
+		}
+		for (auto& textBox : sortedBoxes)
+		{
+			textBox.calculateTextMask();
+			auto boxRect = textBox.getTextBoxRect();
+			auto textRect = textBox.getTextRect();
 
-					cv::Mat cropped;
-					fourPointsTransform(recInput, &quadrangle_2f[0], cropped);
-				}
-				polylines(recInput, contours, true, cv::Scalar(0, 255, 0), 2);
-			}
-			cv::imwrite("resources/raw_EAST_textboxes.png", recInput);
+			int x = std::max(boxRect.x + textRect.x , 0);
+			int y = std::max(boxRect.y + textRect.y , 0);
+			int w = std::min(textRect.width  , (img.cols - x));
+			int h = std::min(textRect.height , (img.rows - y));
+
+			auto tb = cv::Rect{x , y, w, h };
+			textBox = { tb,img };
 		}
 
-#endif // _DEBUG
+		// Sort vertically
+		std::sort(sortedBoxes.begin(), sortedBoxes.end(), [](const TextBox& a, const TextBox& b) {
+			return a.getTextBoxRect().y < b.getTextBoxRect().y; 
+		});
+		// Sort horizontally after vertically
+		std::sort(sortedBoxes.begin(), sortedBoxes.end(), [&](const TextBox& a, const TextBox& b) {
+			if (std::abs(a.getTextBoxRect().y - b.getTextBoxRect().y) < MAX_Y_DIFF) {
+				return a.getTextBoxRect().x < b.getTextBoxRect().x;
+			}
+			return a.getTextBoxRect().y < b.getTextBoxRect().y;
+		});
 
-		return boxes;
+		TextBox currentLine = sortedBoxes[0];
+		int count = 0;
+
+		for (size_t i = 1; i < sortedBoxes.size(); ++i) {
+			const auto& box = sortedBoxes[i];
+
+			// Calculate the average y-value for alignment
+			int heightThreshold = (currentLine.getTextBoxRect().height + box.getTextBoxRect().height) / 2;
+			int avgYCurrent = currentLine.getTextBoxRect().y + currentLine.getTextBoxRect().height / 2;
+			int avgYBox = box.getTextBoxRect().y + box.getTextBoxRect().height / 2;
+
+			auto currentX = currentLine.getTextBoxRect().x + currentLine.getTextBoxRect().width;
+			auto mergeX = (std::abs(box.getTextBoxRect().x- currentX) <=  + MAX_X_DIFF);
+			// Check if the current box is aligned with the current line
+			if (false || std::abs(avgYBox - avgYCurrent) < MAX_Y_DIFF  &&  mergeX)
+			{
+				// Merge text
+				// Expand bounding rectangle
+				currentLine = { currentLine.getTextBoxRect() | box.getTextBoxRect(), img };
+				count++;
+			}
+			else {
+				// Save the current line and start a new one
+				//std::cout << "The following text: "<< box.getTextBoxRect() << (std::abs(avgYBox - avgYCurrent) < MAX_Y_DIFF ?" failed on X":"failed on Y" )<< std::endl;
+				mergedLines.push_back(currentLine);
+				currentLine = box;
+			}
+		}
+		
+		return { mergedLines, boxes };
 	}
 }

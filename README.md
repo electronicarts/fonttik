@@ -11,12 +11,10 @@ Fonttik is a console application and library created by EA that processes images
 
 Fonttik has been created as a CMake project and can be compiled in any C++ compatible system. There are various subprojects, all of them compile their necessary inter-project dependencies as well:
 - FonttikLib: Logical backend for Fonttik, has everything needed for analysis.
-- FonttikApp: Standard Fonttik executable, connects to FonttikLib.
-- FonttikApp_MT: CPU multithreaded Fonttik executable, it'll run on as many cores as available in the system by default. Number of threads can be configured with the `-t` parameter.
-- FonttikLib.Benchmarks: Multithreading benchmarks for different Fonttik operations
-- FonttikLib.Tests: All of the acceptance, integration and unit tests for the Fonttik code. Any change to the code must pass or update these tests.
+- FonttikApp: Standard Fonttik example executable, links to FonttikLib.
+- Fonttik.Tests: All of the acceptance, integration and unit tests for the Fonttik code. Any change to the code must pass or update these tests.
 
-All of the dependencies for Fonttik are specified in [vcpk.json](./Backend/CoreCpp/vcpkg.json). vcpkg is a cross-platform package manager for C++ developed by Microsoft. Installation instructions for vcpkg can be found in its [repository](https://github.com/Microsoft/vcpkg).  
+All of the dependencies for Fonttik are specified in [vcpk.json](./vcpkg.json). vcpkg is a cross-platform package manager for C++ developed by Microsoft. Installation instructions for vcpkg can be found in its [repository](https://github.com/Microsoft/vcpkg).  
 If you want CMake to automatically run vcpkg and compile all dependencies for you, you must set your VCPKG root folder as an environment variable called "VCPKG_ROOT" or add it as a variable in the CMakePresets.json.
 
 Fonttik uses cmake presets to build with different configurations, e.g.
@@ -25,6 +23,15 @@ Fonttik uses cmake presets to build with different configurations, e.g.
 `>cmake --build --preset windows-release`
 
 Note: There are some CUDA presets that allow to build OpenCV with hardware acceleration. To be able to use CUDA you will need an NVidia GPU and their compilers, for more information you can read the [OpenCV docs on the topic](https://docs.opencv.org/2.4/modules/gpu/doc/introduction.html).
+
+More presets can be added to the CMakePresets.json file or defined in a CMakeUserPresets.json file.
+
+Build options:
+- BUILD_EXAMPLE_APP: build Fonttik example console application
+- BUILD_SHARED_LIBS: build Fonttik as a shared library
+- EXPORT_FONTTIK: export and install library
+- BUILD_TESTS: build library unit tests
+- BUILD_COVERAGE: build code coverage (only available for Linux)
 
 ## Running the tool
 
@@ -50,7 +57,7 @@ Results will be saved depending on the appsetting options enabled (explained in 
 When running Fonttik the following optional arguments can be passed to alter the functionality of the tool:
 
 - `-c`: Specify configuration file. Given a path to a specific configuration file uses that one during this execution. By default Fonttik looks for config.json in its own folder.
-- `-t`: Specify the number of threads for multithreading. Only available when running 'FonttikApp_MT'.
+- `-a`: Store results as the analysis runs asynchronously 
 
 ## Configuration
 
@@ -58,24 +65,18 @@ Fonttik can be configured by a .json file, default configuration provided under 
 
 - AppSettings configuration for how the tool should function:
 	- DetectionBackend: Fonttik supports the EAST and DB (differential binarization) backends from OpenCV.
-	- SaveLuminanceMap: whether to save the luminance map generated when processing the image;
 	- SaveTextboxOutline: whether to save the resulting images with the textboxes indicating if each textbox passed the guidelines test.
 	- TextboxOutlineColors: Sets of RGB values (0 to 255) for the different results the tool can output.
-	- SaveSeparateTextboxes: whether to save separately each of the textboxes recognized as image files.
-	- SaveHistograms: whether to generate and save luminance histograms for each textbox recognized.
-	- SaveRawTextboxOutline: whether to generate an image with the textboxes as recognized by EAST with no additional processing.
-	- SaveLuminanceMasks: whether to save to a file the different masks used for luminance testing.
 	- UseTextRecognition: whether to use text recognition. If deactivated execution will be faster but character width won't be measured.
 	- UseDPI: Whether to compare measurements to DPI-based guidelines or resolution-based guidelines. 
 	- TargetDPI: Only used if UseDPI is set to true. Determine the target DPI of the image to be tested.
 	- TargetResolution: Only used if UseDPI is set to false and TargetResolution's value is different to 0. Useful if you want to analyze a cropped image and want to set its source resolution.
 	- SaveLogs: Whether to create the txt log file at the end of execution.
-	- PrintValuesOnResults: Whether to print the obtained measurements to the side of detected text boxes in the image output to facilitate reviewing.
-	- FramesToSkip: When processing video, set how many frames to skip between checks. With high framerates it may not be useful to check all frames as a human takes more than one frame to read text present.
-	- VideoImageOutputInterval: Sets the frame interval to wait between video frames to export an image of a failing frame. For example, if processing a 30 fps video and -     VideoImageOutputInterval is set to 30 it'll export one failing frame of the video each second so it can be better looked at by testers. Exported frames can be found in the same    folder as the results and have their frame number in the filename. By default set to 0 (deactivated).
-		- Important! If videoImageOutputInterval is set to a value smaller than FramesToSkip you can get exported frames that have repeat and inaccurate values.
+	- PrintResultValues: Whether to print the obtained measurements to the side of detected text boxes in the image output to facilitate reviewing.
 	- FocusMask: Start and finish width and height in a range of 0 to 1 of the part of the image that is to be recognized. By default the whole image is processed.
 	- IgnoreMask: Regions to be ignored when processing the image. Format is the same as FocusMask.
+	- SizeByLine: Try to infer textlines and calculate the text size based in lines and not single words. (WIP)
+	- AnalysisWaitSeconds: Seconds to wait between each frame analysis in video mode. Defaults to 0 (analysing everyframe).
 - TextRecognition configuration for the models used for text recognition:
 	- RecognitionModel: Name of the file for a trained neural network to be used for text recognition.
 	- DecodeType: Sets the decoding method of translating the network output into string, can be 'CTC-greedy' or 'CTC-prefix-beam-search'.

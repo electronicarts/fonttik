@@ -1,24 +1,28 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #pragma once
-#include "fonttik/Configuration.h"
-#include "fonttik/Frame.h"
-#include "fonttik/Textbox.h"
+
+#include "fonttik/Frame.hpp"
+#include "fonttik/TextBox.hpp"
 #include "fonttik/Results.h"
 #include <vector>
 
-namespace tik {
+namespace tik 
+{
+class Configuration;
 
-class IChecker {
+class IChecker 
+{
 public:
-	virtual ~IChecker() { config = nullptr; }
+	virtual ~IChecker() { }
 
-	virtual FrameResults check(Frame& image, std::vector<Textbox>& boxes) = 0;
+	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& boxes) = 0;
 
 protected:
-	Configuration* config = nullptr;
 
-	IChecker(Configuration* config) : config(config) {};
+	IChecker(Configuration* config) : configuration(config){};
+
+	Configuration* configuration;
 };
 
 }

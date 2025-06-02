@@ -1,4 +1,4 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #pragma once
 #include <string>
@@ -21,7 +21,7 @@ public:
 		recognitionModel = textRecognition["recognitionModel"];
 		decodeType = textRecognition["decodeType"];
 		vocabularyFilepath = textRecognition["vocabularyFile"];
-		scale = (double)scale["numerator"] / (double)scale["denominator"];
+		this->scale = (double)scale["numerator"] / (double)scale["denominator"];
 		mean = { jmean[0],jmean[1] ,jmean[2] };
 		size = { jsize["width"], jsize["height"] };
 	}

@@ -1,42 +1,40 @@
 {
   "appSettings": {
-"detectionBackend": "DB",    
-"saveLuminanceMap": true,
+    "detectionBackend": "DB_EAST",
     "saveTextboxOutline": true,
     "textboxOutlineColors": {
       "pass": [
-        100,
-        143,
-        255
+        0,
+        255,
+        106
       ],
       "warning": [
-        254,
-        97,
-        0
+        164,
+        0,
+        255
       ],
       "fail": [
-        220,
-        38,
-        127
+        255,
+        0,
+        0
       ],
       "unrecognized": [
-        255,
-        176,
-        0
+        189,
+        189,
+        189
       ]
     },
-    "saveSeparateTexboxes": false,
-    "saveHistograms": false,
-    "saveRawTextboxOutline": false,
-    "saveLuminanceMasks": false,
-    "useTextRecognition": false,
+    "useTextRecognition": true,
     "useDPI": false,
-    "targetResolution": 0,
+    "targetResolution": "0",
     "targetDPI": 0,
     "saveLogs": true,
-    "printValuesOnResults": true,
-    "videoFramesToSkip": 5,
+    "failsAsWarnings": false,
+    "printResultValues": true,
+    "analysisWaitSeconds": 0,
     "videoImageOutputInterval": 0,
+    "detectResolution": true,
+    "sizeByLine": true,
     "focusMask": [
       {
         "x": 0,
@@ -68,13 +66,14 @@
   "textDetection": {
     "confidence": 0.5,
     "rotationThresholdDegrees": 10,
+    "groupByCharacters": false,
     "mergeThreshold": {
       "x": 0.3,
       "y": 0.75
     },
     "preferredBackend": "CUDA",
     "preferredTarget": "CUDA",
-    "EAST": {
+    "DB_EAST": {
       "detectionModel": "frozen_east_text_detection.pb",
       "nmsThreshold": 0.4,
       "detectionScale": 1.0,
@@ -113,7 +112,7 @@
       },
       "1080": {
         "width": 4,
-        "height": 28
+        "height": 26
       },
       "2160": {
         "width": 10,
@@ -126,8 +125,7 @@
         "width": 4,
         "height": 30
       }
-    },
-    "textSizeRatio": [1,3,1]
+    }
   },
   "sRGBLinearizationValues": [
     0,

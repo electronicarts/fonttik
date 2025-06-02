@@ -1,8 +1,8 @@
-//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
 
 #include <gtest/gtest.h>
-#include "fonttik/Media.h"
-#include "../src/Video.h"
+#include "fonttik/Media.hpp"
+#include "../src/Video.hpp"
 #include "fonttik/Results.h"
 #include "fonttik/Log.h"
 
@@ -11,15 +11,9 @@ namespace tik {
 	protected:
 		bool checkSimilarity(fs::path path) {
 			tik::Log::InitCoreLogger(false, false);
-			tik::Video* video = static_cast<tik::Video*>(tik::Media::CreateMedia(path));
-
-			cv::Mat nextFrame;
-			video->videoCapture >> nextFrame;
-			
-			bool comparison = video->compareFramesSimilarity(video->imageMatrix, nextFrame);
-
+			tik::Video* video = static_cast<tik::Video*>(tik::Media::createMedia(path.string()));
+			bool comparison = video->compareFramesSimilarity(video->_GetNextFrame(), video->_GetNextFrame());
 			delete video;
-
 			return comparison;
 		}
 	};
