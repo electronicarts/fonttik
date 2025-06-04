@@ -8,7 +8,12 @@
     "spscqueue",
     "gtest",
     "spdlog",
-    "benchmark"
+    "benchmark",
+    {
+      "name": "ffmpeg",
+      "features": [ "openh264", "openjpeg", "zlib" ]
+    }
+
   ],
   "features": {
     "cuda-opencv": {
