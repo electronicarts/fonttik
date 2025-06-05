@@ -20,11 +20,13 @@ namespace tik
 		int boxWidth = bottomRight.x - topLeft.x;
 
 		textBoxRect = cv::Rect(topLeft.x, topLeft.y, boxWidth, boxHeight);
+		textRect = textBoxRect;
 		textSubMat = frameImg(textBoxRect);
 	}
 
 	TextBox::TextBox(cv::Rect rect, cv::Mat frameImg) : textBoxRect(rect)
 	{
+		textRect = textBoxRect;
 		textSubMat = frameImg(textBoxRect);
 	}
 

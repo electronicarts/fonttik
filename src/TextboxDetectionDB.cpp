@@ -99,24 +99,38 @@ namespace tik {
 		if (boxes.empty()) return { mergedLines, boxes };
 
 		// Sort boxes by the top y-coordinate
-		auto sortedBoxes = boxes;
+		auto& sortedBoxes = boxes;
 		for (auto& textBox : sortedBoxes)
 		{
 			textBox.calculateTextBoxLuminance(sRGB_LUT);
 		}
+
 		for (auto& textBox : sortedBoxes)
 		{
 			textBox.calculateTextMask();
 			auto boxRect = textBox.getTextBoxRect();
 			auto textRect = textBox.getTextRect();
 
-			textBox = { cv::Rect{ boxRect.x + textRect.x - 1, boxRect.y + textRect.y - 1, textRect.width + 2, textRect.height + 2 },img };
+			int x = std::max(boxRect.x + textRect.x, 0);
+			int y = std::max(boxRect.y + textRect.y, 0);
+			int w = std::min(boxRect.width, (img.cols - x));
+			int h = std::min(boxRect.height, (img.rows - y));
+
+			auto tb = cv::Rect{ x , y, w, h };
+			textBox = { tb,img };
 		}
 
-		// boxRect.x + textRect.x - 1, boxRect.y + textRect.y - 1, textRect.width + 2, textRect.height + 2
+		// Sort vertically
 		std::sort(sortedBoxes.begin(), sortedBoxes.end(), [](const TextBox& a, const TextBox& b) {
 			return a.getTextBoxRect().y < b.getTextBoxRect().y;
-		});
+			});
+		// Sort horizontally after vertically
+		std::sort(sortedBoxes.begin(), sortedBoxes.end(), [&](const TextBox& a, const TextBox& b) {
+			if (std::abs(a.getTextBoxRect().y - b.getTextBoxRect().y) < MAX_Y_DIFF) {
+				return a.getTextBoxRect().x < b.getTextBoxRect().x;
+			}
+			return a.getTextBoxRect().y < b.getTextBoxRect().y;
+			});
 
 		TextBox currentLine = sortedBoxes[0];
 

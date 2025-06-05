@@ -125,7 +125,7 @@ namespace tik {
 		if (boxes.empty()) return { mergedLines, boxes };
 
 		// Sort boxes by the top y-coordinate
-		auto sortedBoxes = boxes;
+		auto& sortedBoxes = boxes;
 		for (auto& textBox : sortedBoxes)
 		{
 			textBox.calculateTextBoxLuminance(sRGB_LUT);
@@ -138,8 +138,8 @@ namespace tik {
 
 			int x = std::max(boxRect.x + textRect.x , 0);
 			int y = std::max(boxRect.y + textRect.y , 0);
-			int w = std::min(textRect.width  , (img.cols - x));
-			int h = std::min(textRect.height , (img.rows - y));
+			int w = std::min(boxRect.width  , (img.cols - x));
+			int h = std::min(boxRect.height , (img.rows - y));
 
 			auto tb = cv::Rect{x , y, w, h };
 			textBox = { tb,img };

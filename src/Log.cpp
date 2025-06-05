@@ -14,7 +14,7 @@ namespace tik
 		m_CoreLogger = std::make_shared<spdlog::logger>("CoreLogger");
 
 		// Then the logging level can be set with the following function
-		cv::utils::logging::setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT);
+		
 
 		//add sinks to logger
 		if (console)
