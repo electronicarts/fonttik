@@ -79,14 +79,12 @@ jobs:
         
       # Ensure that the developer command promt is present on Windows runners
       - uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Restore from cache the dependencies and generate project files
-        run: |
-          cmake -DBUILD_EXAMPLE_APP=ON -DBUILD_TESTS=ON --preset ${{ env.CURRENT_OS }}-release
-
-      - name: Build (Release configuration)
-        run: |
-          cmake --build --preset ${{ env.CURRENT_OS }}-release
+      - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
+        uses: lukka/run-cmake@v10
+        with:
+            configurePreset: ${{ env.CURRENT_OS }}-release
+            configurePresetAdditionalArgs: "['--DBUILD_EXAMPLE_APP=ON','-DBUILD_TESTS=ON']"
+            buildPreset: ${{ env.CURRENT_OS }}-release
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
