@@ -1,8 +1,12 @@
 {
   "name": "fonttik",
-  "description": [ "Needed" ],
+  "description": [
+    "Needed"
+  ],
   "version-string": "1.0.3",
-  "default-features": [ "default-opencv" ],
+  "default-features": [
+    "default-opencv"
+  ],
   "dependencies": [
     "nlohmann-json",
     "spscqueue",
@@ -11,9 +15,12 @@
     "benchmark",
     {
       "name": "ffmpeg",
-      "features": [ "openh264", "openjpeg", "zlib" ]
+      "features": [
+        "openh264",
+        "openjpeg",
+        "zlib"
+      ]
     }
-
   ],
   "features": {
     "cuda-opencv": {
@@ -21,7 +28,12 @@
       "dependencies": [
         {
           "name": "opencv",
-          "features": [ "ffmpeg", "cuda", "cudnn", "dnn-cuda" ]
+          "features": [
+            "ffmpeg",
+            "cuda",
+            "cudnn",
+            "dnn-cuda"
+          ]
         },
         "cuda",
         "cudnn"
@@ -32,9 +44,13 @@
       "dependencies": [
         {
           "name": "opencv",
-          "features": [ "ffmpeg", "dnn" ]
+          "features": [
+            "ffmpeg",
+            "dnn"
+          ]
         }
       ]
     }
-  }
+  },
+  "builtin-baseline": "b1b19307e2d2ec1eefbdb7ea069de7d4bcd31f01"
 }
