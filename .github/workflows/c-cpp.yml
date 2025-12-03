@@ -31,27 +31,11 @@ jobs:
         run: echo "CURRENT_OS=$(echo $RUNNER_OS | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
         shell: bash
       
-      - name: Set up cache
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - uses: actions/checkout@v4
-
-      - name: Create vcpkg default binary cache
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            mkdir -p ${{ github.workspace }}\vcpkg\bincache
-          else
-            mkdir -p ${{ github.workspace }}/vcpkg/bincache
-          fi
-        shell: bash
 
       - name: Install packages
         if: runner.os == 'Linux'
-        run: sudo apt-get install -y libxi-dev libxtst-dev bison gperf libgles2-mesa-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm autoconf automake libtool pkg-config libltdl-dev
+        run: sudo apt-get update && sudo apt-get install -y autoconf-archive automake libxtst-dev bison gperf libgles2-mesa-dev libxrandr-dev libxcursor-dev libxdamage-dev libxinerama-dev nasm autoconf automake libtool pkg-config libltdl-dev
         
       - if: runner.os == 'macOS'
         run: brew install nasm
@@ -59,34 +43,16 @@ jobs:
       - uses: lukka/get-cmake@v3.26.0
 
       - name: Set up vcpkg
-        uses: lukka/run-vcpkg@v4
+        uses: lukka/run-vcpkg@v11
         with:
-          setupOnly: true
-          vcpkgGitCommitId: d320630b28aeb59b24424eb2a7ef3905314107a1
-      
-      # Restore vpkg cache
-      - name: Restore vcpkg
-        uses: actions/cache@v4
+          vcpkgGitCommitId: 4c4abc2e8727221ede31021349386dac674309b0      
+
+      - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
+        uses: lukka/run-cmake@v10
         with:
-          path: |
-            ${{ env._VCPKG_ }}
-            !${{ env._VCPKG_ }}/buildtrees
-            !${{ env._VCPKG_ }}/packages
-            !${{ env._VCPKG_ }}/downloads
-            !${{ env._VCPKG_ }}/installed
-          key: |
-            ${{ hashFiles( '.git/modules/vcpkg/HEAD' )}}
-        
-      # Ensure that the developer command promt is present on Windows runners
-      - uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Restore from cache the dependencies and generate project files
-        run: |
-          cmake -DBUILD_EXAMPLE_APP=ON -DBUILD_TESTS=ON --preset ${{ env.CURRENT_OS }}-release
-
-      - name: Build (Release configuration)
-        run: |
-          cmake --build --preset ${{ env.CURRENT_OS }}-release
+            configurePreset: ${{ env.CURRENT_OS }}-release
+            configurePresetAdditionalArgs: "['-DBUILD_EXAMPLE_APP=ON','-DBUILD_TESTS=ON']"
+            buildPreset: ${{ env.CURRENT_OS }}-release
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

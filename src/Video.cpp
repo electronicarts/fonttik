@@ -93,7 +93,7 @@ void storeResultsInFrame(cv::Mat frameCopy, const std::vector<ResultBox>& res, M
 	for (const ResultBox& box : res) 
 	{
 		cv::Scalar color = props.colors[box.type];
-		Frame::paintTextBox(box.x, box.y, box.x + box.width, box.y + box.height, color, frameCopy);
+		Frame::paintTextBox(box.x, box.y, box.width, box.height, color, frameCopy);
 	}
 
 	//Add measurements after boxes so boxes don't cover the numbers
@@ -101,7 +101,7 @@ void storeResultsInFrame(cv::Mat frameCopy, const std::vector<ResultBox>& res, M
 	{
 		for (const ResultBox& box : res) 
 		{
-			Frame::paintTextBoxResultValues(frameCopy, box, decimals); //Only add decimals with contrast checks
+			Frame::paintTextBoxResultValues(frameCopy, box, box.value, decimals); //Only add decimals with contrast checks
 		}
 	}
 
@@ -171,7 +171,7 @@ std::pair<fs::path, fs::path> Video::saveResultsOutlines(const SaveResultPropert
 	return { sizeResultProperties.path, contrastResultProperties.path };
 }
 
-void Video::saveResultsOutlinesAsync(const SaveResultProperties& sizeResultProperties, const SaveResultProperties& contrastResultProperties, 
+void Video::saveResultsOutlinesAsync(const SaveResultProperties& sizeResultProperties, const SaveResultProperties& contrastResultProperties,
 	rigtorp::SPSCQueue<FrameResult>& queue, std::atomic<bool>& done)
 {
 	LOG_CORE_DEBUG("Storing results at {}", getOutputPath().string());

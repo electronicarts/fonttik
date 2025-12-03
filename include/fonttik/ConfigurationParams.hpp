@@ -1,4 +1,4 @@
-//Copyright (C) 2022-2025 Electronic Arts, Inc.  All rights reserved.
+//Copyright (C) 2022 Electronic Arts, Inc.  All rights reserved.
 #pragma once
 
 #include <array>

@@ -41,16 +41,13 @@ void Frame::applyMask(cv::Mat mask)
 
 void Frame::paintTextBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& image, int thickness)
 {
-	cv::line(image, cv::Point(x1, y1), cv::Point(x2, y1), color, thickness);
-	cv::line(image, cv::Point(x2, y1), cv::Point(x2, y2), color, thickness);
-	cv::line(image, cv::Point(x2, y2), cv::Point(x1, y2), color, thickness);
-	cv::line(image, cv::Point(x1, y2), cv::Point(x1, y1), color, thickness);
+	cv::rectangle(image, cv::Rect{ x1,y1,x2,y2 }, color, thickness);
 }
 
-void Frame::paintTextBoxResultValues(cv::Mat& image, const ResultBox& box, int precision)
+void Frame::paintTextBoxResultValues(cv::Mat& image, const ResultBox& box, double value, int precision)
 {
 	std::stringstream stream;
-	stream << std::fixed << std::setprecision(precision) << box.value; //remove trailing zeros when converting to string
+	stream << std::fixed << std::setprecision(precision) << value; //remove trailing zeros when converting to string
 	std::string text = stream.str();
 
 	//Calculate text size

@@ -55,6 +55,7 @@ source_group("Public header files" FILES ${PUBLIC_HEADERS})
 
 set(SOURCE_FILES
     "src/Configuration.cpp"
+    "src/ColorblindFilters.cpp"
     "src/IChecker.h"
     "src/ITextboxDetection.h"
     "src/ITextboxDetection.cpp"

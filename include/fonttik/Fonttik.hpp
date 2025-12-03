@@ -4,7 +4,8 @@
 #include <filesystem>
 #include <opencv2/core/mat.hpp>
 namespace fs = std::filesystem;
-
+#include "Results.h"
+#include "../src/ColorblindFilters.hpp"
 
 namespace tik
 {
@@ -25,8 +26,18 @@ struct AsyncResults
 	fs::path pathToContrastResult;
 	fs::path pathToJSONSizeResult;
 	fs::path pathToJSONContrastResult;
+
+	fs::path pathToProtanResult;
+	fs::path pathToDeutanResult;
+	fs::path pathToTritanResult;
+	fs::path pathToGrayscaleResult;
+
 	bool overAllPassSize = true;
+	tik::ResultType overAllResultSize = PASS;
 	bool overAllPassContrast = true;
+	tik::ResultType overAllResultContrast = PASS;
+	std::vector<bool> overallPassColorblind = { true, true, true, true };
+	std::vector<ResultType> overallResultColorblind = { PASS, PASS, PASS, PASS };
 };
 
 
@@ -44,11 +55,13 @@ public:
 
 	Results processMedia(Media& media);
 
-	std::pair<FrameResults, FrameResults> processFrame(Frame& frame, bool sizeByLine);
-
+	std::pair<FrameResults, FrameResults> processFrame(Frame& frame, std::vector<Frame> colorblindFrames, bool sizeByLine);
+	
 	std::pair<fs::path, fs::path> saveResults(Media& media, Results& results);
 
 	std::pair<fs::path, fs::path> saveResultsToJson(fs::path outputPath, Results& results);
+
+	ColorblindFilters* colorblindFilters = nullptr;
 
 private:
 	bool setResolutionGuideline(const Media& media);
@@ -58,6 +71,8 @@ private:
 	void calculateTextBoxLuminance(std::vector<TextBox>& textBoxes);
 
 	void calculateTextMasks(std::vector<TextBox>& textBoxes);
+
+	std::vector<std::vector<TextBox>> createColorblindTextBoxes(std::vector<Frame> colorblindFrames, std::vector<TextBox> words);
 
 	/// <summary>
 	/// Sets the recognized text in the contrast results

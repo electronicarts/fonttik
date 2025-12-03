@@ -30,6 +30,11 @@ public:
 	inline const ContrastRatioParams& getContrastRatioParams() const { return contrastRatioParams; }
 	inline const TextSizeParams& getTextSizeParams() const { return textSizeParams; }
 	inline const std::vector<double>& getSbgrValues() const { return sBgrValues; }
+	inline const cv::Mat& getLinearRGBToLMSMatrix() const { return linearRGBToLMSMatrix; }
+	inline const cv::Mat& getXYZJuddVosToLMSMatrix() const { return XYZJuddVosToLMSMatrix; }
+	inline const cv::Mat& getLMSToLinearRGBMatrix() const { return LMSToLinearRGBMatrix; }
+	inline const cv::Mat& getProtanProjectionMatrix() const { return protanProjectionMatrix; }
+	inline const cv::Mat& getDeutanProjectionMatrix() const { return deutanProjectionMatrix; }
 	const std::vector<cv::Scalar> getOutlineColors() const { return outlineColors; }
 
 	inline void setAnalysisWaitSeconds(const int& aws) { appSettings.analysisWaitSeconds = aws; }
@@ -52,7 +57,7 @@ public:
 	}
 	inline void setUseOcr(const bool useOcr) { textSizeParams.useTextRecognition = useOcr; }
 	inline void setTreatFailsAsWarnings(const bool failsAsWarnings) { appSettings.failsAsWarnings = failsAsWarnings; }
-	inline void setContrastRatio(const int& cr) { contrastRatioParams.contrastRatio = cr; }
+	inline void setContrastRatio(const float cr) { contrastRatioParams.contrastRatio = cr; }
 	inline void setSizeGuideline(const std::string& height, const SizeGuidelines& sg) { textSizeParams.resolutionGuidelines[height] = sg; }
 	inline void setSizeByLine(bool sizeByLine) { appSettings.sizeByLine = sizeByLine; }
 
@@ -69,6 +74,7 @@ private:
 	void loadTextSizeParams(const json& section, const json& section2);
 	void loadEASTParams(const json& section);
 	void loadDiffBinarizationParams(const json& section);
+	cv::Mat loadMatrix(const json& section);
 	std::unordered_map<std::string, SizeGuidelines> loadSizeGuidelines(const json& section);
 
 	/// <summary>
@@ -88,6 +94,12 @@ private:
 	ContrastRatioParams contrastRatioParams;
 	TextSizeParams textSizeParams;
 
+	cv::Mat linearRGBToXYZJuddVosMatrix;
+	cv::Mat XYZJuddVosToLMSMatrix;
+	cv::Mat linearRGBToLMSMatrix;
+	cv::Mat LMSToLinearRGBMatrix;
+	cv::Mat protanProjectionMatrix;
+	cv::Mat deutanProjectionMatrix;
 	std::vector<double> sBgrValues;
 	std::vector<cv::Scalar> outlineColors;
 };

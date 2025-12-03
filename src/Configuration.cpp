@@ -32,6 +32,13 @@ void Configuration::init(const char* filePath)
 
 	sBgrValues = config["sRGBLinearizationValues"].get<std::vector<double>>();
 
+	linearRGBToXYZJuddVosMatrix = loadMatrix(config["colorblindness"]["linearRGBToXYZJuddVosMatrix"]);
+	XYZJuddVosToLMSMatrix = loadMatrix(config["colorblindness"]["XYZJuddVosToLMSMatrix"]);
+	linearRGBToLMSMatrix = XYZJuddVosToLMSMatrix * linearRGBToXYZJuddVosMatrix;
+	LMSToLinearRGBMatrix = linearRGBToLMSMatrix.inv();
+	protanProjectionMatrix = loadMatrix(config["colorblindness"]["protanProjectionMatrix"]);
+	deutanProjectionMatrix = loadMatrix(config["colorblindness"]["deutanProjectionMatrix"]);
+
 	outlineColors.resize((int)ResultType::RESULTYPE_COUNT);
 	outlineColors[(int)ResultType::PASS] = colorFromJson(config["appSettings"]["textboxOutlineColors"]["pass"]);
 	outlineColors[(int)ResultType::WARNING] = colorFromJson(config["appSettings"]["textboxOutlineColors"]["warning"]);
@@ -168,6 +175,20 @@ void Configuration::loadDiffBinarizationParams(const json& section)
 	std::array<int, 2> inputSize = { section["inputSize"][0], section["inputSize"][1] };
 
 	textDetectionParams.dbParams = { detectionModel, binaryThreshold, polygonThreshold, maxCandidates, unclipRatio, scale, detectionMean, inputSize };
+}
+
+cv::Mat Configuration::loadMatrix(const json& section)
+{
+	std::vector<std::vector<double>> values = section.get<std::vector<std::vector<double>>>();
+	cv::Mat matrix = cv::Mat(3, 3, CV_64F);
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			matrix.at<double>(i, j) = values[i][j];
+		}
+	}
+	return matrix;
 }
 
 template<typename T>

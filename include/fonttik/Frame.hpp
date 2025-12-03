@@ -33,7 +33,7 @@ public:
 	static void paintTextBox(const int& x1, const int& y1, const int& x2, const int& y2, cv::Scalar& color, cv::Mat& image, int thickness = 1);
 
 	//Paints output value from a resultbox next to itself in an image
-	static void paintTextBoxResultValues(cv::Mat& image, const ResultBox& box, int precision);
+	static void paintTextBoxResultValues(cv::Mat& image, const ResultBox& box, double value, int precision);
 
 	virtual ~Frame();
 

@@ -17,6 +17,7 @@ enum ResultType
 	RESULTYPE_COUNT
 };
 
+ResultType ResultTypeMerge(const ResultType a, const ResultType b);
 std::string ResultTypeAsString(ResultType t);
 
 struct ResultBox {
@@ -24,11 +25,21 @@ struct ResultBox {
 		type(type), x(x), y(y), width(w), height(h), value(value), text("") {};
 	ResultBox(ResultType type, int x, int y, int w, int h, double value, const std::string& text) :
 		type(type), x(x), y(y), width(w), height(h), value(value), text(text) {};
+	ResultBox(ResultType type, cv::Rect r, double value) :
+		type(type), x(r.x), y(r.y), width(r.width), height(r.height), value(value), text("") {};
+	ResultBox(ResultType type, cv::Rect r, double value, const std::string& text) :
+		type(type), x(r.x), y(r.y), width(r.width), height(r.height), value(value), text(text) {};
+
+	ResultBox(ResultType type, cv::Rect r, double value, std::vector<double> colorblindValues, std::vector<ResultType> colorblindTypes) :
+		type(type), x(r.x), y(r.y), width(r.width), height(r.height), value(value), text(""), colorblindValues(colorblindValues), colorblindTypes(colorblindTypes) {
+	};
 	
 	ResultType type;
 	int x, y, width, height;
 	double value;
 	std::string text;
+	std::vector<double> colorblindValues = {};
+	std::vector<ResultType> colorblindTypes = {};
 };
 
 struct FrameResults 
@@ -43,10 +54,12 @@ struct FrameResults
 		return frame > b.frame;
 	};
 
+	std::vector<ResultBox> results = {};
+	ResultType overallType = ResultType::PASS;
 	int frame;
 	bool overallPass = true;
-	std::vector<ResultBox> results = {};
-
+	std::vector<bool> overallColorblindPass = { true, true, true, true };
+	std::vector<ResultType> overallColorblindType = { ResultType::PASS, ResultType::PASS, ResultType::PASS, ResultType::PASS };
 };
 
 class Results {
@@ -55,6 +68,12 @@ public:
 	void clear() {
 		overallContrastPass = true;
 		overallSizePass = true;
+		overallColorblindPass = { true, true, true, true };
+
+		overallContrastResult = PASS;
+		overallSizeResult = PASS;
+		overallColorblindResult = { PASS, PASS, PASS, PASS };
+
 		warningsRaisedFlag = false;
 
 		contrastResults.clear();
@@ -72,6 +91,11 @@ public:
 		contrastResults.push_back(res);
 		sortedContrast = false;
 		overallContrastPass = overallContrastPass && res.overallPass;
+		overallContrastResult = ResultTypeMerge(overallContrastResult,res.overallType);
+		for (int i = 0; i < 4; i++) {
+			overallColorblindPass[i] = overallColorblindPass[i] && res.overallColorblindPass[i];
+			overallColorblindResult[i] = ResultTypeMerge(overallColorblindResult[i], res.overallColorblindType[i]);
+		}
 	}
 
 	//Ads an already filled contrast results
@@ -79,6 +103,7 @@ public:
 		sizeResults.push_back(res);
 		sortedSize = false;
 		overallSizePass = overallSizePass && res.overallPass;
+		overallSizeResult = ResultTypeMerge(overallSizeResult, res.overallType);
 	}
 
 	/// <summary>
@@ -94,7 +119,7 @@ public:
 		std::vector<FrameResults>& res = contrastResults;
 		return res;
 	}
-		
+	
 	/// <summary>
 	/// /// Returns the sorted size resutls
 	/// </summary>
@@ -114,7 +139,11 @@ private:
 
 
 	bool overallContrastPass = true;
+	ResultType overallContrastResult = PASS;
 	bool overallSizePass = true;
+	ResultType overallSizeResult = PASS;
+	std::vector<bool> overallColorblindPass = { true, true, true, true }; //Protan, Deutan, Tritan, Grayscale
+	std::vector<ResultType> overallColorblindResult = { PASS, PASS, PASS, PASS };
 	bool warningsRaisedFlag = false;
 
 	// Flags to keep track of the sorted status of the results

@@ -30,7 +30,7 @@ namespace tik {
 
 		// The input shape
 		auto size = detectionParams->dbParams.inputSize;
-		cv::Size inputSize = cv::Size(736, 736);
+		cv::Size inputSize = cv::Size(size[0], size[1]);
 
 		db->setInputParams(scale, inputSize, detMean);
 
@@ -104,7 +104,6 @@ namespace tik {
 		{
 			textBox.calculateTextBoxLuminance(sRGB_LUT);
 		}
-
 		for (auto& textBox : sortedBoxes)
 		{
 			textBox.calculateTextMask();
@@ -117,20 +116,20 @@ namespace tik {
 			int h = std::min(boxRect.height, (img.rows - y));
 
 			auto tb = cv::Rect{ x , y, w, h };
-			textBox = { tb,img };
+
+			textBox = {tb, img };
 		}
 
-		// Sort vertically
+		// boxRect.x + textRect.x - 1, boxRect.y + textRect.y - 1, textRect.width + 2, textRect.height + 2
 		std::sort(sortedBoxes.begin(), sortedBoxes.end(), [](const TextBox& a, const TextBox& b) {
 			return a.getTextBoxRect().y < b.getTextBoxRect().y;
-			});
-		// Sort horizontally after vertically
+		});
 		std::sort(sortedBoxes.begin(), sortedBoxes.end(), [&](const TextBox& a, const TextBox& b) {
 			if (std::abs(a.getTextBoxRect().y - b.getTextBoxRect().y) < MAX_Y_DIFF) {
 				return a.getTextBoxRect().x < b.getTextBoxRect().x;
 			}
 			return a.getTextBoxRect().y < b.getTextBoxRect().y;
-			});
+		});
 
 		TextBox currentLine = sortedBoxes[0];
 
