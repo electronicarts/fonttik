@@ -83,7 +83,7 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
             configurePreset: ${{ env.CURRENT_OS }}-release
-            configurePresetAdditionalArgs: "['--DBUILD_EXAMPLE_APP=ON','-DBUILD_TESTS=ON']"
+            configurePresetAdditionalArgs: "['-DBUILD_EXAMPLE_APP=ON','-DBUILD_TESTS=ON']"
             buildPreset: ${{ env.CURRENT_OS }}-release
 
       - name: Upload build artifacts
