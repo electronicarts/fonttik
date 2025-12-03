@@ -59,7 +59,7 @@ jobs:
       - uses: lukka/get-cmake@v3.26.0
 
       - name: Set up vcpkg
-        uses: lukka/run-vcpkg@v4
+        uses: lukka/run-vcpkg@v11
         with:
           setupOnly: true
           vcpkgGitCommitId: d320630b28aeb59b24424eb2a7ef3905314107a1
