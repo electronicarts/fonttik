@@ -40,11 +40,20 @@ namespace tik
 	}
 	void TextBox::calculateTextMask()
 	{
-		//OTSU threshold automatically calculates best fitting threshold values
 		cv::Mat unsignedLuminance;
 		textMatLuminance.convertTo(unsignedLuminance, CV_8UC1, 255);
 
-		cv::threshold(unsignedLuminance, textMask, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
+		// Apply sharpening to enhance text edges
+		cv::Mat sharpeningKernel = (cv::Mat_<float>(3, 3) <<
+			0, -1, 0,
+			-1, 5, -1,
+			0, -1, 0);
+
+		cv::Mat sharpenedLuminance;
+		cv::filter2D(unsignedLuminance, sharpenedLuminance, CV_8UC1, sharpeningKernel);
+
+		// OTSU threshold automatically calculates best fitting threshold values
+		cv::threshold(sharpenedLuminance, textMask, 0, 255, cv::THRESH_OTSU | cv::THRESH_BINARY);
 
 		/* Ensure that text is being highlighted
 			If text mask has an 'outline' of the box on top and bottom sides it means that most probably is inverted.
@@ -86,6 +95,10 @@ namespace tik
 			{
 				boundingRects.emplace_back(rect);
 			}
+		}
+
+		if (boundingRects.size() == 0) {
+			return;
 		}
 
 		std::vector<std::vector<cv::Rect>> groupedRects = { {boundingRects[0]} };

@@ -11,7 +11,7 @@ namespace tik
 
 class Frame;
 
-Media* Media::createMedia(std::string mediaSource)
+Media* Media::createMedia(std::string mediaSource, ColorblindFilters* colorblindFilters)
 {
 	Media* media = nullptr;
 
@@ -20,7 +20,7 @@ Media* Media::createMedia(std::string mediaSource)
 	
 	if (!img.empty()) 
 	{
-		media = new Image(mediaSource, img);
+		media = new Image(mediaSource, img, colorblindFilters);
 	}
 	else 
 	{

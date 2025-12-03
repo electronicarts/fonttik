@@ -32,8 +32,8 @@ void TextBoxRecognitionOpenCV::init(const TextRecognitionParams& params)
 	std::pair<int, int> size = params.size;
 	textRecognition.setInputParams(params.scale, cv::Size(size.first, size.second), cv::Scalar(mean[0], mean[1], mean[2]));
 
-	textRecognition.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
-	textRecognition.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
+	textRecognition.setPreferableBackend(cv::dnn::DNN_BACKEND_DEFAULT);
+	textRecognition.setPreferableTarget(cv::dnn::DNN_TARGET_CPU);
 }
 
 std::string TextBoxRecognitionOpenCV::recognizeBox(TextBox& box) 

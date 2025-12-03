@@ -17,6 +17,7 @@ public:
 	virtual bool loadFrame() override;
 
 	virtual Frame getFrame() override;
+	virtual std::vector<Frame> getColorblindFrames() { return {}; }
 
 	virtual std::pair<fs::path, fs::path>saveResultsOutlines(const SaveResultProperties& sizeResultProperties, 
 		const SaveResultProperties& contrastResultProperties) override;

@@ -31,7 +31,7 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 void processMedia(tik::Fonttik& fonttik, fs::path path, tik::Configuration& config, bool async) 
 {
-	tik::Media* media = tik::Media::createMedia(path.string());
+	tik::Media* media = tik::Media::createMedia(path.string(), fonttik.colorblindFilters);
 	
 	if (media != nullptr) 
 	{
@@ -74,20 +74,13 @@ void processFolder(tik::Fonttik& fonttik, fs::path path, tik::Configuration& con
 }
 
 
-ushort median(cv::Mat m) {
-	auto b = m.begin<ushort>();
-	auto mi = b + (m.total() / 2);
-	auto e = m.end<ushort>();
-	std::nth_element(b, mi, e);
-	return *mi;
-}
-
-
 int main(int argc, char* argv[]) {
 	tik::Log::InitCoreLogger(true, false, 1, nullptr, "%^[%l] %v%$");
 	LOG_CORE_WARNING("Note: The results shown in this report are for informational purposes only, and should not be used as a certification or validation of compliance with any legal, regulatory or other requirements.");
 	
 	LOG_CORE_TRACE("Executing in {0}", std::filesystem::current_path().string());
+
+	std::cout << cv::getBuildInformation() << std::endl;
 
 	bool async = cmdOptionExists(argv, argv + argc, "-a");
 
@@ -138,7 +131,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	fonttik.init(&config);
-	
+
 	if (fs::exists(path) || path.string().rfind("http",0)==0/*begins with http*/ ) {
 
 		if (!fs::is_directory(path)) {

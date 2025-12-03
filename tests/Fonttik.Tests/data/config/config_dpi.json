@@ -59,8 +59,9 @@
       "x": 0.3,
       "y": 0.75
     },
-    "preferredBackend": "DEFAULT",
-    "preferredTarget": "CPU",
+    "preferredBackend": "CUDA",
+    "preferredTarget": "CUDA",
+
     "EAST": {
       "detectionModel": "frozen_east_text_detection.pb",
       "nmsThreshold": 0.4,

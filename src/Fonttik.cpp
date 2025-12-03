@@ -30,6 +30,8 @@ void Fonttik::init(Configuration* config)
 	//Create checkers
 	contrastChecker = new ContrastChecker(config);
 	sizeChecker = new SizeChecker(config, textBoxRecognition);
+
+	colorblindFilters = new ColorblindFilters(config);
 }
 
 std::pair<fs::path, fs::path> Fonttik::saveResults(Media& media, Results& results)
@@ -72,6 +74,18 @@ std::pair<fs::path, fs::path> Fonttik::saveResultsToJson(fs::path outputPath, Re
 					jResult["value"] = res.value;
 					jResult["text"] = res.text;
 
+					if (path.stem() == "contrastChecks" && !res.colorblindValues.empty())
+					{
+						jResult["protanValue"] = res.colorblindValues[0];
+						jResult["protanType"] = tik::ResultTypeAsString(res.colorblindTypes[0]);
+						jResult["deutanValue"] = res.colorblindValues[1];
+						jResult["deutanType"] = tik::ResultTypeAsString(res.colorblindTypes[1]);
+						jResult["tritanValue"] = res.colorblindValues[2];
+						jResult["tritanType"] = tik::ResultTypeAsString(res.colorblindTypes[2]);
+						jResult["grayscaleValue"] = res.colorblindValues[3];
+						jResult["grayscaleType"] = tik::ResultTypeAsString(res.colorblindTypes[3]);
+					}
+
 					jFrame["results"].push_back(jResult);
 				}
 
@@ -83,7 +97,7 @@ std::pair<fs::path, fs::path> Fonttik::saveResultsToJson(fs::path outputPath, Re
 
 	resultsToJSON(outputContrast, results.getContrastResults());
 	resultsToJSON(outputSize, results.getSizeResults());
-
+	
 	return { outputSize, outputContrast };
 }
 
@@ -117,16 +131,29 @@ AsyncResults tik::Fonttik::processMediaAsync(Media& media)
 	while (media.loadFrame()) 
 	{
 		Frame frame = media.getFrame();
-		std::pair<FrameResults, FrameResults> res = processFrame(frame,configuration->getAppSettings().sizeByLine);
-		FrameResult frameResult{ res.first, res.second, count++, frame.getTimeStamp()};
+		auto colorblindFrames = media.getColorblindFrames();
+		std::pair<FrameResults, FrameResults> res = processFrame(frame, colorblindFrames, configuration->getAppSettings().sizeByLine);
+		FrameResult frameResult{ res.first, res.second, count++, frame.getTimeStamp() };
 		while (!queue.try_push(frameResult)) {}; //Busy wait for results to be consumed
 		result.overAllPassSize = result.overAllPassSize && res.first.overallPass;
-		result.overAllPassContrast = result.overAllPassContrast && res.second.overallPass;
+		result.overAllResultSize = ResultTypeMerge(result.overAllResultSize, res.first.overallType);
+
+		result.overAllPassContrast   = result.overAllPassContrast && res.second.overallPass;
+		result.overAllResultContrast = ResultTypeMerge(result.overAllResultContrast, res.second.overallType);
+
+		for (int i = 0; i < 4; i++) {
+			result.overallPassColorblind[i] = result.overallPassColorblind[i] && res.second.overallColorblindPass[i];
+			result.overallResultColorblind[i] = ResultTypeMerge(result.overallResultColorblind[i], res.second.overallColorblindType[i]);
+		}
 	}
 	done = true;
 	t.join();
 	result.pathToSizeResult = media.getOutputPath() / fs::path{ std::string("sizeChecks") + media.getExtension() };
 	result.pathToContrastResult = media.getOutputPath() / fs::path{ std::string("contrastChecks") + media.getExtension() };
+	result.pathToProtanResult = media.getOutputPath() / fs::path{ std::string("protanImage") + media.getExtension() };
+	result.pathToDeutanResult = media.getOutputPath() / fs::path{ std::string("deutanImage") + media.getExtension() };
+	result.pathToTritanResult = media.getOutputPath() / fs::path{ std::string("tritanImage") + media.getExtension() };
+	result.pathToGrayscaleResult = media.getOutputPath() / fs::path{ std::string("grayscaleImage") + media.getExtension() };
 	result.pathToJSONSizeResult = media.getOutputPath() / fs::path{ std::string("sizeChecks.json") };
 	result.pathToJSONContrastResult = media.getOutputPath() / fs::path{ std::string("contrastChecks.json") };
 
@@ -136,14 +163,7 @@ AsyncResults tik::Fonttik::processMediaAsync(Media& media)
 
 Results Fonttik::processMedia(Media& media)
 {
-	
-	/*	
-	int activeSize = appSettings->getSpecifiedSize();
-	guideline->setDPI(appSettings->usingDPI());
-	guideline->setActiveGuideline((activeSize != 0) ? activeSize : nextFrame->getImageMatrix().rows);*/
-
-	if (!setResolutionGuideline(media))
-	{
+	if (!setResolutionGuideline(media)){
 		return {};
 	}
 
@@ -151,10 +171,11 @@ Results Fonttik::processMedia(Media& media)
 	media.calculateMask(configuration->getMaskParams());
 	media.setAnalysisWaitSeconds(configuration->getAppSettings().analysisWaitSeconds);
 
-	while (media.loadFrame())
-	{
+	while (media.loadFrame()){
 		auto frame = media.getFrame();
-		std::pair<FrameResults, FrameResults> res = processFrame(frame, configuration->getAppSettings().sizeByLine);
+		auto colorblindFrames = media.getColorblindFrames();
+		std::pair<FrameResults, FrameResults> res = processFrame(frame, colorblindFrames, configuration->getAppSettings().sizeByLine);
+		
 		results.addSizeResults(res.first);
 		results.addContrastResults(res.second);
 	}
@@ -165,7 +186,22 @@ Results Fonttik::processMedia(Media& media)
 	return results;
 }
 
-std::pair<FrameResults, FrameResults> Fonttik::processFrame(Frame& frame, bool sizeByLine)
+std::vector< std::vector<tik::TextBox>> Fonttik::createColorblindTextBoxes(std::vector<Frame> colorblindFrames, std::vector<tik::TextBox> words) {
+	std::vector< std::vector<tik::TextBox>> colorblindWords;
+	for (auto tb : words) {
+		std::vector<tik::TextBox> colorblindTypeWords;
+		for (auto frame : colorblindFrames) {
+			colorblindTypeWords.push_back(TextBox(tb.getTextBoxRect(), frame.getFrameMat()));
+		}
+		calculateTextBoxLuminance(colorblindTypeWords);
+		calculateTextMasks(colorblindTypeWords);
+		colorblindWords.push_back(colorblindTypeWords);
+	}
+
+	return colorblindWords;
+}
+
+std::pair<FrameResults, FrameResults> Fonttik::processFrame(Frame& frame, std::vector<Frame> colorblindFrames, bool sizeByLine)
 {
 	//TODO:: Add condition on whether we are grouping by line or not for text size
 	std::vector<tik::TextBox> words;
@@ -201,10 +237,15 @@ std::pair<FrameResults, FrameResults> Fonttik::processFrame(Frame& frame, bool s
 	calculateTextMasks(words);
 	calculateTextMasks(lines);
 
-	contrastResults = contrastChecker->check(frame.getFrameIndex(), words);
+	std::vector< std::vector<tik::TextBox>> colorblindWords = {};
+	if (!colorblindFrames.empty()) {
+		colorblindWords = createColorblindTextBoxes(colorblindFrames, words);
+	}
+
+	contrastResults = contrastChecker->check(frame.getFrameIndex(), words, colorblindWords);
 	sizeResults = sizeChecker->check(frame.getFrameIndex(), lines);
 
-	setTextInContrastResults(sizeResults,contrastResults);
+	setTextInContrastResults(sizeResults, contrastResults);
 
 	return { sizeResults, contrastResults };
 }
@@ -304,6 +345,10 @@ Fonttik::~Fonttik()
 		delete sizeChecker;
 	}
 
+	if (colorblindFilters != nullptr)
+	{
+		delete colorblindFilters;
+	}
 }
 
 } //namescape tik

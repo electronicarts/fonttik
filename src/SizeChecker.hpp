@@ -17,6 +17,7 @@ public:
 	virtual ~SizeChecker() { textboxRecognition = nullptr; }
 
 	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& textBoxes) override;
+	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& textBoxes, std::vector<std::vector<TextBox>> colorblindBoxes) { return FrameResults(frameIndex); };
 
 protected:
 	bool textBoxSizeCheck(TextBox& textBox, FrameResults& results);

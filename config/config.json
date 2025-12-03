@@ -71,8 +71,8 @@
       "x": 0.3,
       "y": 0.75
     },
-    "preferredBackend": "CUDA",
-    "preferredTarget": "CUDA",
+    "preferredBackend": "default",
+    "preferredTarget": "default",
     "DB_EAST": {
       "detectionModel": "frozen_east_text_detection.pb",
       "nmsThreshold": 0.4,
@@ -126,6 +126,33 @@
         "height": 30
       }
     }
+  },
+  "colorblindness": {
+        "linearRGBToXYZJuddVosMatrix": [
+            [ 40.9568, 35.5041, 17.9167 ],
+            [ 21.3389, 70.6743, 7.98680 ],
+            [ 1.86297, 11.4620, 91.2367 ]
+        ],
+        "XYZJuddVosToLMSMatrix": [
+            [ 0.15514, 0.54312, -0.03286 ],
+            [ -0.15514, 0.45684, 0.03286 ],
+            [ 0.00000, 0.00000, 0.01608 ]
+        ],
+        "LMSToLinearRGBMatrix": [
+            [ 0.080944, -0.130504, 0.116721 ],
+            [ -0.0102485, 0.0540194, -0.113615 ],
+            [ -0.000365294, -0.00412163, 0.693513 ]
+        ],
+        "protanProjectionMatrix": [
+            [ 0.00000, 2.02344, -2.52581 ],
+            [ 0.00000, 1.00000, 0.00000 ],
+            [ 0.00000, 0.00000, 1.00000 ]
+        ],
+        "deutanProjectionMatrix": [
+            [ 1.00000, 0.00000, 0.00000 ],
+            [ 0.494207, 0.00000, 1.24827 ],
+            [ 0.00000, 0.00000, 1.00000 ]
+        ]
   },
   "sRGBLinearizationValues": [
     0,

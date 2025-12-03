@@ -4,9 +4,13 @@ project(Fonttik.Tests)
 set(SOURCE_FILES 
 	configuration_tests.cpp
 	contrast_tests.cpp
+	Fonttik_tests.cpp
+	image_tests.cpp
+#	luminance_tests.cpp #--Temporary disabled luminance tests
 	size_tests.cpp
-	
+	textbox_merging_tests.cpp
 	video_tests.cpp
+	colorblindness_tests.cpp
 )
 
 # Dependencies

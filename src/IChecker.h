@@ -17,6 +17,7 @@ public:
 	virtual ~IChecker() { }
 
 	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& boxes) = 0;
+	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& boxes, std::vector<std::vector<TextBox>> colorblindBoxes) = 0;
 
 protected:
 

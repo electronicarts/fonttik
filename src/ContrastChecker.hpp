@@ -14,10 +14,11 @@ public:
 
 	virtual ~ContrastChecker() {}
 
-	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& textBoxes);
+	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& textBoxes) { return FrameResults(frameIndex); };
+	virtual FrameResults check(const int& frameIndex, std::vector<TextBox>& textBoxes, std::vector<std::vector<TextBox>> colorblindBoxes) override;
 
 protected:
-	bool textboxContrastCheck(TextBox& textbox, FrameResults& results);
+	std::pair<tik::ResultType, double> textboxContrastCheck(TextBox& textBox, cv::Mat textMask, cv::Mat outlineMask);
 
 	//Operator method
 	//Calculates the contrast ratio of two given regions of a luminance matrix

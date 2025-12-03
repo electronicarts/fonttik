@@ -5,6 +5,7 @@
 #include <opencv2/imgproc.hpp>
 #include "Results.h"
 #include "fonttik/Frame.hpp"
+#include "../src/ColorblindFilters.hpp"
 
 #include <rigtorp/SPSCQueue.h>
 #include <vector>
@@ -42,7 +43,7 @@ public:
 
 	//Factory Method that creates a video or an image depending on the file
 	//returns nullptr in case of invalid file
-	static Media* createMedia(std::string mediaSource);
+	static Media* createMedia(std::string mediaSource, ColorblindFilters* colorblindFilters=nullptr);
 
 	virtual void calculateMask(const MaskParams& maskParams);
 
@@ -56,6 +57,7 @@ public:
 	/// Returns the current loaded frame pending to be analysed
 	/// </summary>
 	virtual Frame getFrame() = 0;
+	virtual std::vector<Frame> getColorblindFrames() = 0;
 
 	fs::path getPath() {
 		return fs::path{mediaSource};

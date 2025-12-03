@@ -172,12 +172,6 @@
       "inherits": "core-build"
     },
     {
-      "name": "code-coverage",
-      "configurePreset": "linux-debug",
-      "inherits": "core-build",
-      "targets": "coverage"
-    },
-    {
       "name": "linux-release",
       "configurePreset": "linux-release",
       "inherits": "core-build"

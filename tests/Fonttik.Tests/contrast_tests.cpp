@@ -34,6 +34,15 @@ namespace tik {
 		ASSERT_TRUE(checkContrast(path));
 	}
 
+	/*TEST_F(ContrastRatioChecks, PassingContrastGradient) {
+		std::string path = "config/Contrasts/gradientPass.png";
+		ASSERT_TRUE(checkContrast(path));
+	}*/
+
+	/*TEST_F(ContrastRatioChecks, PassingContrastStripes) {
+		std::string path = "config/Contrasts/stripesPass.png";
+		ASSERT_TRUE(checkContrast(path));
+	}*/
 
 	TEST_F(ContrastRatioChecks, FailingContrastFlat) {
 		std::string path = "config/Contrasts/flatFail.png";

@@ -10,7 +10,7 @@ namespace tik
 class Image : public Media
 {
 public:
-	Image(std::string mediaSource, cv::Mat img);
+	Image(std::string mediaSource, cv::Mat img, ColorblindFilters* colorblindFilters);
 	virtual ~Image() = default;
 
 
@@ -24,6 +24,7 @@ public:
 	/// Return Frame object with the loaded image mat
 	/// </summary>
 	virtual Frame getFrame() override;
+	virtual std::vector<Frame> getColorblindFrames() override;
 
 	std::pair<fs::path, fs::path>saveResultsOutlines(const SaveResultProperties& sizeResultProperties, 
 		const SaveResultProperties& contrastResultProperties) override;
@@ -39,10 +40,12 @@ private:
 	fs::path saveResultsOutlines(const std::vector<FrameResults>& results, fs::path path, 
 		const std::vector<cv::Scalar>& colors, bool saveNumbers);
 
+	void storeResultsInJSON(const std::vector<ResultBox>& res, int id, std::ofstream& out, bool contrast=false);
 
-	void storeResultsInJSON(const std::vector<ResultBox>& res, int id, std::ofstream& out);
+	void saveColorblindImages();
 
 	Frame frame;
+	Frame protanFrame, deutanFrame, tritanFrame, grayscaleFrame;
 	bool processed;
 	
 	

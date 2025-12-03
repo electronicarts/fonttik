@@ -58,6 +58,8 @@ When running Fonttik the following optional arguments can be passed to alter the
 
 - `-c`: Specify configuration file. Given a path to a specific configuration file uses that one during this execution. By default Fonttik looks for config.json in its own folder.
 - `-a`: Store results as the analysis runs asynchronously 
+## Notes on Colorblindness simulation filters
+Fonttik now includes colorblindness filters that simulate how text may appear to users with a color vision deficiency. The filters support simulation of the three main types of color vision deficiency; Protanopia (red cone deficiency), Deuteranopia (green cone deficiency), Tritanopia (blue cone deficiency), in addition to a Grayscale filter. These filters are integrated into the image analysis process by default, but are not available for video analysis. Fonttik processes each image through each filter to generate contrast results for each filter type, showing the detected text boxes overlaid on the simulated versions of the original image. The colorblindness simulation is only applied to the contrast checks.
 
 ## Configuration
 
@@ -123,3 +125,9 @@ Fonttik utilizes open source software, see [NOTICE](./NOTICE.txt) licenses and d
 ## CONTRIBUTING
 
 Before you can contribute, EA must have a Contributor License Agreement (CLA) on file that has been signed by each contributor. You can sign here: [CLA](https://electronicarts.na1.echosign.com/public/esignWidget?wid=CBFCIBAA3AAABLblqZhByHRvZqmltGtliuExmuV-WNzlaJGPhbSRg2ufuPsM3P0QmILZjLpkGslg24-UJtek*)
+
+## Special thanks
+#### To the interns that have worked on this project:
+- Adrian Alvarez Bernabe
+- Esteban Restrepo Gutierrez
+- Paula Antequera Hernandez
